@@ -1,0 +1,228 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<vra xmlns="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+
+        <work id="w_0000001GHU" xml:lang="ar">
+        <!--<agentSet>
+            <agent></agent>
+        </agentSet>-->
+        <culturalContextSet>
+            <culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</culturalContext>
+        </culturalContextSet>
+        <!--<dateSet>
+            <date></date>
+        </dateSet>-->
+        <descriptionSet>
+            <display>تتدفق قناة الري الفلج (الجمع. أفلاج) بشكل متعرّج على طول حديقة مغطّاة بمزروعات النخيل والتمر على طول المنحدر الصخري.
+                ويُعتبر هذا الجزء من قناة الفلج في وادي غول أعلى وادٍ في عُمان، وقد تم إنشاءه ضمن الصخور الجبلية.
+                ويشكّل البناء هيكل مرتبط بالأرض مما يساهم في تشكيل واحدة من العديد من التراسات والتي تشكّلت الواحة ضمنها
+                بالإضافة إلى العديد من المستوطنات الجبلية الأخرى في الروافد العليا من سلاسل الجبل الأخضر.
+            </display>
+            <description source="Bandyopadhyay, Soumyen, https://orcid.org/0000-0003-3231-9166">
+                تتدفق قناة الري الفلج (الجمع. أفلاج) بشكل متعرّج على طول حديقة مغطّاة بمزروعات النخيل والتمر على طول المنحدر الصخري.
+                ويُعتبر هذا الجزء من قناة الفلج في وادي غول أعلى وادٍ في عُمان، وقد تم إنشاءه ضمن الصخور الجبلية.
+                ويشكّل البناء هيكل مرتبط بالأرض مما يساهم في تشكيل واحدة من العديد من التراسات والتي تشكّلت الواحة ضمنها
+                بالإضافة إلى العديد من المستوطنات الجبلية الأخرى في الروافد العليا من سلاسل الجبل الأخضر.
+            </description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+            <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+             <display>غول (عُمان)</display>
+            <location type="site">
+                <name type="geographic" vocab="VIAF" refid="137147093748525002537" href="http://viaf.org/viaf/137147093748525002537">غول</name>
+                <name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">">سلطنة عمان</name>
+            </location>
+            <location type="other">
+                <name type="geographic" refid="23.145069, 57.210217" vocab="GNS">غول</name></location>
+        </locationSet>
+        <materialSet>
+            <display>صخر؛ صاروج أو إكساءإسمنت</display>
+            <material type="other" refid="300011692" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300011692">صخر (مادة غير عضوية)</material>
+            <material type="other" refid="300010362" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300010362">إسمنت (مادة بناء)</material>
+            <material type="other" vocab="other">صاروج</material>
+        </materialSet>
+        <!--<measurementsSet>
+            <measurements></measurements>
+        </measurementsSet>-->
+        <!--<relationSet>
+            <relation></relation>
+        </relationSet>-->
+        <!--<rightsSet>
+            <rights></rights>
+        </rightsSet>-->
+        <!--<sourceSet>
+            <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <stylePeriodSet>
+            <display>عُماني شعبي</display>
+            <stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</stylePeriod>
+            <stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</stylePeriod>
+        </stylePeriodSet>
+        <subjectSet>
+            <display>فلج؛ نظام ري؛ واحة؛ وادي</display>
+            <subject>
+                <term type="descriptiveTopic" refid="300006167" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300006167">فلج</term>
+                <term type="descriptiveTopic" refid="300055262" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300055262">أنظمة الري</term>
+                <term type="descriptiveTopic" refid="300008686" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300008686">واحة</term>
+                <term type="descriptiveTopic" refid="300379998" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300379998">وادي</term>
+            </subject>
+        </subjectSet>
+        <techniqueSet>
+            <display>منحوت في الصخر؛ صاروج أو إكساءإسمنت</display>
+            <technique vocab="other">صاروج</technique>
+            <technique refid="300010362" vocab="AAT" href="http://vocab.getty.edu/page/aat/300010362">إسمنت (مادة بناء)</technique>
+            <technique refid="300379688" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379688">طلاء (تغطية)</technique>
+            <technique refid="300011692" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011692">صخر (مادة غير عضوية)</technique>
+            <technique refid="300053149" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053149">نحت (عمليات)</technique>
+        </techniqueSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <titleSet>
+            <display>فلج في غول، عُمان.</display>
+            <title type="descriptive">فلج في غول، عُمان.</title>
+            <title type="translated">Falaj in Ghul, Oman.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>نظام ري</display>
+            <worktype refid="300055262" vocab="AAT" href="http://vocab.getty.edu/page/aat/300055262">أنظمة الري</worktype>
+        </worktypeSet>
+    </work>
+
+
+
+
+
+
+
+    <image id="i_0000001KUN" xml:lang="ar">
+        <agentSet>
+            <display>تم إنشاؤها من قبل مانفريد كونتر؛ جزء من مستودع أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)</display>
+            <agent>
+                <name type="personal" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">كونتر، مانفريد</name>
+                <culture>ألماني</culture>
+                <dates type="activity">
+                    <earliestDate circa="true">1957</earliestDate>
+                    <latestDate circa="true">1997</latestDate>
+                </dates>
+                <role vocab="AAT" refid="300025583" href="http://vocab.getty.edu/page/aat/300025583">علماء الأنثروبولوجيا</role>
+                <role>مؤلف</role>
+                <role>مالك سابق</role>
+            </agent>
+            <agent>
+                <name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</name>
+                <role>مستودع</role>
+                <role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</role>
+            </agent>
+        </agentSet>
+        <!--<culturalContextSet>
+            <culturalContext></culturalContext>
+        </culturalContextSet>-->
+        <dateSet><!--date source based on inscription by Manfred Kunter-->
+            <display>تم إنشاؤها 1997</display>
+            <date source="Kunter, Manfred" type="creation">
+                <earliestDate>1997</earliestDate>
+                <latestDate>1997</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet><!--description source based on field notes provided by Manfred Kunter-->
+            <display>منظر لقسم من الفلج وأشجار النخيل في الخلفية في واحة غول، عُمان.
+                يشق هذا الجزء من الفلج طريقه في الصخرة الجبلية لوادي غول، أعلى وادي في عُمان، وقد تم إكساءة بالإسمنت.
+                غالباً، يحل الإسمنت الرملي المعاصر محل الصاروج الأصلي، وهو مادة هيدروليكية تقليدية تساعد على التماسك  مصنوعة من الطين المكلس والجير،
+                والتي كانت تستخدم في بناء قنوات الري بسبب خصائصها البوزولانية وعازليتها للماء.
+            </display>
+            <description source="Kunter, Manfred">منظر لقسم من الفلج وأشجار النخيل في الخلفية في واحة غول، عُمان.
+                يشق هذا الجزء من الفلج طريقه في الصخرة الجبلية لوادي غول، أعلى وادي في عُمان، وقد تم إكساءة بالإسمنت.
+                غالباً، يحل الإسمنت الرملي المعاصر محل الصاروج الأصلي، وهو مادة هيدروليكية تقليدية تساعد على التماسك  مصنوعة من الطين المكلس والجير،
+                والتي كانت تستخدم في بناء قنوات الري بسبب خصائصها البوزولانية وعازليتها للماء.
+            </description>
+        </descriptionSet>
+        <inscriptionSet>
+            <display>مكتوب على إطار الشريحة، Jebel Akhdar Oman 1997 Ghul, Falaj</display>
+            <inscription>
+                <author refid="73868808" vocab="VIAF" href="https://viaf.org/viaf/73868808">كونتر، مانفريد</author>
+                <position>على إطار الشريحة، مكتوب</position>
+                <text type="text" xml:lang="en">Jebel Akhdar Oman 1997 Ghul, Falaj</text>
+            </inscription>
+        </inscriptionSet>
+        <locationSet>
+            <display>تم إنشاؤها في غول (عُمان)</display>
+            <location type="creation">
+                <name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">">سلطنة عمان</name>
+                <name type="geographic" vocab="VIAF" refid="137147093748525002537" href="http://viaf.org/viaf/137147093748525002537">غول</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>فلم فوتوغرافي؛ 35 ملم شريحة ملونة</display>
+            <material refid="300014638" type="medium" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300014638">فلم فوتوغرافي (مواد التصوير)</material>
+            <material refid="300128366" type="support" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300128366">شرائح ملونة</material>
+            <material refid="300263816" type="medium" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300263816">35 ملم (قياس الفلم الفوتوغرافي)</material>
+        </materialSet>
+         <measurementsSet>
+            <display>6600 px(W) x 4329 px(H) أبعاد الصورة الرقمية</display>
+            <measurements type="width" unit="px">6600</measurements>
+            <measurements type="height" unit="px">4329</measurements>
+        </measurementsSet>
+        <relationSet>
+            <display>من مجموعة مانفريد كونتر. صورة لفلج في غول.</display>
+            <relation relids="w_0000001GHU" type="imageOf">فلج في غول، عُمان.</relation>
+            <relation refid="c_0000000KUN" type="partOf">مجموعة مانفريد كونتر.</relation>
+        </relationSet>
+        <rightsSet>
+             <display>© مانفريد كونتر. CC BY 4.0</display>
+            <notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </notes>
+            <rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+                <rightsHolder>مانفريد كونتر</rightsHolder>
+                <text>© مانفريد كونتر. CC BY 4.0</text>
+            </rights>
+        </rightsSet>
+        <sourceSet>
+             <display>كونتر، مانفريد</display>
+            <source>
+                <name type="donor" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">مانفريد كونتر</name>
+            </source>
+        </sourceSet>
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <!--<stylePeriodSet>
+            <stylePeriod></stylePeriod>
+        </stylePeriodSet>-->
+        <!--<subjectPeriodSet>
+            <subject></subject>
+        </subjectSet>-->
+        <techniqueSet>
+            <display>تصوير ملون؛ شفافية ملونة</display>
+            <technique refid="300134530" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134530">تصوير ملون</technique>
+            <technique refid="300128364" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128364">شفافيات ملونة</technique>
+        </techniqueSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <titleSet>
+            <display>صورة لفلج وواحة في غول، عُمان.</display>
+            <title type="generalView">صورة لفلج وواحة في غول، عُمان.</title>
+            <title type="generalView">Photograph of falaj and oasis in Ghul, Oman.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>شفافية ملونة</display>
+            <worktype vocab="AAT" refid="300128364" href="http://vocab.getty.edu/page/aat/300128364">شفافيات ملونة</worktype>
+        </worktypeSet>
+    </image>
+</vra>

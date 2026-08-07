@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<vra xmlns="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+
+    <work id="w_001SET_MIR" xml:lang="ar">
+        <!--<agentSet>
+            <agent></agent>
+        </agentSet>-->
+        <culturalContextSet>
+            <culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</culturalContext>
+        </culturalContextSet>
+        <!--<dateSet>
+        <date></date>
+        </dateSet>-->
+        <descriptionSet>
+            <display>كان لميناء مرباط والواقع بالقرب من صلالة في محافظة ظُفَار أهمية جيدة في الفترة المبكّرة من العصور الوسطى،
+                حيث كان ميناءً للتجارة مع الهند والعديد من الموانئ الأخرى في منطقة غرب المحيط الهندي. ومع ذلك فقد انحسرت أهميته في أوائل القرن العشرين ليكون قرية صيد صغيرة.
+                وقد تم تشكيل المستوطنات المتشعبة - على غرار العديد من المستوطنات الساحلية في منطقة الباطنة - حول خليج
+                ضحل مع مساكن إلى الغرب من تفرّع الوادي الصغير ومسجد الجمعة وتجمع السوق والمنطقة المعروفة باسم قلعة مرباط خارج الضفة الشرقية للوادي وعلى مقربة من البحر.
+                حيث يكون العدد الكبير من المساكن إما قائم بذاته أو متصل بمساكن أخرى ولكل منها فناء داخلي خاص بها.
+                إن نموذج مسكن مرباط مميّز ومختلف عن الأمثلة الساحلية في الباطنة (على سبيل المثال، في سوهار)، حيث توجد مساحة مفتوحة كبيرة غالبًا ما تكون محاطة بسور واسع.
+            </display>
+            <description
+                    source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Mirbat, Dhofar Governorate, Liverpool: University of Liverpool, 2017">
+                كان لميناء مرباط والواقع بالقرب من صلالة في محافظة ظُفَار أهمية جيدة في الفترة المبكّرة من العصور الوسطى،
+                حيث كان ميناءً للتجارة مع الهند والعديد من الموانئ الأخرى في منطقة غرب المحيط الهندي. ومع ذلك فقد انحسرت أهميته في أوائل القرن العشرين ليكون قرية صيد صغيرة.
+                وقد تم تشكيل المستوطنات المتشعبة - على غرار العديد من المستوطنات الساحلية في منطقة الباطنة - حول خليج
+                ضحل مع مساكن إلى الغرب من تفرّع الوادي الصغير ومسجد الجمعة وتجمع السوق والمنطقة المعروفة باسم قلعة مرباط خارج الضفة الشرقية للوادي وعلى مقربة من البحر.
+                حيث يكون العدد الكبير من المساكن إما قائم بذاته أو متصل بمساكن أخرى ولكل منها فناء داخلي خاص بها.
+                إن نموذج مسكن مرباط مميّز ومختلف عن الأمثلة الساحلية في الباطنة (على سبيل المثال، في سوهار)، حيث توجد مساحة مفتوحة كبيرة غالبًا ما تكون محاطة بسور واسع.
+            </description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+         <inscription></inscription>
+         </inscriptionSet>-->
+        <locationSet>
+          <display>مرباط (محافظة ظفار، عُمان)</display>
+            <location type="site">
+                <name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">مرباط (عُمان)</name>
+                <name type="geographic" vocab="GNS" refid="374691">ظفار</name>
+                <name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">سلطنة عمان</name>
+            </location>
+            <location type="other">
+                <name type="geographic" refid="16.984721, 54.691469" vocab="GNS">مرباط</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>حجر كلسي مرجاني؛ بناء خشبي؛ إكساء صاروج</display>
+            <material type="other" refid="300011291" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300011291">حجر كلسي مرجاني</material>
+            <material type="other" refid="300012827" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300012827">عارضة (من الخشب)</material>
+            <material type="other" vocab="other">صاروج</material>
+        </materialSet>
+        <!--<measurementsSet>
+            <measurements></measurements>
+        </measurementsSet>-->
+        <!--<relationSet>
+            <relation></relation>
+        </relationSet>-->
+        <!--<rightsSet>
+            <rights></rights>
+        </rightsSet>-->
+        <!--<sourceSet>
+            <source></source>
+         </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <stylePeriodSet>
+            <display>عُماني شعبي بدايةالعصر الإسلامي</display>
+            <stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</stylePeriod>
+            <stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483"> عُماني</stylePeriod>
+            <stylePeriod refid="300419282" vocab="AAT" href="http://vocab.getty.edu/page/aat/300419282">بداية العصر الإسلامي</stylePeriod>
+        </stylePeriodSet>
+        <subjectSet>
+            <display>مستوطنة ساحلية</display>
+            <subject>
+                <term type="descriptiveTopic" refid="300387314" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387314">مستوطنات ساحلية</term>
+            </subject>
+        </subjectSet>
+        <techniqueSet>
+            <display>بناء حجر؛ هيكل خشبي</display>
+            <technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">البناء من حجر</technique>
+            <technique refid="300012822" vocab="AAT" href="http://vocab.getty.edu/page/aat/300012822">هيكل خشبي</technique>
+        </techniqueSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <titleSet>
+            <display>مستوطنة مرباط، عُمان.</display>
+            <title type="descriptive">مستوطنة مرباط، عُمان.</title>
+            <title type="translated">Mirbāṭ settlement, Oman.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>مستوطنة ساحلية</display>
+            <worktype refid="300387314" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387314">مستوطنات ساحلية</worktype>
+        </worktypeSet>
+    </work>
+
+
+
+
+
+
+
+
+
+
+
+    <image id="i_00001ArMIR" xml:lang="ar">
+        <agentSet>
+            <display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</display>
+            <agent>
+                <name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</name>
+                <culture>الإنكليزية</culture>
+                <dates type="activity">
+                    <earliestDate>2012</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role>مؤلف</role>
+                <role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</role>
+                <attribution>جامعة ليفربول. كلية الهندسة المعمارية</attribution>
+            </agent>
+            <agent>
+                <name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</name>
+                <culture>عُماني</culture>
+                <dates type="activity">
+                    <earliestDate>1976</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</role>
+            </agent>
+        </agentSet>
+        <!--<culturalContextSet>
+            <culturalContext></culturalContext>
+        </culturalContextSet>-->
+        <dateSet>
+            <display>تم إنشاؤها 2015</display>
+            <date type="creation">
+                <earliestDate>2015</earliestDate>
+                <latestDate>2015</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet>
+            <display>صورة جوية بواسطة طائرة صغيرة بدون طيار لمستوطنة مرباط الساحلية، عُمان.</display>
+            <description>صورة جوية بواسطة الطائرة الصغيرة بدون طيار لمستوطنة مرباط الساحلية، عُمان.</description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+             <inscription></inscription>
+             </inscriptionSet>-->
+        <locationSet>
+            <display> مرباط (محافظة ظفار ،عُمان)</display>
+            <location type="creation">
+                <name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">مرباط (عُمان)</name>
+                <name type="geographic" vocab="GNS" refid="374691">ظفار</name>
+                <name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">">سلطنة عمان</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>لقطة فلم</display>
+            <material refid="300134997" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134997">لقطات فلم</material>
+        </materialSet>
+        <measurementsSet>
+            <display>أبعاد الصورة الرقمية 4000 (px(W) x 3000 px(H </display>
+            <measurements type="width" unit="px">4000</measurements>
+            <measurements type="height" unit="px">3000</measurements>
+        </measurementsSet>
+        <relationSet>
+            <display>من مجموعة أركيام: مرباط. صورة لمستوطنة مرباط، عُمان.</display>
+            <relation relids="w_00001MIR" type="imageOf">مستوطنة مرباط، عُمان.></relation>
+            <relation refid="c_00000Ar_MIR" type="partOf">مجموعة أركيام: مرباط.</relation>
+        </relationSet>
+        <rightsSet>
+            <display>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</display>
+            <notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                   والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG</notes>
+            <rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+                <rightsHolder>وزارة التراث والثقافة في سلطنة عُمان</rightsHolder>
+                <text>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</text>
+            </rights>
+        </rightsSet>
+        <sourceSet>
+            <display>بانديوبادايا، شومان وآخرون، مخطط التوثيق وإدارة التراث والتطوير: مرباط ، محافظة ظُفَار ، ليفربول، جامعة ليفربول 2017</display>
+            <source>
+                <name type="other">بانديوبادايا، شومان وآخرون، مخطط التوثيق وإدارة التراث والتطوير: مرباط ، محافظة ظُفَار ، ليفربول، جامعة ليفربول 2017</name>
+                <refid type="openURL">https://issuu.com/archiam/docs/20170908_hmp_mirbat</refid>
+            </source>
+        </sourceSet>
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <!--<stylePeriodSet>
+            <stylePeriod></stylePeriod>
+        </stylePeriodSet>-->
+        <!--<subjectPeriodSet>
+            <subject></subject>
+        </subjectSet>-->
+        <techniqueSet>
+            <display>تصوير جوي بواسطة طائرة صغيرة بدون طيار؛ تصوير ملون</display>
+            <technique/>
+            <technique refid="300053443" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053443">تصوير جوي</technique>
+            <technique refid="300374932" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374932">طائرة صغيرة بدون طيار</technique>
+            <technique refid="300134530" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134530">تصوير ملون</technique>
+        </techniqueSet>
+        <titleSet>
+            <display>صورة جوية لمستوطنة مرباط، عُمان.</display>
+            <title type="partialView">صورة جوية لمستوطنة مرباط، عُمان.</title>
+            <title type="partialView">Aerial photograph of Mirbāṭ settlement, Oman.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>صورة جوية</display>
+            <worktype refid="300128222" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128222">صور جوية</worktype>
+        </worktypeSet>
+    </image>
+</vra>

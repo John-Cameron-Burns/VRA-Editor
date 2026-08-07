@@ -1,0 +1,215 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<vra xmlns="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+
+
+    <work id="w_0000001MUD" xml:lang="en">
+        <!-- <agentSet>
+            <agent></agent>
+        </agentSet>-->
+        <culturalContextSet>
+            <culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</culturalContext>
+        </culturalContextSet>
+        <dateSet>
+            <display>Created 1835-1865</display>
+            <date type="creation" source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014">
+                <earliestDate>1835</earliestDate>
+                <latestDate>1865</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet>
+             <display>The grandest of the houses in Mudayrib is Bayt Sa’īd b. Muhammad al Tashash al Maharmi, located
+                 on the southern end of the sūq and overlooking the palm groves.Its construction date is likely datable to the middle of the nineteenth century.
+                 The building remains uninhabited since the mid-1970s and its current state of preservation is precarious.
+                 A number of uncoordinated rebuildings and repairs have been carried out in cement and concrete blocks only barely keeping the main structure from collapsing.
+                 From the outside the structure resembles a solid block of mixed masonry with three small towers on the corners of the roof.
+                 The south-eastern corner is occupied by a round tower integrated into the fabric of the structure.
+                 The apparent plain solidity of the structure comes also from the almost complete lack of windows, with the exception of a few ventilation slots placed
+                 high on the first floor level and a few gun-loops for defence. The interior of the ground floor is very dark and it received nearly no natural light
+                 from either windows of the courtyard. It was used primarily for storage, stabling of animals as well as a slave prison.
+                 It also housed a well which would have been used regularly but provided extra subsistence in times of drought, strife or when the house was under siege.
+             </display>
+             <description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014">
+                 The grandest of the houses in Mudayrib is Bayt Sa’īd b. Muhammad al Tashash al Maharmi, located
+                 on the southern end of the sūq and overlooking the palm groves.Its construction date is likely datable to the middle of the nineteenth century.
+                 The building remains uninhabited since the mid-1970s and its current state of preservation is precarious.
+                 A number of uncoordinated rebuildings and repairs have been carried out in cement and concrete blocks only barely keeping the main structure from collapsing.
+                 From the outside the structure resembles a solid block of mixed masonry with three small towers on the corners of the roof.
+                 The south-eastern corner is occupied by a round tower integrated into the fabric of the structure.
+                 The apparent plain solidity of the structure comes also from the almost complete lack of windows, with the exception of a few ventilation slots placed
+                 high on the first floor level and a few gun-loops for defence. The interior of the ground floor is very dark and it received nearly no natural light
+                 from either windows of the courtyard. It was used primarily for storage, stabling of animals as well as a slave prison.
+                 It also housed a well which would have been used regularly but provided extra subsistence in times of drought, strife or when the house was under siege.
+             </description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+             <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+            <display>Mudayrib (Oman)</display>
+            <location type="site">
+                  <name type="geographic" vocab="VIAF" refid="102153651688355781260" href="http://viaf.org/viaf/102153651688355781260">Mudayrib (Oman)</name>
+                 <name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</name>
+            </location>
+            <location type="other">
+                 <name type="geographic" refid="22.613447, 58.667656" vocab="GNS">Mudayrib</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>stone; adobe bricks; sarūj render</display>
+            <material type="other" refid="300081138" vocab="AAT" href="http://vocab.getty.edu/page/aat/300081138">adobe (material)</material>
+            <material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">building stone</material>
+            <material type="other" vocab="other">sarūj</material>
+        </materialSet>
+        <!--<measurementsSet>
+            <measurements></measurements>
+        </measurementsSet>-->
+        <relationSet>
+            <display>From Mudayrib settlement, Oman.</display>
+            <relation refid="w_001SET_MUD" type="partOf">Mudayrib settlement, Oman.</relation>
+        </relationSet>
+        <!--<rightsSet>
+            <rights></rights>
+        </rightsSet>-->
+        <!--<sourceSet>
+            <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <stylePeriodSet>
+            <display>Omani vernacular</display>
+            <stylePeriod/>
+            <stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</stylePeriod>
+            <stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</stylePeriod>
+        </stylePeriodSet>
+        <subjectSet>
+            <display>dwelling; earthen architecture</display>
+            <subject>
+                <term refid="300005425" type="descriptiveTopic" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300005425">dwellings</term>
+                <term type="descriptiveTopic" refid="300379486" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300379486">earthen architecture</term>
+            </subject>
+        </subjectSet>
+        <techniqueSet>
+            <display>stone masonry; earth construction</display>
+            <technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">stonemasonry</technique>
+            <technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">earth construction</technique>
+        </techniqueSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <titleSet>
+            <display>Dwelling in Mudayrib, Oman.</display>
+            <title type="descriptive">Dwelling in Mudayrib, Oman.</title>
+            <title type="translated">مسكن في المضيرب، عُمان</title>
+        </titleSet>
+        <worktypeSet>
+            <display>dwelling</display>
+            <worktype refid="300005425" vocab="AAT" href="http://vocab.getty.edu/page/aat/300005425">dwellings</worktype>
+        </worktypeSet>
+    </work>
+
+
+
+
+    <image id="i_00001ArMUD" xml:lang="en">
+        <agentSet>
+            <display>Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman</display>
+            <agent>
+                <name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</name>
+                <culture>English</culture>
+                <dates type="activity">
+                    <earliestDate>2012</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role>creator</role>
+                <role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</role>
+                <attribution>University of Liverpool. School of Architecture</attribution>
+            </agent>
+            <agent>
+                <name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</name>
+                <culture>Omani</culture>
+                <dates type="activity">
+                    <earliestDate>1976</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</role>
+            </agent>
+        </agentSet>
+        <!--<culturalContextSet>
+            <culturalContext></culturalContext>
+        </culturalContextSet>-->
+        <dateSet>
+            <display>Created 2016</display>
+            <date type="creation">
+                <earliestDate>2016</earliestDate>
+                <latestDate>2016</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet>
+            <display>Digital 3-D model of Bayt Sa’īd b. Muhammad al Tashash al Maharmi, dwelling in Mudayrib oasis, Oman. The model was generated using AutoCad software.</display>
+            <description>Digital 3-D model of Bayt Sa’īd b. Muhammad al Tashash al Maharmi, dwelling in Mudayrib oasis, Oman. The model was generated using AutoCad software.</description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+            <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+            <display>Created in University of Liverpoool, School of Architecture (Great Britain)</display>
+            <location type="creation">
+               <name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">University of Liverpool. School of Architecture</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>digital file</display>
+            <material/>
+            <material refid="300404202" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">files (digital files)</material>
+        </materialSet>
+        <measurementsSet>
+            <display>File size 28.8 MB</display>
+            <measurements type="fileSize" unit="MB">28.8</measurements>
+        </measurementsSet>
+        <relationSet>
+            <display>From The ArCHIAM Collection: Mudayrib. Image of Dwelling in Mudayrib, Oman. </display>
+            <relation relids="w_0000001MUD" type="imageOf">Dwelling in Mudayrib, Oman.</relation>
+            <relation refid="c_00000ArMUD" type="partOf">The ArCHIAM Collection: Mudayrib.</relation>
+        </relationSet>
+        <rightsSet>
+            <display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</display>
+            <notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG
+            </notes>
+            <rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+                <rightsHolder>Ministry of Heritage and Culture Sultanate of Oman</rightsHolder>
+                <text>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</text>
+            </rights>
+        </rightsSet>
+        <!--<sourceSet>
+            <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <!--<stylePeriodSet>
+            <stylePeriod></stylePeriod>
+        </stylePeriodSet>-->
+        <!--<subjectPeriodSet>
+            <subject></subject>
+        </subjectSet>-->
+        <techniqueSet>
+            <display>born digital CAD (computer-aided design) drawing</display>
+            <technique refid="300374824" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374824">born digital</technique>
+            <technique refid="300404202" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">computer-aided design (process)</technique>
+        </techniqueSet>
+        <titleSet>
+            <display>Digital 3-D model of dwelling in Mudayrib, Oman.</display>
+            <title type="generalView">Digital 3-D model of dwelling in Mudayrib, Oman.</title>
+            <title type="generalView">نموذج رقمي ثلاثي الأبعاد لمسكن في المضيرب، عُمان.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>virtual model</display>
+            <worktype refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">virtual models</worktype>
+        </worktypeSet>
+    </image>
+</vra>

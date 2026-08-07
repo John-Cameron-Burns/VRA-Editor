@@ -1,0 +1,225 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<vra xmlns="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+
+
+    <work id="w_0000001MUD" xml:lang="ar">
+        <!--<agentSet>
+            <agent></agent>
+        </agentSet>-->
+        <culturalContextSet>
+            <culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</culturalContext>
+        </culturalContextSet>
+        <dateSet>
+            <display>تم إنشاؤها 1835-1865</display>
+            <date type="creation" source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014">
+                <earliestDate>1835</earliestDate>
+                <latestDate>1865</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet>
+            <display>يُعتبر بيت سعيد بن محمد الطشاش المحارمي من أعظم المنازل في المضيرب، حيث يقع على الطرف الجنوبي من
+                السوق ويطل على بساتين النخيل. من المحتمل أن يعود تاريخ بنائه إلى منتصف القرن التاسع عشر.
+                لا يزال المبنى غير مأهول بالسكان منذ منصف السبعينات ويعتبر هذا البناء مهدد بالإنهيار. وقد تعرض هذا
+                المسكن إلى العديد من عمليات الترميم والإصلاح الغير مدروسة والتي تم فيها استخدام الإسمنت والكتل البيتونية
+                والتي تكاد تمنع الهيكل الرئيسي من الإنهيار بشكل كامل.
+                يشبه هيكل البناء من الخارج كتلة صلبة من البناء المختلط مع ثلاثة أبراج صغيرة على زوايا السقف. يقع في
+                الركن الجنوبي الشرقي برج دائري مُدمج في نسيج المبنى.
+                تأتي صلابة الهيكل الظاهري الواضحة أيضًا من الافتقار شبه الكامل للنوافذ، باستثناء عدد قليل من فتحات
+                التهوية الموضوعة على مستوى الطابق الأول وعدد قليل من فتحات المدافع النارية لغرض الدفاع.
+                إن المنطقة الداخلية من الطابق الأرضي مظلمة جداً حيث تتلقى جزء صغير جداً من الإضائة الطبيعية من نوافذ
+                الفناء الداخلي. حيث كان يستخدم هذا الجزء بشكا أساسي للتخزين وحظيرة للحيوانات وكذلك سجن للرقيق. كما كان
+                يحتوي على بئر ماء والتي كانت تستخدم فقط في أوقات الجفاف والنزاعات أو عندما كان المنزل تحت الحصار بالرغم من وفرة مائها.
+            </display>
+            <description
+                source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014">
+                يُعتبر بيت سعيد بن محمد الطشاش المحارمي من أعظم المنازل في المضيرب، حيث يقع على الطرف الجنوبي من السوق
+                ويطل على بساتين النخيل. من المحتمل أن يعود تاريخ بنائه إلى منتصف القرن التاسع عشر.
+                لا يزال المبنى غير مأهول بالسكان منذ منصف السبعينات ويعتبر هذا البناء مهدد بالإنهيار. وقد تعرض هذا
+                المسكن إلى العديد من عمليات الترميم والإصلاح الغير مدروسة والتي تم فيها استخدام الإسمنت والكتل البيتونية
+                والتي تكاد تمنع الهيكل الرئيسي من الإنهيار بشكل كامل.
+                يشبه هيكل البناء من الخارج كتلة صلبة من البناء المختلط مع ثلاثة أبراج صغيرة على زوايا السقف. يقع في
+                الركن الجنوبي الشرقي برج دائري مُدمج في نسيج المبنى.
+                تأتي صلابة الهيكل الظاهري الواضحة أيضًا من الافتقار شبه الكامل للنوافذ، باستثناء عدد قليل من فتحات
+                التهوية الموضوعة على مستوى الطابق الأول وعدد قليل من فتحات المدافع النارية لغرض الدفاع.
+                إن المنطقة الداخلية من الطابق الأرضي مظلمة جداً حيث تتلقى جزء صغير جداً من الإضائة الطبيعية من نوافذ
+                الفناء الداخلي. حيث كان يستخدم هذا الجزء بشكا أساسي للتخزين وحظيرة للحيوانات وكذلك سجن للرقيق. كما كان
+                يحتوي على بئر ماء والتي كانت تستخدم فقط في أوقات الجفاف والنزاعات أو عندما كان المنزل تحت الحصار بالرغم من وفرة مائها.
+            </description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+            <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+            <display>المضيرب (عُمان)</display>
+            <location type="site">
+                <name type="geographic" refid="-786100" vocab="GNS">المضيرب</name>
+                <name type="geographic" refid="137795373" vocab="VIAF"  href="http://viaf.org/viaf/137795373">سلطنة عمان</name>
+            </location>
+            <location type="other">
+                <name type="geographic" refid="22.613447, 58.667656" vocab="GNS">المضيرب</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>حجر؛ طوب لبن؛ إكساء صاروج</display>
+            <material type="other" refid="300081138" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300081138">طوب (مادة)</material>
+            <material type="other" refid="300011700" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300011700">حجر البناء</material>
+            <material type="other" vocab="other">صاروج</material>
+        </materialSet>
+        <!--<measurementsSet>
+            <measurements></measurements>
+        </measurementsSet>-->
+        <relationSet>
+            <display>من مستوطنة المضيرب، عُمان.</display>
+             <relation refid="w_001SET_MUD" type="partOf">مستوطنة المضيرب، عُمان.</relation>
+        </relationSet>
+        <!--<rightsSet>
+            <rights></rights>
+        </rightsSet>-->
+        <!--<sourceSet>
+            <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <stylePeriodSet>
+            <display>عُماني شعبي</display>
+            <stylePeriod/>
+            <stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</stylePeriod>
+            <stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483"> عُماني</stylePeriod>
+        </stylePeriodSet>
+        <subjectSet>
+            <display>مسكن؛ عمارة طينية</display>
+            <subject>
+                <term refid="300005425" type="descriptiveTopic" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300005425">مساكن</term>
+                <term type="descriptiveTopic" refid="300379486" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300379486">عمارة طينية</term>
+            </subject>
+        </subjectSet>
+        <techniqueSet>
+            <display>بناء من حجر؛ منشأة طينية</display>
+            <technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">البناء من حجر</technique>
+            <technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">منشأة طينية</technique>
+        </techniqueSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <titleSet>
+            <display>مسكن في المضيرب، عُمان.</display>
+            <title type="descriptive">مسكن في المضيرب، عُمان.</title>
+            <title type="translated">Dwelling in Mudayrib, Oman.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>مسكن</display>
+            <worktype refid="300005425" vocab="AAT" href="http://vocab.getty.edu/page/aat/300005425">مساكن</worktype>
+        </worktypeSet>
+    </work>
+
+
+
+
+
+    <image id="i_00001ArMUD" xml:lang="ar">
+        <agentSet>
+            <display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</display>
+            <agent>
+                <name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</name>
+                <culture>الإنكليزية</culture>
+                <dates type="activity">
+                    <earliestDate>2012</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role>مؤلف</role>
+                <role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</role>
+                <attribution>جامعة ليفربول. كلية الهندسة المعمارية</attribution>
+            </agent>
+            <agent>
+                <name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</name>
+                <culture>عُماني</culture>
+                <dates type="activity">
+                    <earliestDate>1976</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</role>
+            </agent>
+        </agentSet>
+        <!--<culturalContextSet>
+            <culturalContext></culturalContext>
+        </culturalContextSet>-->
+        <dateSet>
+            <display>تم إنشاؤها 2016</display>
+            <date type="creation">
+                <earliestDate>2016</earliestDate>
+                <latestDate>2016</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet>
+            <display>نموذج رقمي ثلاثي الأبعاد لبيت سعيد بن محمد الطشاش المحارمي في واحة المضيرب، عُمان. تم إنشاء النموذج باستخدام برنامج AutoCad.</display>
+            <description>نموذج رقمي ثلاثي الأبعاد لبيت سعيد بن محمد الطشاش المحارمي في واحة المضيرب، عُمان. تم إنشاء النموذج باستخدام برنامج AutoCad.</description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+            <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+           <display>تم إنشاؤها في جامعة ليفربول، كلية الهندسة المعمارية (بريطانيا العظمى)</display>
+            <location type="creation">
+                <name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">جامعة ليفربول. كلية الهندسة المعمارية</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>ملف رقمي</display>
+            <material/>
+            <material refid="300404202" type="support" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300404202">ملفات (ملفات رقمية)</material>
+        </materialSet>
+        <measurementsSet>
+            <display> 28.8 MB حجم الملف</display>
+            <measurements/>
+            <measurements type="fileSize" unit="MB">28.8</measurements>
+        </measurementsSet>
+        <relationSet>
+            <display>من مجموعة أركيام: المضيرب. صورة لمسكن في المضيرب، عُمان.</display>
+            <relation relids="w_0000001MUD" type="imageOf">مسكن في المضيرب، عُمان.</relation>
+            <relation refid="c_00000ArMUD" type="partOf">مجموعة أركيام: المضيرب.</relation>
+        </relationSet>
+        <rightsSet>
+            <display>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</display>
+            <notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </notes>
+            <rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+                <rightsHolder>وزارة التراث والثقافة في سلطنة عُمان</rightsHolder>
+                <text>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</text>
+            </rights>
+        </rightsSet>
+        <!--<sourceSet>
+            <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <!--<stylePeriodSet>
+            <stylePeriod></stylePeriod>
+        </stylePeriodSet>-->
+        <!--<subjectPeriodSet>
+            <subject></subject>
+        </subjectSet>-->
+        <techniqueSet>
+            <display>رسم تصميمي تم إنشاء الملف رقمياً (تصميم بمساعدة الحاسب)</display>
+            <technique refid="300374824" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374824">تم إنشاء الملف رقمياً</technique>
+            <technique refid="300404202" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">تصميم بمساعدة الحاسب (عملية)</technique>
+        </techniqueSet>
+        <titleSet>
+            <display>نموذج رقمي ثلاثي الأبعاد لمسكن في المضيرب، عُمان.</display>
+            <title type="generalView">نموذج رقمي ثلاثي الأبعاد لمسكن في المضيرب، عُمان.</title>
+            <title type="generalView">Digital 3-D model of dwelling in Mudayrib, Oman.</title>
+        </titleSet>
+        <worktypeSet>
+           <display>نموذج رقمي افتراضي</display>
+            <worktype refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">نماذج رقمية افتراضية</worktype>
+        </worktypeSet>
+    </image>
+</vra>

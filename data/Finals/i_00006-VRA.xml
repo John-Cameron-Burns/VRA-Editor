@@ -1,0 +1,233 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<vra xmlns="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+
+    <work id="w_0000001SIN" xml:lang="en">
+        <!-- <agentSet>
+            <agent></agent>
+        </agentSet>-->
+        <culturalContextSet>
+            <culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</culturalContext>
+        </culturalContextSet>
+        <dateSet>
+            <display>Created ca. 1765-1835</display>
+             <date type="creation"
+                   source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Harat Al-Barashid and Harat as-Sawafah, Sinaw, Nottingham: Nottingham Trent University, 2014">
+                <earliestDate circa="true">1765</earliestDate>
+                <latestDate circa="true">1835</latestDate>
+             </date>
+        </dateSet>
+        <descriptionSet>
+             <display>The fortified settlement of Ḩārat as-Sawāfah forms, along with the neighbouring quarter of al-Barāshid to the south,
+                 the eastern edge of the Sināw oasis, in the Ash Sharqīyah North Governorate. Sawāfah developed along Falaj al Mushaq with an extended north-south orientation with the palm groves
+                 to the west of the falaj channel. Originally enclosed within a continuous defensive wall with gates on the north, south and west walls, more openings have emerged to allow shortcuts to
+                 the agricultural fields from the new settlement developments beyond. The settlement presents two highly dilapidated gates on the downhill side,
+                 at the northern and southern ends respectively. A relatively regular street plan, consisting in main thoroughfares that spread out approximately orthogonally from a central open space,
+                 suggest a relatively recent development, in the eighteenth or the early- nineteenth century.
+                 Clearly delineated clusters laid out in both a north-south and east-west direction accommodate grand houses on two and three storeys.
+                 These are organised around courtyards and arcaded porticoes (līwāns), where daily domestic activities such as grinding, coffee making and weaving,
+                 the storage of produce and agricultural implements, sheltering of animal, as well as social activities would take place.
+                 Made of mud brick and stone, the buildings of as-Sawāfah present remarkable architectural and decorative features.
+                 These include generous arcades of pointed arches on round masonry columns, masonry lattice balustrades separating the courtyard from the shaded porticoes
+                 and high-quality workmanship of mouldings in sarūj, a traditional hydraulic render made of calcined clay and lime.</display>
+             <description
+                 source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Harat Al-Barashid and Harat as-Sawafah, Sinaw, Nottingham: Nottingham Trent University, 2014">
+                 The fortified settlement of Ḩārat as-Sawāfah forms, along with the neighbouring quarter of al-Barāshid to the south,
+                 the eastern edge of the Sināw oasis, in the Ash Sharqīyah North Governorate. Sawāfah developed along Falaj al Mushaq with an extended north-south orientation with the palm groves
+                 to the west of the falaj channel. Originally enclosed within a continuous defensive wall with gates on the north, south and west walls, more openings have emerged to allow shortcuts to
+                 the agricultural fields from the new settlement developments beyond. The settlement presents two highly dilapidated gates on the downhill side,
+                 at the northern and southern ends respectively. A relatively regular street plan, consisting in main thoroughfares that spread out approximately orthogonally from a central open space,
+                 suggest a relatively recent development, in the eighteenth or the early- nineteenth century.
+                 Clearly delineated clusters laid out in both a north-south and east-west direction accommodate grand houses on two and three storeys.
+                 These are organised around courtyards and arcaded porticoes (līwāns), where daily domestic activities such as grinding, coffee making and weaving,
+                 the storage of produce and agricultural implements, sheltering of animal, as well as social activities would take place.
+                 Made of mud brick and stone, the buildings of as-Sawāfah present remarkable architectural and decorative features.
+                 These include generous arcades of pointed arches on round masonry columns, masonry lattice balustrades separating the courtyard from the shaded porticoes
+                 and high-quality workmanship of mouldings in sarūj, a traditional hydraulic render made of calcined clay and lime.
+             </description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+             <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+         <display>Ḩārat as-Sawāfah, Sināw (Ash Sharqīyah North Governorate, Oman)</display>
+            <location type="site">
+                <name type="geographic" refid="136118942" vocab="VIAF" href="http://viaf.org/viaf/136118942">Sharqīyah (Oman)</name>
+                <name refid="-788710" type="geographic" vocab="GNS">Sināw</name>
+                <name type="geographic">Ḩārat as-Sawāfah</name>
+                <name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</name>
+            </location>
+            <location type="other">
+                <name type="geographic" refid="22.501139, 58.030105" vocab="GNS">Sināw</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>stone; adobe bricks; sarūj render</display>
+            <material type="other" refid="300081138" vocab="AAT" href="http://vocab.getty.edu/page/aat/300081138">adobe (material)</material>
+            <material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">building stone</material>
+            <material type="other" vocab="other">sarūj</material>
+        </materialSet>
+        <!--<measurementsSet>
+            <measurements></measurements>
+        </measurementsSet>-->
+        <!--<relationSet>
+            <relation></relation>
+        </relationSet>-->
+        <!--<rightsSet>
+            <rights></rights>
+        </rightsSet>-->
+        <!--<sourceSet>
+            <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <stylePeriodSet>
+            <display>Islamic Omani vernacular</display>
+            <stylePeriod refid="300380013" vocab="AAT" href="http://vocab.getty.edu/page/aat/300380013">Islamic (culture or style)</stylePeriod>
+            <stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</stylePeriod>
+            <stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</stylePeriod>
+        </stylePeriodSet>
+        <subjectSet>
+            <display>oasis settlement; earthen architecture</display>
+            <subject>
+                <term type="descriptiveTopic" refid="300387317" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387317">oasis settlements</term>
+                <term type="descriptiveTopic" refid="300379486" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379486">earthen architecture</term>
+            </subject>
+        </subjectSet>
+        <techniqueSet>
+            <display>stone masonry; earth construction</display>
+            <technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">stonemasonry</technique>
+            <technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">earth construction</technique>
+        </techniqueSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <titleSet>
+            <display>Ḩārat as-Sawāfah settlement in Sināw oasis, Oman.</display>
+            <title type="descriptive">Ḩārat as-Sawāfah settlement in Sināw oasis, Oman.</title>
+            <title type="translated">مستوطنة حارة الصوافة في واحة سناو، عُمان.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>oasis settlement</display>
+            <worktype refid="300387317" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387317">oasis settlements</worktype>
+        </worktypeSet>
+    </work>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <image id="i_00001ArSIN" xml:lang="en">
+        <agentSet>
+            <display>Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman</display>
+            <agent>
+                <name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</name>
+                <culture>English</culture>
+                <dates type="activity">
+                    <earliestDate>2012</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role>creator</role>
+                <role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</role>
+                <attribution>University of Liverpool. School of Architecture</attribution>
+            </agent>
+            <agent>
+                <name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</name>
+                <culture>Omani</culture>
+                <dates type="activity">
+                    <earliestDate>1976</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</role>
+            </agent>
+        </agentSet>
+        <!--<culturalContextSet>
+            <culturalContext></culturalContext>
+        </culturalContextSet>-->
+        <dateSet>
+           <display>Created 2013</display>
+           <date type="creation">
+                <earliestDate>2013</earliestDate>
+                <latestDate>2013</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet>
+            <display>Digital navigable 3-D model of Ḩārat as-Sawāfah settlement in Sināw oasis, Oman. The model is created using Agisoft software.</display>
+            <description>Digital navigable 3-D model of Ḩārat as-Sawāfah settlement in Sināw oasis, Oman. The model is created using Agisoft software.</description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+            <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+            <display>Created in University of Liverpoool, School of Architecture (Great Britain)</display>
+            <location type="creation">
+              <name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">University of Liverpool. School of Architecture</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>digital file</display>
+            <material refid="300404202" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">files (digital files)</material>
+        </materialSet>
+        <measurementsSet>
+            <display>File size 12.5 MB</display>
+            <measurements type="fileSize" unit="MB">12.5</measurements>
+        </measurementsSet>
+        <relationSet>
+            <display>From The ArCHIAM Collection: Sināw. Image of Ḩārat as-Sawāfah settlement in Sināw oasis, Oman. </display>
+            <relation relids="w_001SET_SIN" type="imageOf">Ḩārat as-Sawāfah settlement in Sināw oasis, Oman.</relation>
+            <relation refid="c_00000ArSIN" type="partOf">The ArCHIAM Collection: Sināw.</relation>
+        </relationSet>
+        <rightsSet>
+            <display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</display>
+            <notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                   and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG</notes>
+            <rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+                <rightsHolder>Ministry of Heritage and Culture Sultanate of Oman</rightsHolder>
+                <text>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</text>
+            </rights>
+        </rightsSet>
+        <sourceSet>
+            <display>Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan:
+                     Harat Al-Barashid &amp; Harat as-Sawafah, Sinaw, Nottingham: Nottingham Trent University, 2014</display>
+            <source>
+                <name type="other">Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan:
+                Harat Al-Barashid &amp; Harat as-Sawafah, Sinaw, Nottingham: Nottingham Trent University, 2014</name>
+            </source>
+        </sourceSet>
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <!--<stylePeriodSet>
+            <stylePeriod></stylePeriod>
+        </stylePeriodSet>-->
+        <!--<subjectPeriodSet>
+            <subject></subject>
+        </subjectSet>-->
+        <techniqueSet>
+            <display>aerial photogrammetry 3-D virtual model</display>
+            <technique/>
+            <technique refid="300053581" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053581">aerial photogrammetry</technique>
+            <technique refid="300010331" vocab="AAT" href="http://vocab.getty.edu/page/aat/300010331">three-dimensional</technique>
+            <technique refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">virtual models</technique>
+        </techniqueSet>
+        <titleSet>
+            <display>Digital 3-D model of Ḩārat as-Sawāfah settlement in Sināw oasis, Oman.</display>
+            <title type="generalView">Digital 3-D model of Ḩārat as-Sawāfah settlement in Sināw oasis, Oman.</title>
+            <title type="generalView">نموذج رقمي ثلاثي الأبعاد لمستوطنة حارة الصوافة في واحة سناو، عُمان.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>virtual model</display>
+            <worktype refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">virtual models</worktype>
+        </worktypeSet>
+    </image>
+</vra>

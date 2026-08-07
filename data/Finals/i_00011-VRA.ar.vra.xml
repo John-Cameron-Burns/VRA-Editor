@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<vra xmlns="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+
+    <work id="w_001SET_MUD" xml:lang="ar">
+        <!--<agentSet>
+            <agent></agent>
+        </agentSet>-->
+        <culturalContextSet>
+            <culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</culturalContext>
+        </culturalContextSet>
+        <!--<dateSet>
+            <date></date>
+        <dateSet>-->
+        <descriptionSet>
+            <display>تقع المضيرب على بعد حوالي 130 كم جنوب شرق مسقط في ولاية القابل في محافظة شمال الشرقية على الحواف الشمالية من صحراء الشرقية (سابقا رمال وهيبة ، رملة الوهيبة).
+                تقع على ضفاف الوادي الشرقي، والذي يمتد في اتجاه الجنوب الشرقي على امتداد سفوح جبال الحجر الشرقية (الحجر الشرقي).
+                استفادت المضيرب والتي تقع على الطريق الرئيسي الداخلي من الميناء الشرقي لصور إلى المناطق الداخلية من عُمان دائماً من التجارة في المحيط الهندي.
+                على عكس العديد من الواحات الأخرى في المنطقة، فإن المضيرب تتألف من مركز واحد للمستوطنة بدلاً من وجود أجزاء متعددة.
+                تقع المستوطنة نفسها داخل حلقة من التلال المنخفضة والتي تحيط بالنواة الحضرية من جميع الجوانب باستثناء الجانب الجنوبي، حيث تقع الواحة باتجاه الخارج.
+               يتم تزويد مياه نظام الري، فلج المضيرب، من الوادي على بعد حوالي 6 كيلومترات إلى الشمال من المستوطنة حيث يتفرع إلى أربع قنوات رئيسية (ساقية) بالقرب من السوق حيث تشكل المكون الرئيسي للري في شبكة الأفلاج.
+             يعلو التلال المحيطة أبراج حراسة والتي تُشرف على المناطق الريفية المحيطة والمداخل الرئيسية للمستوطنة. تحتوي التلة الأكبر والمنحدرة صعوداً على الحافة الشرقية للمستوطنة، في قمتها حصن المضيرب، وهو عبارة عن مكان مغلق محصن يستخدم في أوقات النزاع دون أي وظائف سكنية.
+                ومن أحد العوامل التي فرضت شكل المستوطنة المدمج والمنغلق على نفسه  هو القيود الطبوغرافية التي تفرضها التلال المحيطة على توسع المستوطنة، ومن العوامل الأخرى الموقع القوي لقبيلة حرث في منطقتي إبراء والقابل.
+تم تشكيل المركز حول سلسلة من التحصينات، مثل حصن الخناجرة، والذي يقع في وسط المُضيرب مباشرة إلى الغرب من  السوق.
+                تمثل المستوطنة السكنية مثالاً ممتازًا للتطور المعماري التقليدي والذي وصل إلى صقل رائع ومستويات عالية من الجودة.
+            </display>
+            <description
+                source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014">
+               تقع المضيرب على بعد حوالي 130 كم جنوب شرق مسقط في ولاية القابل في محافظة شمال الشرقية على الحواف الشمالية من صحراء الشرقية (سابقا رمال وهيبة ، رملة الوهيبة).
+                تقع على ضفاف الوادي الشرقي، والذي يمتد في اتجاه الجنوب الشرقي على امتداد سفوح جبال الحجر الشرقية (الحجر الشرقي).
+                استفادت المضيرب والتي تقع على الطريق الرئيسي الداخلي من الميناء الشرقي لصور إلى المناطق الداخلية من عُمان دائماً من التجارة في المحيط الهندي.
+                على عكس العديد من الواحات الأخرى في المنطقة، فإن المضيرب تتألف من مركز واحد للمستوطنة بدلاً من وجود أجزاء متعددة.
+                تقع المستوطنة نفسها داخل حلقة من التلال المنخفضة والتي تحيط بالنواة الحضرية من جميع الجوانب باستثناء الجانب الجنوبي، حيث تقع الواحة باتجاه الخارج.
+               يتم تزويد مياه نظام الري، فلج المضيرب، من الوادي على بعد حوالي 6 كيلومترات إلى الشمال من المستوطنة حيث يتفرع إلى أربع قنوات رئيسية (ساقية) بالقرب من السوق حيث تشكل المكون الرئيسي للري في شبكة الأفلاج.
+             يعلو التلال المحيطة أبراج حراسة والتي تُشرف على المناطق الريفية المحيطة والمداخل الرئيسية للمستوطنة. تحتوي التلة الأكبر والمنحدرة صعوداً على الحافة الشرقية للمستوطنة، في قمتها حصن المضيرب، وهو عبارة عن مكان مغلق محصن يستخدم في أوقات النزاع دون أي وظائف سكنية.
+                ومن أحد العوامل التي فرضت شكل المستوطنة المدمج والمنغلق على نفسه  هو القيود الطبوغرافية التي تفرضها التلال المحيطة على توسع المستوطنة، ومن العوامل الأخرى الموقع القوي لقبيلة حرث في منطقتي إبراء والقابل.
+تم تشكيل المركز حول سلسلة من التحصينات، مثل حصن الخناجرة، والذي يقع في وسط المُضيرب مباشرة إلى الغرب من  السوق.
+                تمثل المستوطنة السكنية مثالاً ممتازًا للتطور المعماري التقليدي والذي وصل إلى صقل رائع ومستويات عالية من الجودة.
+            </description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+            <inscription></inscription>
+        <inscriptionSet>-->
+        <locationSet>
+            <display>المضيرب (عُمان)</display>
+            <location type="site">
+                <name type="geographic" refid="-786100" vocab="GNS">المضيرب</name>
+                <name type="geographic" refid="137795373" vocab="VIAF"  href="http://viaf.org/viaf/137795373">سلطنة عمان</name>
+            </location>
+            <location type="other">
+                <name type="geographic" refid="22.613447, 58.667656" vocab="GNS">المضيرب</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>حجر؛ طوب لبن؛ إكساء صاروج</display>
+            <material type="other" refid="300081138" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300081138">طوب (مادة)</material>
+            <material type="other" refid="300011700" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300011700">حجر البناء</material>
+            <material type="other" vocab="other">صاروج</material>
+        </materialSet>
+        <!--<measurementsSet>
+            <measurements></measurements>
+        </measurementsSet>-->
+        <!--<relationSet>
+            <relation></relation>
+        </relationSet>-->
+        <!--<rightsSet>
+            <rights></rights>
+        </rightsSet>-->
+        <!--<sourceSet>
+            <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <stylePeriodSet>
+            <display>عُماني شعبي</display>
+            <stylePeriod/>
+            <stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</stylePeriod>
+            <stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</stylePeriod>
+        </stylePeriodSet>
+        <subjectSet>
+            <display>مستوطنة الواحة؛ عمارة طينية</display>
+            <subject>
+                <term type="descriptiveTopic" refid="300387317" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300387317">مستوطنات الواحة</term>
+                <term refid="300379486" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379486">عمارة طينية</term>
+            </subject>
+        </subjectSet>
+        <techniqueSet>
+            <display>بناء حجر؛ هيكل خشبي</display>
+            <technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">البناء من حجر</technique>
+            <technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">منشأة طينية</technique>
+        </techniqueSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <titleSet>
+            <display>مستوطنة المضيرب، عُمان.</display>
+            <title type="descriptive">مستوطنة المضيرب، عُمان.</title>
+            <title type="translated">Mudayrib settlement, Oman.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>مستوطنة الواحة</display>
+            <worktype refid="300387317" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387317">مستوطنات الواحة</worktype>
+        </worktypeSet>
+    </work>
+
+
+
+
+    <image id="i_00002ArMUD" xml:lang="ar">
+        <agentSet>
+            <display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</display>
+            <agent>
+                <name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</name>
+                <culture>الإنكليزية</culture>
+                <dates type="activity">
+                    <earliestDate>2012</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role>مؤلف</role>
+                <role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</role>
+                <attribution>جامعة ليفربول. كلية الهندسة المعمارية</attribution>
+            </agent>
+            <agent>
+                <name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</name>
+                <culture>عُماني</culture>
+                <dates type="activity">
+                    <earliestDate>1976</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</role>
+            </agent>
+        </agentSet>
+        <!--<culturalContextSet>
+            <culturalContext></culturalContext>
+        </culturalContextSet>-->
+        <dateSet>
+            <display>تم إنشاؤها 2013</display>
+            <date type="creation">
+                <earliestDate>2013</earliestDate>
+                <latestDate>2013</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet>
+            <display>مقابلة فيديو مع السكان المحليين حيث يتحدثون عن المظهر العمراني السابق للمستوطنة في المضيرب، عُمان.
+                تمت مقابلة السكان من قبل أركيام. بعد إنهاء عملية التوثيق والتصوير الفوتوغرافي وبواسطة طائرة بدون طيار
+                وخلال العمل الميداني لأركيام أُجريت سلسلة من المقابلات مع السكان السابقين للحارات.
+                إن الهدف الإثنوغرافي لهذه المقابلات هو توثيق مكثف للتاريخ والتراث الامادي للواحات، و تشكيل فكرة واضحة عن
+                نمط الملكية القبلية للمساكن داخل الحارة، وبالتالي تشكيل نظرة أعمق حول التطور المورفولوجي للتخطيط العمراني.
+            </display>
+            <description>مقابلة فيديو مع السكان المحليين حيث يتحدثون عن المظهر العمراني السابق للمستوطنة في المُضيرب، عُمان.
+                تمت مقابلة السكان من قبل أركيام. بعد إنهاء عملية التوثيق والتصوير الفوتوغرافي وبواسطة طائرة بدون طيار
+                وخلال العمل الميداني لأركيام أُجريت سلسلة من المقابلات مع السكان السابقين للحارات.
+                إن الهدف الإثنوغرافي لهذه المقابلات هو توثيق مكثف للتاريخ والتراث الامادي للواحات، و تشكيل فكرة واضحة عن
+                نمط الملكية القبلية للمساكن داخل الحارة، وبالتالي تشكيل نظرة أعمق حول التطور المورفولوجي للتخطيط العمراني.
+            </description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+            <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+            <display>تم إنشاؤها في المضيرب (محافظة شمال الشرقية، عُمان)</display>
+            <location type="site">
+                 <name type="geographic" refid="-786100" vocab="GNS">المضيرب</name>
+                <name type="geographic" refid="136118942" vocab="VIAF" href="http://viaf.org/viaf/136118942">شرقية (عُمان)</name>
+                <name type="geographic" refid="137795373" vocab="VIAF"  href="http://viaf.org/viaf/137795373">سلطنة عمان</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>تسجيل فيديو</display>
+            <material type="medium" refid="300028682" vocab="AAT" href="http://vocab.getty.edu/page/aat/300028682">تسجيلات فيديو (إنتاج صنعي ملموس)</material>
+        </materialSet>
+        <measurementsSet>
+            <display>حجم الملف 2.52 GB؛ مدة الفيديو 11:39 min</display>
+            <measurements type="fileSize" unit="GB">2.52</measurements>
+            <measurements type="runningTime" unit="min">11:39</measurements>
+        </measurementsSet>
+        <relationSet>
+            <display>من مجموعة أركيام: المضيرب. صورة لمستوطنةالمضيرب، عُمان.</display>
+            <relation relids="w_001SET_MUD" type="imageOf">مستوطنةالمضيرب، عُمان.</relation>
+            <relation refid="c_00000ArMUD" type="partOf">مجموعة أركيام: المضيرب.</relation>
+            <relation/>
+        </relationSet>
+        <rightsSet>
+            <display>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</display>
+            <notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                   والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG</notes>
+            <rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+                <rightsHolder>وزارة التراث والثقافة في سلطنة عُمان</rightsHolder>
+                <text>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</text>
+            </rights>
+        </rightsSet>
+        <!--<sourceSet>
+           <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <!--<stylePeriodSet>
+            <stylePeriod></<stylePeriod>
+        </stylePeriodSet>-->
+        <!--<subjectPeriodSet>
+            <subject></<subject>
+        <subjectSet>-->
+        <techniqueSet>
+        <display>مقابلة فيديو</display>
+            <technique/>
+            <technique refid="300026392" vocab="AAT" href="http://vocab.getty.edu/page/aat/300026392"> مقابلات</technique>
+            <technique refid="300417974" vocab="AAT" href="http://vocab.getty.edu/page/aat/300417974">تسجيلات فيديو (عملية)</technique>
+        </techniqueSet>
+        <titleSet>
+            <display>مقابلة فيديو مع سكان محليين في المضيرب، عُمان، الجزء الأول.</display>
+            <title type="generalView">مقابلة فيديو مع سكان محليين في المضيرب، عُمان، الجزء الأول.</title>
+            <title type="generalView">Video interview of local inhabitants in Mudayrib, Oman, Part 1.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>مقابلة</display>
+            <worktype refid="300026392" vocab="AAT" href="http://vocab.getty.edu/page/aat/300026392">مقابلات</worktype>
+        </worktypeSet>
+    </image>
+</vra>

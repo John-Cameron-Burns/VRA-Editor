@@ -1,0 +1,226 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<vra xmlns="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+
+
+    <work id="w_0000001BAM" xml:lang="ar">
+        <!--<agentSet>
+            <agent></agent>
+        </agentSet>-->
+        <culturalContextSet>
+            <culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</culturalContext>
+        </culturalContextSet>
+        <!--<dateSet>
+            <date></date>
+        </dateSet>-->
+        <descriptionSet>
+            <display>تُشكّل حارة برج المكاسير واحدة من المستوطنات التقليدية الثلاثة لواحة بركة الموز، والحارتين
+                المتبقيتين هما حارة السيباني وحارة الوادي (أو حلّة السوق).
+                يُشتق الاسم من البرج الدائري المستدير (برج) الموجود على قاعدة صخرية والذي يهيمن على مساحة المستوطنة
+                السكنية، ويرتفع فوق مجموعة من المساكن الصغيرة المتمركزة حول قاعدته. حيث تقع في التلال الجنوبية لسلاسل
+                الجبل الأخضر مع حارة السيباني وهي تُشكّل الزاوية الشمالية للواحة.
+                ويمرالفلج (الجمع. أفلاج) وهو قناة الري التي تمتد إلى الشرق من حارة السيباني عبر المستوطنة حيث تقوم
+                بتوفير المياه المنزلية وتروي الروافد العليا من مزارع النخيل والتمر المحيطة بها.
+                وتمر أيضاً قناة فلج أُخرى من الشمال إلى الجنوب عبر الواحة بالقرب من حارة برج المكاسير كمجرد قناة مائية بارزة.
+            </display>
+            <description source="Ministry of Heritage and Culture Sultanate of Oman, Birkat al-Mawz: Harat as-Saybani. Documentation and Heritage Management Plan, Masqaṭ: Mazoon Printing and Advertising L.L.C., 2014">
+                تُشكّل حارة برج المكاسير واحدة من المستوطنات التقليدية الثلاثة لواحة بركة الموز، والحارتين المتبقيتين
+                هما حارة السيباني وحارة الوادي (أو حلّة السوق).
+                يُشتق الاسم من البرج الدائري المستدير (برج) الموجود على قاعدة صخرية والذي يهيمن على مساحة المستوطنة
+                السكنية، ويرتفع فوق مجموعة من المساكن الصغيرة المتمركزة حول قاعدته. حيث تقع في التلال الجنوبية لسلاسل
+                الجبل الأخضر مع حارة السيباني وهي تُشكّل الزاوية الشمالية للواحة.
+                ويمرالفلج (الجمع. أفلاج) وهو قناة الري التي تمتد إلى الشرق من حارة السيباني عبر المستوطنة حيث تقوم
+                بتوفير المياه المنزلية وتروي الروافد العليا من مزارع النخيل والتمر المحيطة بها.
+                وتمر أيضاً قناة فلج أُخرى من الشمال إلى الجنوب عبر الواحة بالقرب من حارة برج المكاسير كمجرد قناة مائية بارزة.
+            </description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+            <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+            <display>بركة الموز (عُمان)</display>
+            <location type="site">
+                <name type="geographic" vocab="GNS" refid="-786583">بركة الموز</name>
+                <name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">سلطنة عمان</name>
+            </location>
+            <location type="other">
+                <name type="geographic" refid="22.917301, 57.669828" vocab="GNS">بركة الموز</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>حجر؛ طوب لبن؛ إكساء صاروج</display>
+            <material type="other" refid="300011700" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300011700">حجر البناء</material>
+            <material type="other" refid="300081138" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300081138">طوب (مادة)</material>
+            <material type="other">صاروج</material>
+        </materialSet>
+        <!--<measurementsSet>
+            <measurements></measurements>
+        </measurementsSet>-->
+        <relationSet>
+            <display>من مستوطنة واحة بركة الموز، عُمان.</display>
+        <relation refid="w_001SET_BAM" type="partOf">مستوطنة واحة بركة الموز، عُمان.</relation>
+         </relationSet>
+        <!--<rightsSet>
+            <rights></rights>
+        </rightsSet>-->
+        <!--<sourceSet>
+            <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <stylePeriodSet>
+            <display>عُماني شعبي</display>
+            <stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</stylePeriod>
+            <stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</stylePeriod>
+        </stylePeriodSet>
+        <subjectSet>
+            <display>منطقة سكنية؛ برج؛ دفاعي؛ عمارة طينية</display>
+            <subject>
+                <term type="otherName" vocab="other">برج</term>
+                <term type="descriptiveTopic" refid="300000742" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300000742">منطقة سكنية</term>
+                <term type="descriptiveTopic" refid="300004862" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300004862">برج دفاعي</term>
+                <term type="descriptiveTopic" refid="300379486" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300379486">عمارة طينية</term>
+            </subject>
+        </subjectSet>
+        <techniqueSet>
+            <display>جدار حجري جاف؛ منشأة طينية</display>
+            <technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">البناء من حجر</technique>
+            <technique refid="300070971" vocab="AAT" href="http://vocab.getty.edu/page/aat/300070971">جدران حجرية جافة بدون طينة</technique>
+            <technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">منشأة طينية</technique>
+        </techniqueSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <titleSet>
+            <display>حارة برج المكاسير في مستوطنة بركة الموز، عُمان.</display>
+            <title type="descriptive">حارة برج المكاسير في مستوطنة بركة الموز، عُمان.</title>
+            <title type="translated">Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>منطقة سكنية</display>
+            <worktype refid="300000742" vocab="AAT" href="http://vocab.getty.edu/page/aat/300000742">مناطق سكنية</worktype>
+        </worktypeSet>
+    </work>
+
+
+
+
+    <image id="i_00001ArBAM" xml:lang="ar">
+        <agentSet>
+            <display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</display>
+            <agent>
+                <name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</name>
+                <culture>الإنكليزية</culture>
+                <dates type="activity">
+                    <earliestDate>2012</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role>مؤلف</role>
+                <role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</role>
+                <attribution>جامعة ليفربول. كلية الهندسة المعمارية</attribution>
+            </agent>
+            <agent>
+                <name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</name>
+                <culture>عُماني</culture>
+                <dates type="activity">
+                    <earliestDate>1976</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</role>
+            </agent>
+        </agentSet>
+        <!--<culturalContextSet>
+            <culturalContext></culturalContext>
+        </culturalContextSet>-->
+        <dateSet>
+            <display>تم إنشاؤها 2011</display>
+            <date type="creation">
+                <earliestDate>2011</earliestDate>
+                <latestDate>2011</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet>
+            <display>رسم لمخطط حارة برج المكاسر في مستوطنة بركة الموز، عُمان؛ أُنتجت خلال العمل الميداني التوثيقي من قبل أركيام.</display>
+            <description>رسم لمخطط حارة برج المكاسر في مستوطنة بركة الموز، عُمان؛ أُنتجت خلال العمل الميداني التوثيقي من قبل أركيام.</description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+            <inscription></inscription>
+        </inscriptionSet>-->
+        <locationSet>
+            <display>تم إنشاؤها في بركة الموز (عُمان)</display>
+            <location type="creation">
+                <name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">">سلطنة عمان</name>
+                <name type="geographic" vocab="GNS" refid="-786583">بركة الموز</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>حبر على ورق</display>
+            <material refid="300015012" type="medium" vocab="AAT"
+                      href="http://vocab.getty.edu/page/aat/300015012">حبر</material>
+            <material refid="300014109" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300014109">ورقة (مادة مصنوعة من ألياف)</material>
+        </materialSet>
+        <measurementsSet>
+            <display>أبعادالورقة 31.34 (cm(W) x 22.35 cm(H؛ دقة الصورة المرقمنة 400 ppi</display>
+            <measurements type="width" unit="cm">31.34</measurements>
+            <measurements type="height" unit="cm">22.35</measurements>
+            <measurements type="resolution" unit="ppi">400</measurements>
+        </measurementsSet>
+        <relationSet>
+            <display>من مجموعة أركيام: بركة الموز. صورة لحارة برج المكاسير في مستوطنة بركة الموز، عُمان.</display>
+            <relation relids="w_002SET_BAM" type="imageOf">حارة برج المكاسير في مستوطنة بركة الموز، عُمان.</relation>
+            <relation refid="c_00000ArBAM" type="partOf">مجموعة أركيام: بركة الموز</relation>
+        </relationSet>
+        <rightsSet>
+            <display>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</display>
+            <notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </notes>
+            <rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+                <rightsHolder>وزارة التراث والثقافة في سلطنة عُمان</rightsHolder>
+                <text>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</text>
+            </rights>
+        </rightsSet>
+        <sourceSet>
+            <display>وزارة التراث القومي والثقافة في سلطنة عُمان، بركة الموز: حارة السيباني. مخطط التوثيق
+                    وإدارة التراث، مسقط: مزون للطباعة والنشر والإعلان (ش.م.م)، 2014.</display>
+            <source>
+                <name type="book">وزارة التراث القومي والثقافة في سلطنة عُمان، بركة الموز: حارة السيباني. مخطط التوثيق
+                    وإدارة التراث، مسقط: مزون للطباعة والنشر والإعلان (ش.م.م)، 2014.
+                </name>
+                <refid type="ISBN">978-99969-0-303-8</refid>
+            </source>
+        </sourceSet>
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <!--<stylePeriodSet>
+            <stylePeriod></stylePeriod>
+        </stylePeriodSet>-->
+        <!--<subjectPeriodSet>
+            <subject></subject>
+        </subjectSet>-->
+        <techniqueSet>
+            <display>رسم معماري باليد الحرة</display>
+            <technique refid="300054197" vocab="AAT" href="http://vocab.getty.edu/page/aat/300054197">رسم معماري (عملية)</technique>
+            <technique refid="300053181" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053181">رسم باليد الحرة(تقنية)</technique>
+        </techniqueSet>
+        <titleSet>
+            <display>مخطط لحارة برج المكاسير في مستوطنة بركة الموز، عُمان.</display>
+            <title type="generalView">مخطط لحارة برج المكاسير في مستوطنة بركة الموز، عُمان.</title>
+            <title type="generalView">Plan of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</title>
+        </titleSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <worktypeSet>
+            <display>رسم معماري</display>
+            <worktype refid="300034787" vocab="AAT" href="http://vocab.getty.edu/page/aat/300034787">رسومات معمارية (أعمال بصرية)</worktype>
+        </worktypeSet>
+    </image>
+</vra>

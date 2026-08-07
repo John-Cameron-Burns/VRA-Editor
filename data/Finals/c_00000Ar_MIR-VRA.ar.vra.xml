@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<vra xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.vraweb.org/vracore4.htm"
+     xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+
+    <collection id="c_00000ArMIR" xml:lang="ar">
+        <agentSet>
+            <display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</display>
+            <agent>
+                <name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب</name>
+                <culture>الإنكليزية</culture>
+                <dates type="activity">
+                    <earliestDate>2012</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role>مؤلف</role>
+                <role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</role>
+                <attribution>جامعة ليفربول. كلية الهندسة المعمارية</attribution>
+            </agent>
+            <agent>
+                <name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</name>
+                <culture>عُماني</culture>
+                <dates type="activity">
+                    <earliestDate>1976</earliestDate>
+                    <latestDate>present</latestDate>
+                </dates>
+                <role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</role>
+            </agent>
+        </agentSet>
+        <culturalContextSet>
+            <culturalContext vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">عُماني</culturalContext>
+        </culturalContextSet>
+        <dateSet>
+            <display>تم إنشاؤها 2015-2016</display>
+            <date type="creation">
+                <earliestDate>2015</earliestDate>
+                <latestDate>2016</latestDate>
+            </date>
+        </dateSet>
+        <descriptionSet>
+            <display>تتألف المجموعة المؤسسيّة لمركز أركيام من مواد ووثائق سمعية وبصرية عن مرباط، سلطنة عُمان
+                تم إنتاج المادة كجزء من مشروع خطة إدارة الوثائق والتراث بتكليف من وزارة التراث القومي والثقافة في عُمان. تم إنشاء المجموعة بين عامي 2015 و 2016.
+            </display>
+            <description>تتألف المجموعة المؤسسيّة لمركز أركيام من مواد ووثائق سمعية وبصرية عن مرباط، سلطنة عُمان.
+                تم إنتاج المادة كجزء من مشروع خطة إدارة الوثائق والتراث بتكليف من وزارة التراث القومي والثقافة في عُمان. تم إنشاء المجموعة بين عامي 2015 و 2016.
+            </description>
+        </descriptionSet>
+        <!--<inscriptionSet>
+         <inscription></inscription>
+         </inscriptionSet>-->
+        <locationSet>
+            <display>أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب) (ليفربول، بريطانيا العظمى) تم إنشاؤها في مرباط (محافظة ظفار ،عُمان)</display>
+            <location type="repository">
+                <name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</name>
+                <name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">جامعة ليفربول. كلية الهندسة المعمارية</name>
+            </location>
+            <location type="creation">
+                <name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">مرباط (عُمان)</name>
+                <name type="geographic" vocab="GNS" refid="374691">ظفار</name>
+                <name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">">سلطنة عمان</name>
+            </location>
+        </locationSet>
+        <materialSet>
+            <display>رسومات معمارية؛ صور رقمية؛ فيديوهات</display>
+            <material type="medium" vocab="AAT" refid="300034787"
+                      href="http://vocab.getty.edu/page/aat/300034787">رسومات معمارية (أعمال بصرية)</material>
+            <material type="medium" vocab="AAT" refid="300417379"
+                      href="http://vocab.getty.edu/page/aat/300417379">صور رقمية</material>
+            <material type="support" vocab="AAT" refid="300054153"
+                      href="http://vocab.getty.edu/page/aat/300054153">فيديو</material>
+        </materialSet>
+        <!--<measurementsSet>
+            <measurements/></measurements>
+        </measurementsSet>-->
+        <!--<relationSet>
+            <relation></relation>
+        </relationSet>-->
+         <rightsSet>
+            <display>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</display>
+            <notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </notes>
+            <rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+                <rightsHolder>وزارة التراث والثقافة في سلطنة عُمان</rightsHolder>
+                <text>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</text>
+            </rights>
+        </rightsSet>
+        <!--<sourceSet>
+            <source></source>
+        </sourceSet>-->
+        <!--<stateEditionSet>
+            <stateEdition></stateEdition>
+        </stateEditionSet>-->
+        <stylePeriodSet>
+            <display>عُماني شعبي بداية العصر الإسلامي</display>
+            <stylePeriod vocab="AAT" refid="300068483" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</stylePeriod>
+            <stylePeriod vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483"> عُماني</stylePeriod>
+            <stylePeriod vocab="AAT" refid="300419282" href="http://vocab.getty.edu/page/aat/300419282">بداية العصر الإسلامي</stylePeriod>
+        </stylePeriodSet>
+        <subjectSet>
+            <display>عمارة؛ مستوطنات ساحلية؛ مناظر طبيعية؛ أثنوغرافيا</display>
+            <subject>
+                <term type="descriptiveTopic" vocab="AAT" refid="300387314"
+                      href="http://vocab.getty.edu/page/aat/300387314">مستوطنات ساحلية</term>
+                <term type="descriptiveTopic" vocab="AAT" refid="300054156"
+                      href="http://vocab.getty.edu/page/aat/300054156">عمارة (تخصّص)</term>
+                <term type="descriptiveTopic" vocab="AAT" refid="300008346"
+                      href="http://vocab.getty.edu/page/aat/300008346">مستوطنات ومناظر طبيعية (اسم متسلسل)</term>
+                <term type="descriptiveTopic" vocab="AAT" refid="300054319"
+                      href="http://vocab.getty.edu/page/aat/300054319">أثنوغرافيا</term>
+            </subject>
+        </subjectSet>
+        <techniqueSet>
+            <!--Part of the collection material is already digitised or born digital. The rest of the material was digitised using A0 Roller Scanner or A3 Flatbed Scanner in 400 ppi - 600 ppi resolution.-->
+             <display>رسم معماري؛ تصوير رقمي؛ تسجيل فيديو</display>
+            <technique vocab="AAT" refid="300054197"
+                       href="http://vocab.getty.edu/page/aat/300054197">رسم معماري (عملية)</technique>
+            <technique vocab="AAT" refid="300386812"
+                       href="http://vocab.getty.edu/page/aat/300386812">تصوير رقمي (كاميرا رقمية)</technique>
+            <technique vocab="AAT" refid="300417974"
+                       href="http://vocab.getty.edu/page/aat/300417974">تسجيل فيديو (عملية)</technique>
+        </techniqueSet>
+        <!--<textrefSet>
+            <textref></textref>
+        </textrefSet>-->
+        <titleSet>
+            <display>مجموعة أركيام: مرباط.</display>
+            <title type="descriptive">مجموعة أركيام: مرباط.</title>
+            <title type="descriptive">The ArCHIAM Collection: Mirbāṭ.</title>
+        </titleSet>
+        <worktypeSet>
+            <display>توثيق</display>
+            <worktype vocab="AAT" refid="300054638" href="http://vocab.getty.edu/page/aat/300054638">توثيق (نشاط)</worktype>
+        </worktypeSet>
+    </collection>
+</vra>
