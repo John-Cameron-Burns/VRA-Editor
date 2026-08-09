@@ -283,7 +283,17 @@ class MainWindow(QMainWindow):
         dlg.exec()  # modal -- blocks until the user Saves or Cancels
         # dlg.exec() returning doesn't itself change app mode; Settings
         # remains an overlay on whatever mode was active before it opened.
-    def _on_about(self): ...
+    def _on_about(self):
+        QMessageBox.about(
+            self, "About VRA Core 4 XML Editor",
+            "<h3>VRA Core 4 XML Editor</h3>"
+            "<p>Copyright &copy; 2026 John Burns and Impact Data Metrics Limited.</p>"
+            "<p>Licensed under the "
+            "<a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">"
+            "Creative Commons Attribution-NonCommercial 4.0 International License</a> "
+            "(CC BY-NC 4.0).</p>"
+            "<p>See the LICENSE file included with this application for the full license text.</p>",
+        )
     def _on_save(self):
         ok, message = self.doc_controller.save_file()
         if not ok:

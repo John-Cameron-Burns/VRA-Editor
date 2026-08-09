@@ -72,9 +72,11 @@ def merge_xml_elements(target: ET.Element, source: ET.Element):
 def process_vra_directory(input_dir: str, output_dir: str, progress_callback=None):
     """Scans input_dir for VRA-Core XML files, merges files that share a
     record ID, and writes one file per record into output_dir. Source
-    files that were successfully merged/written are moved into a
-    "done" subfolder of input_dir, so re-running only ever processes
-    what's newly arrived.
+    files are moved into a "done" subfolder of input_dir once handled --
+    whether that meant writing/merging them or skipping because a file
+    with that record ID already exists in output_dir -- so re-running
+    only ever processes what's newly arrived, and a record ID already
+    present in output_dir isn't overwritten.
 
     progress_callback, if given, is called as
     progress_callback(current: int, total: int, message: str) at each
@@ -136,11 +138,13 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
 
         out_file = output_path / f"{rec_id}.xml"
         if out_file.exists():
-            report(index, total, f" [!] Skipped '{rec_id}': '{out_file}' already exists -- left source file(s) in place.")
-            continue
+            report(index, total, f" [!] '{rec_id}' already exists in '{output_dir}' -- not overwritten.")
+        else:
+            primary_tree.write(out_file, encoding="utf-8", xml_declaration=True)
 
-        primary_tree.write(out_file, encoding="utf-8", xml_declaration=True)
-
+        # Whether written or skipped as a duplicate, this ingest batch is
+        # done with these source files -- move them out either way so a
+        # re-run doesn't keep re-reporting the same already-handled ones.
         for file_path, _ in files:
             dest = done_path / file_path.name
             if dest.exists():
