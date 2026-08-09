@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
 
 from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
 from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
+from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
 from vra_editor.config import load_locations
 from vra_editor.utils import user_name
 from vra_editor.core.commit_to_git import add_file_to_repo
@@ -320,4 +321,17 @@ class MainWindow(QMainWindow):
                 f"{path} was saved, but could not be committed to the version-control repository.",
             )
     def _on_autofill(self): ...
-    def _on_import(self): ...
+
+    def _on_import(self):
+        locations = load_locations()  # re-read so it reflects the latest Settings
+        ingest_dir = locations.get('ingest')
+        edit_dir = locations.get('edit')
+        if ingest_dir is None or edit_dir is None:
+            QMessageBox.warning(
+                self, "Missing location",
+                "Both 'ingest' and 'edit' folders must be configured in vra-config.ini.",
+            )
+            return
+
+        dlg = ImportProgressDialog(ingest_dir, edit_dir, parent=self)
+        dlg.exec()

@@ -1,4 +1,5 @@
 import os
+import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from collections import defaultdict
@@ -68,50 +69,86 @@ def merge_xml_elements(target: ET.Element, source: ET.Element):
                 target.append(source_child)
 
 
-def process_vra_directory(input_dir: str, output_dir: str):
+def process_vra_directory(input_dir: str, output_dir: str, progress_callback=None):
+    """Scans input_dir for VRA-Core XML files, merges files that share a
+    record ID, and writes one file per record into output_dir. Source
+    files that were successfully merged/written are moved into a
+    "done" subfolder of input_dir, so re-running only ever processes
+    what's newly arrived.
+
+    progress_callback, if given, is called as
+    progress_callback(current: int, total: int, message: str) at each
+    step -- current/total are both 0 during the initial scan (before
+    the record count is known) and 1..total afterward, which callers
+    can use to drive an indeterminate-then-determinate progress bar.
+    Falls back to plain print() when no callback is given, so this
+    still works as a standalone script.
+    """
+    def report(current: int, total: int, message: str):
+        if progress_callback:
+            progress_callback(current, total, message)
+        else:
+            print(message)
+
     input_path = Path(input_dir)
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
+    done_path = input_path / "done"
 
     # 1. Scan and group XML files by record ID
     records_by_id = defaultdict(list)
-    
-    print(f"Scanning '{input_dir}' for VRA-Core XML files...")
-    for file_path in input_path.glob("*.xml"):
+
+    report(0, 0, f"Scanning '{input_dir}' for VRA-Core XML files...")
+    for file_path in sorted(input_path.glob("*.xml")):
         try:
             tree = ET.parse(file_path)
             root = tree.getroot()
             rec_id = extract_vra_id(root)
-            
+
             if rec_id:
                 records_by_id[rec_id].append((file_path, tree))
             else:
-                print(f" [!] Warning: No 'id' attribute found in '{file_path.name}'. Skipping.")
+                report(0, 0, f" [!] Warning: No 'id' attribute found in '{file_path.name}'. Skipping.")
         except ET.ParseError as e:
-            print(f" [!] Error parsing '{file_path.name}': {e}")
+            report(0, 0, f" [!] Error parsing '{file_path.name}': {e}")
 
-    # 2. Merge records and save to output directory
-    print(f"\nFound {len(records_by_id)} unique record ID(s). Processing...")
-    
-    for rec_id, files in records_by_id.items():
+    # 2. Merge records, save to output directory, move sources to done/
+    total = len(records_by_id)
+    report(0, total, f"Found {total} unique record ID(s). Processing...")
+
+    if total:
+        done_path.mkdir(parents=True, exist_ok=True)
+
+    for index, (rec_id, files) in enumerate(records_by_id.items(), start=1):
         primary_path, primary_tree = files[0]
         primary_root = primary_tree.getroot()
 
         if len(files) > 1:
-            print(f" -> Merging {len(files)} files for ID '{rec_id}'...")
+            report(index, total, f" -> Merging {len(files)} files for ID '{rec_id}'...")
             for _, secondary_tree in files[1:]:
                 merge_xml_elements(primary_root, secondary_tree.getroot())
         else:
-            print(f" -> Writing single file for ID '{rec_id}'...")
+            report(index, total, f" -> Writing single file for ID '{rec_id}'...")
 
         # Format XML output with clean indentation
         if hasattr(ET, 'indent'):
             ET.indent(primary_tree, space="  ")
 
         out_file = output_path / f"{rec_id}.xml"
+        if out_file.exists():
+            report(index, total, f" [!] Skipped '{rec_id}': '{out_file}' already exists -- left source file(s) in place.")
+            continue
+
         primary_tree.write(out_file, encoding="utf-8", xml_declaration=True)
 
-    print(f"\nFinished! Merged files written to '{output_dir}'.")
+        for file_path, _ in files:
+            dest = done_path / file_path.name
+            if dest.exists():
+                dest.unlink()
+            shutil.move(str(file_path), str(dest))
+        report(index, total, f" -> Moved {len(files)} source file(s) for '{rec_id}' to '{done_path.name}/'.")
+
+    report(total, total, f"Finished! Processed {total} record(s).")
 
 
 if __name__ == "__main__":
