@@ -256,6 +256,7 @@ class MainWindow(QMainWindow):
 
     def _on_open(self):
         self._open_from_folder('edit', dialog_title="Open Record")
+        self.apply_mode('edit')
 
     def _on_create(self): self.apply_mode('edit')
 
