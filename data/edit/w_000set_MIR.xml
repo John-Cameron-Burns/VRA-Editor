@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='utf-8'?>
+<vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+  <vra:work id="w_000set_MIR" xml:lang="en">
+    <vra:culturalContextSet>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani
+            </vra:culturalContext>
+    </vra:culturalContextSet>
+    <vra:descriptionSet>
+      <vra:display>Mirbāṭ near Ṣalālah in the Dhofar Governorate was a port of relative importance in the
+                early-medieval period, trading with India and many other ports in the western Indian Ocean region.
+                However, by the early-twentieth century it had dwindled into a small fishing village.
+                The dispersed settlement formation – similar to many Bāṭinah coastal settlements – developed around a shallow cove, with dwellings to the west of a minor wadī discharge and
+                the Friday mosque, the sūq and the fortlet known as Mirbāṭ Castle gathered beyond the eastern bank of the wadi and close to the sea.
+                A large number of the dwellings are either free-standing or attached to another dwelling, each with its own internal courtyard.
+                The Mirbāṭ dwelling type is distinctive and different from the Bāṭinah coastal examples (e.g., around
+                Ṣuḥār), where a large open space is often found enclosed behind an extensive wall.</vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Mirbat, Dhofar Governorate, Liverpool: University of Liverpool, 2017">
+                Mirbāṭ near Ṣalālah in the Dhofar Governorate was a port of relative importance in the
+                early-medieval period, trading with India and many other ports in the western Indian Ocean region.
+                However, by the early-twentieth century it had dwindled into a small fishing village.
+                The dispersed settlement formation – similar to many Bāṭinah coastal settlements – developed around a shallow cove, with dwellings to the west of a minor wadī discharge and
+                the Friday mosque, the sūq and the fortlet known as Mirbāṭ Castle gathered beyond the eastern bank of the wadi and close to the sea.
+                A large number of the dwellings are either free-standing or attached to another dwelling, each with its own internal courtyard.
+                The Mirbāṭ dwelling type is distinctive and different from the Bāṭinah coastal examples (e.g., around
+                Ṣuḥār), where a large open space is often found enclosed behind an extensive wall.</vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>Mirbāṭ (Dhofar Governorate, Oman)</vra:display>
+      <vra:location type="site">
+        <vra:name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">Mirbāṭ (Oman)</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="154778103" href="http://viaf.org/viaf/154778103">Dhofar (Oman)</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
+      </vra:location>
+      <vra:location type="other">
+        <vra:name type="geographic" refid="16.984721, 54.691469" vocab="GNS">Mirbāṭ</vra:name>
+      </vra:location>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>coral limestone and timber construction; sarūj render</vra:display>
+      <vra:material type="other" refid="300011291" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011291">coral limestone</vra:material>
+      <vra:material type="other" refid="300012827" vocab="AAT" href="http://vocab.getty.edu/page/aat/300012827">timber (wood by origin)</vra:material>
+      <vra:material type="other" vocab="other">sarūj</vra:material>
+    </vra:materialSet>
+    <vra:stylePeriodSet>
+      <vra:display>Early Islamic Omani vernacular</vra:display>
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
+      <vra:stylePeriod refid="300419282" vocab="AAT" href="http://vocab.getty.edu/page/aat/300419282">Early Islamic</vra:stylePeriod>
+    </vra:stylePeriodSet>
+    <vra:subjectSet>
+      <vra:display>coastal settlement</vra:display>
+      <vra:subject>
+        <vra:term type="descriptiveTopic" refid="300387314" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387314">coastal settlements</vra:term>
+      </vra:subject>
+    </vra:subjectSet>
+    <vra:techniqueSet>
+      <vra:display>stone masonry; timber construction</vra:display>
+      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">stonemasonry</vra:technique>
+      <vra:technique refid="300012822" vocab="AAT" href="http://vocab.getty.edu/page/aat/300012822">structural timber</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>Mirbāṭ settlement, Oman.</vra:display>
+      <vra:title type="descriptive">Mirbāṭ settlement, Oman.</vra:title>
+      <vra:title type="translated">مستوطنة مرباط، عُمان.</vra:title>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>coastal settlement</vra:display>
+      <vra:worktype refid="300387314" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387314">coastal settlements</vra:worktype>
+    </vra:worktypeSet>
+  </vra:work>
+  <vra:image id="i_00001ArMIR" xml:lang="en">
+    <vra:agentSet>
+      <vra:display>Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman</vra:display>
+      <vra:agent>
+        <vra:name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:culture>English</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate>2012</vra:earliestDate>
+          <vra:latestDate>present</vra:latestDate>
+        </vra:dates>
+        <vra:role>creator</vra:role>
+        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</vra:role>
+        <vra:attribution>University of Liverpool. School of Architecture</vra:attribution>
+      </vra:agent>
+      <vra:agent>
+        <vra:name type="corporate" refid="134225770" vocab="VIAF" href="https://viaf.org/viaf/134225770">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</vra:name>
+        <vra:culture>Omani</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate>1976</vra:earliestDate>
+          <vra:latestDate>present</vra:latestDate>
+        </vra:dates>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</vra:role>
+      </vra:agent>
+    </vra:agentSet>
+    <vra:dateSet>
+      <vra:display>Created 2015</vra:display>
+      <vra:date type="creation">
+        <vra:earliestDate>2015</vra:earliestDate>
+        <vra:latestDate>2015</vra:latestDate>
+      </vra:date>
+    </vra:dateSet>
+    <vra:descriptionSet>
+      <vra:display>Drone aerial photograph of Mirbāṭ coastal settlement, Oman.</vra:display>
+      <vra:description>Drone aerial photograph of Mirbāṭ coastal settlement, Oman.</vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>Mirbāṭ (Dhofar Governorate, Oman)</vra:display>
+      <vra:location type="creation">
+        <vra:name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">Mirbāṭ (Oman)</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="154778103" href="http://viaf.org/viaf/154778103">Dhofar (Oman)</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
+      </vra:location>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>film still</vra:display>
+      <vra:material refid="300134997" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134997">film stills</vra:material>
+    </vra:materialSet>
+    <vra:measurementsSet>
+      <vra:display>Digital image dimensions 4000 px(W) x 3000 px(H)</vra:display>
+      <vra:measurements type="width" unit="px">4000</vra:measurements>
+      <vra:measurements type="height" unit="px">3000</vra:measurements>
+    </vra:measurementsSet>
+    <vra:relationSet>
+      <vra:display>From The ArCHIAM Collection: Mirbāṭ. Image of Mirbāṭ settlement, Oman.</vra:display>
+      <vra:relation relids="w_001SET_MIR" type="imageOf">Mirbāṭ settlement, Oman.</vra:relation>
+      <vra:relation refid="c_00000ArMIR" type="partOf">The ArCHIAM Collection: Mirbāṭ.</vra:relation>
+    </vra:relationSet>
+    <vra:rightsSet>
+      <vra:display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:display>
+      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                   and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG</vra:notes>
+      <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+        <vra:rightsHolder>Ministry of Heritage and Culture Sultanate of Oman</vra:rightsHolder>
+        <vra:text>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:text>
+      </vra:rights>
+    </vra:rightsSet>
+    <vra:sourceSet>
+      <vra:display>Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Mirbat, Dhofar Governorate, Liverpool: University of Liverpool, 2017</vra:display>
+      <vra:source>
+        <vra:name type="other">Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Mirbat, Dhofar Governorate, Liverpool: University of Liverpool, 2017</vra:name>
+        <vra:refid type="openURL">https://issuu.com/archiam/docs/20170908_hmp_mirbat</vra:refid>
+      </vra:source>
+    </vra:sourceSet>
+    <vra:techniqueSet>
+      <vra:display>drone aerial photography; color photography</vra:display>
+      <vra:technique />
+      <vra:technique refid="300053443" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053443">aerial photography</vra:technique>
+      <vra:technique refid="300374932" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374932">drone aircraft</vra:technique>
+      <vra:technique refid="300134530" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134530">color photography</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>Aerial photograph of Mirbāṭ settlement, Oman.</vra:display>
+      <vra:title type="partialView">Aerial photograph of Mirbāṭ settlement, Oman.</vra:title>
+      <vra:title type="partialView">صورة جوية لمستوطنة مرباط، عُمان.</vra:title>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>aerial photograph</vra:display>
+      <vra:worktype refid="300128222" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128222">aerial photographs</vra:worktype>
+    </vra:worktypeSet>
+  </vra:image>
+</vra:vra>

@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='utf-8'?>
+<vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+  <vra:work id="w_000set_MIS" xml:lang="en">
+    <vra:culturalContextSet>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
+    </vra:culturalContextSet>
+    <vra:descriptionSet>
+      <vra:display>The small settlement of Misfāt al ‘Abrīyin is located on the southern slopes of the Al Jabal al Akhḑar mountains of Ad Dākhilīyah Governorate of Oman.
+                 It is located within the administrative region, Wilāyat al-Ḩamrā’, which lies about 3 km to the south of Misfāt and some 2 hours’ drive to the southwest of Muscat.
+                 As the name suggests, the settlement was developed and strengthened by the ‘Abriyīn tribe with support from the ruling Ya’āribah imamate in the seventeenth century.
+                 One of the prime factors in the formation of Misfāt’s urban morphology is the complex terrain upon which the settlement was built.
+                 Located on a steep hillside at the confluence of two wadī systems at 945 m ASL, the village of Misfāt negotiates some of the most forbidding terrain in the region.
+                 The steep topography influenced the settlement to form a cluster pattern of terraced structures and passageways.
+                 Individual dwellings follow irregular ground plans and are often constructed over several different levels, which are accessed, either internally or externally,
+                 via stone-built flights of irregular stairs. The dwellings are organised in informal clusters which roughly correspond to family groups.</vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen et al, Tourism Development Plan: Misfat al-Abriyin, Al-Hamra, Liverpool: University of Liverpool, 2015">
+                 The small settlement of Misfāt al ‘Abrīyin is located on the southern slopes of the Al Jabal al Akhḑar mountains of Ad Dākhilīyah Governorate of Oman.
+                 It is located within the administrative region, Wilāyat al-Ḩamrā’, which lies about 3 km to the south of Misfāt and some 2 hours’ drive to the southwest of Muscat.
+                 As the name suggests, the settlement was developed and strengthened by the ‘Abriyīn tribe with support from the ruling Ya’āribah imamate in the seventeenth century.
+                 One of the prime factors in the formation of Misfāt’s urban morphology is the complex terrain upon which the settlement was built.
+                 Located on a steep hillside at the confluence of two wadī systems at 945 m ASL, the village of Misfāt negotiates some of the most forbidding terrain in the region.
+                 The steep topography influenced the settlement to form a cluster pattern of terraced structures and passageways.
+                 Individual dwellings follow irregular ground plans and are often constructed over several different levels, which are accessed, either internally or externally,
+                 via stone-built flights of irregular stairs. The dwellings are organised in informal clusters which roughly correspond to family groups.</vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>Misfāt al ‘Abriyīn (Oman)</vra:display>
+      <vra:location type="site">
+        <vra:name type="geographic" refid="-788062" vocab="GNS">Misfāt al ‘Abriyīn</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
+      </vra:location>
+      <vra:location type="other">
+        <vra:name type="geographic" refid="23.140837, 57.311658" vocab="GNS">Misfāt al ‘Abrīyin</vra:name>
+      </vra:location>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>stone; adobe bricks; sarūj render</vra:display>
+      <vra:material type="other" refid="300081138" vocab="AAT" href="http://vocab.getty.edu/page/aat/300081138">adobe (material)</vra:material>
+      <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">building stone</vra:material>
+      <vra:material type="other" vocab="other">sarūj</vra:material>
+    </vra:materialSet>
+    <vra:stylePeriodSet>
+      <vra:display>Omani vernacular</vra:display>
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
+    </vra:stylePeriodSet>
+    <vra:subjectSet>
+      <vra:display>gate structure; earthen architecture; oasis settlement</vra:display>
+      <vra:subject>
+        <vra:term type="descriptiveTopic" refid="300387317" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387317">oasis settlements</vra:term>
+        <vra:term type="descriptiveTopic" refid="300379486" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379486">earthen architecture</vra:term>
+      </vra:subject>
+    </vra:subjectSet>
+    <vra:techniqueSet>
+      <vra:display>dry wall stone masonry; earth construction</vra:display>
+      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">stonemasonry</vra:technique>
+      <vra:technique refid="300070971" vocab="AAT" href="http://vocab.getty.edu/page/aat/300070971">dry walls (masonry)</vra:technique>
+      <vra:technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">earth construction</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>Misfāt al ‘Abrīyin settlement, Oman.</vra:display>
+      <vra:title type="descriptive">Misfāt al ‘Abrīyin settlement, Oman.</vra:title>
+      <vra:title type="translated">مستوطنة مسفاة العبريين، عُمان.</vra:title>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>oasis settlement</vra:display>
+      <vra:worktype refid="300387317" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387317">oasis settlements</vra:worktype>
+    </vra:worktypeSet>
+  </vra:work>
+  <vra:image id="i_00002ArMIS" xml:lang="en">
+    <vra:agentSet>
+      <vra:display>Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Tourism Sultanate of Oman</vra:display>
+      <vra:agent>
+        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:culture>English</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate>2012</vra:earliestDate>
+          <vra:latestDate>present</vra:latestDate>
+        </vra:dates>
+        <vra:role>creator</vra:role>
+        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</vra:role>
+        <vra:attribution>University of Liverpool. School of Architecture</vra:attribution>
+      </vra:agent>
+      <vra:agent>
+        <vra:name type="corporate" vocab="VIAF" refid="123532087" href="https://viaf.org/viaf/123532087">Oman. Wizārat al-Siyāḥah</vra:name>
+        <vra:culture>Omani</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate>2004</vra:earliestDate>
+          <vra:latestDate>present</vra:latestDate>
+        </vra:dates>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</vra:role>
+      </vra:agent>
+    </vra:agentSet>
+    <vra:dateSet>
+      <vra:display>Created 2014-2015</vra:display>
+      <vra:date type="creation">
+        <vra:earliestDate>2014</vra:earliestDate>
+        <vra:latestDate>2015</vra:latestDate>
+      </vra:date>
+    </vra:dateSet>
+    <vra:descriptionSet>
+      <vra:display>CAD drawing of Misfāt al ‘Abrīyin settlement plan.</vra:display>
+      <vra:description>CAD drawing of Misfāt al ‘Abrīyin settlement plan.</vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>Created in University of Liverpoool, School of Architecture (Great Britain)</vra:display>
+      <vra:location type="creation">
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">University of Liverpool. School of Architecture</vra:name>
+      </vra:location>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>digital file</vra:display>
+      <vra:material refid="300404202" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">files (digital files)</vra:material>
+    </vra:materialSet>
+    <vra:measurementsSet>
+      <vra:display>File size 39.5 MB</vra:display>
+      <vra:measurements />
+      <vra:measurements type="fileSize" unit="MB">39.5</vra:measurements>
+    </vra:measurementsSet>
+    <vra:relationSet>
+      <vra:display>From The ArCHIAM Collection: Misfāt al ‘Abrīyin. Image of Misfāt al ‘Abrīyin settlement, Oman.</vra:display>
+      <vra:relation relids="w_001SET_MIS" type="imageOf">Misfāt al ‘Abrīyin settlement, Oman.</vra:relation>
+      <vra:relation refid="c_00000ArMIS" type="partOf">The ArCHIAM Collection: Misfāt al ‘Abrīyin</vra:relation>
+    </vra:relationSet>
+    <vra:rightsSet>
+      <vra:display>©University of Liverpool and Oman Ministry of Tourism. CC BY 4.0</vra:display>
+      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                   and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG</vra:notes>
+      <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+        <vra:rightsHolder>University of Liverpool &amp; Oman Ministry of Tourism</vra:rightsHolder>
+        <vra:text>©University of Liverpool and Oman Ministry of Tourism. CC BY 4.0
+                </vra:text>
+      </vra:rights>
+    </vra:rightsSet>
+    <vra:sourceSet>
+      <vra:display>Bandyopadhyay, Soumyen et al, Tourism Development Plan: Misfat al-Abriyin, Al-Hamra,Liverpool: University of Liverpool, 2015</vra:display>
+      <vra:source>
+        <vra:name type="other">Bandyopadhyay, Soumyen et al, Tourism Development Plan: Misfat al-Abriyin, Al-Hamra,Liverpool: University of Liverpool, 2015</vra:name>
+        <vra:refid type="openURL">https://issuu.com/archiam/docs/misfat_al-abriyin_hmp_22.02.2016</vra:refid>
+      </vra:source>
+    </vra:sourceSet>
+    <vra:techniqueSet>
+      <vra:display>born digital CAD (computer-aided design) drawing</vra:display>
+      <vra:technique />
+      <vra:technique refid="300374824" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374824">born digital</vra:technique>
+      <vra:technique refid="300054178" vocab="AAT" href="http://vocab.getty.edu/page/aat/300054178">computer-aided design (process)</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>CAD drawing of Misfāt al ‘Abrīyin settlement, Oman.</vra:display>
+      <vra:title type="generalView">CAD drawing of Misfāt al ‘Abrīyin settlement, Oman.</vra:title>
+      <vra:title type="generalView">رسم تصميمي بمساعدة الكمبيوتر لمستوطنة مسفاة العبريين، عُمان.</vra:title>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>architectural drawing</vra:display>
+      <vra:worktype refid="300034787" vocab="AAT" href="http://vocab.getty.edu/page/aat/300034787">architectural drawings (visual works)</vra:worktype>
+    </vra:worktypeSet>
+  </vra:image>
+</vra:vra>

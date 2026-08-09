@@ -1,0 +1,254 @@
+<?xml version='1.0' encoding='utf-8'?>
+<vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+  <vra:work id="w_0000001MUD" xml:lang="ar">
+    <vra:culturalContextSet>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:culturalContext>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
+    </vra:culturalContextSet>
+    <vra:dateSet>
+      <vra:display>تم إنشاؤها 1835-1865</vra:display>
+      <vra:date type="creation" source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014">
+        <vra:earliestDate>1835</vra:earliestDate>
+        <vra:latestDate>1865</vra:latestDate>
+      </vra:date>
+      <vra:display>Created 1835-1865</vra:display>
+    </vra:dateSet>
+    <vra:descriptionSet>
+      <vra:display>يُعتبر بيت سعيد بن محمد الطشاش المحارمي من أعظم المنازل في المضيرب، حيث يقع على الطرف الجنوبي من
+                السوق ويطل على بساتين النخيل. من المحتمل أن يعود تاريخ بنائه إلى منتصف القرن التاسع عشر.
+                لا يزال المبنى غير مأهول بالسكان منذ منصف السبعينات ويعتبر هذا البناء مهدد بالإنهيار. وقد تعرض هذا
+                المسكن إلى العديد من عمليات الترميم والإصلاح الغير مدروسة والتي تم فيها استخدام الإسمنت والكتل البيتونية
+                والتي تكاد تمنع الهيكل الرئيسي من الإنهيار بشكل كامل.
+                يشبه هيكل البناء من الخارج كتلة صلبة من البناء المختلط مع ثلاثة أبراج صغيرة على زوايا السقف. يقع في
+                الركن الجنوبي الشرقي برج دائري مُدمج في نسيج المبنى.
+                تأتي صلابة الهيكل الظاهري الواضحة أيضًا من الافتقار شبه الكامل للنوافذ، باستثناء عدد قليل من فتحات
+                التهوية الموضوعة على مستوى الطابق الأول وعدد قليل من فتحات المدافع النارية لغرض الدفاع.
+                إن المنطقة الداخلية من الطابق الأرضي مظلمة جداً حيث تتلقى جزء صغير جداً من الإضائة الطبيعية من نوافذ
+                الفناء الداخلي. حيث كان يستخدم هذا الجزء بشكا أساسي للتخزين وحظيرة للحيوانات وكذلك سجن للرقيق. كما كان
+                يحتوي على بئر ماء والتي كانت تستخدم فقط في أوقات الجفاف والنزاعات أو عندما كان المنزل تحت الحصار بالرغم من وفرة مائها.
+            </vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014">
+                يُعتبر بيت سعيد بن محمد الطشاش المحارمي من أعظم المنازل في المضيرب، حيث يقع على الطرف الجنوبي من السوق
+                ويطل على بساتين النخيل. من المحتمل أن يعود تاريخ بنائه إلى منتصف القرن التاسع عشر.
+                لا يزال المبنى غير مأهول بالسكان منذ منصف السبعينات ويعتبر هذا البناء مهدد بالإنهيار. وقد تعرض هذا
+                المسكن إلى العديد من عمليات الترميم والإصلاح الغير مدروسة والتي تم فيها استخدام الإسمنت والكتل البيتونية
+                والتي تكاد تمنع الهيكل الرئيسي من الإنهيار بشكل كامل.
+                يشبه هيكل البناء من الخارج كتلة صلبة من البناء المختلط مع ثلاثة أبراج صغيرة على زوايا السقف. يقع في
+                الركن الجنوبي الشرقي برج دائري مُدمج في نسيج المبنى.
+                تأتي صلابة الهيكل الظاهري الواضحة أيضًا من الافتقار شبه الكامل للنوافذ، باستثناء عدد قليل من فتحات
+                التهوية الموضوعة على مستوى الطابق الأول وعدد قليل من فتحات المدافع النارية لغرض الدفاع.
+                إن المنطقة الداخلية من الطابق الأرضي مظلمة جداً حيث تتلقى جزء صغير جداً من الإضائة الطبيعية من نوافذ
+                الفناء الداخلي. حيث كان يستخدم هذا الجزء بشكا أساسي للتخزين وحظيرة للحيوانات وكذلك سجن للرقيق. كما كان
+                يحتوي على بئر ماء والتي كانت تستخدم فقط في أوقات الجفاف والنزاعات أو عندما كان المنزل تحت الحصار بالرغم من وفرة مائها.
+            </vra:description>
+      <vra:display>The grandest of the houses in Mudayrib is Bayt Sa’īd b. Muhammad al Tashash al Maharmi, located
+                 on the southern end of the sūq and overlooking the palm groves.Its construction date is likely datable to the middle of the nineteenth century.
+                 The building remains uninhabited since the mid-1970s and its current state of preservation is precarious.
+                 A number of uncoordinated rebuildings and repairs have been carried out in cement and concrete blocks only barely keeping the main structure from collapsing.
+                 From the outside the structure resembles a solid block of mixed masonry with three small towers on the corners of the roof.
+                 The south-eastern corner is occupied by a round tower integrated into the fabric of the structure.
+                 The apparent plain solidity of the structure comes also from the almost complete lack of windows, with the exception of a few ventilation slots placed
+                 high on the first floor level and a few gun-loops for defence. The interior of the ground floor is very dark and it received nearly no natural light
+                 from either windows of the courtyard. It was used primarily for storage, stabling of animals as well as a slave prison.
+                 It also housed a well which would have been used regularly but provided extra subsistence in times of drought, strife or when the house was under siege.
+             </vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014">
+                 The grandest of the houses in Mudayrib is Bayt Sa’īd b. Muhammad al Tashash al Maharmi, located
+                 on the southern end of the sūq and overlooking the palm groves.Its construction date is likely datable to the middle of the nineteenth century.
+                 The building remains uninhabited since the mid-1970s and its current state of preservation is precarious.
+                 A number of uncoordinated rebuildings and repairs have been carried out in cement and concrete blocks only barely keeping the main structure from collapsing.
+                 From the outside the structure resembles a solid block of mixed masonry with three small towers on the corners of the roof.
+                 The south-eastern corner is occupied by a round tower integrated into the fabric of the structure.
+                 The apparent plain solidity of the structure comes also from the almost complete lack of windows, with the exception of a few ventilation slots placed
+                 high on the first floor level and a few gun-loops for defence. The interior of the ground floor is very dark and it received nearly no natural light
+                 from either windows of the courtyard. It was used primarily for storage, stabling of animals as well as a slave prison.
+                 It also housed a well which would have been used regularly but provided extra subsistence in times of drought, strife or when the house was under siege.
+             </vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>المضيرب (عُمان)</vra:display>
+      <vra:location type="site">
+        <vra:name type="geographic" refid="-786100" vocab="GNS">المضيرب</vra:name>
+        <vra:name type="geographic" refid="137795373" vocab="VIAF" href="http://viaf.org/viaf/137795373">سلطنة عمان</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="102153651688355781260" href="http://viaf.org/viaf/102153651688355781260">Mudayrib (Oman)</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
+        <vra:name type="geographic" refid="22.613447, 58.667656" vocab="GNS">Mudayrib</vra:name>
+      </vra:location>
+      <vra:location type="other">
+        <vra:name type="geographic" refid="22.613447, 58.667656" vocab="GNS">المضيرب</vra:name>
+      </vra:location>
+      <vra:display>Mudayrib (Oman)</vra:display>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>حجر؛ طوب لبن؛ إكساء صاروج</vra:display>
+      <vra:material type="other" refid="300081138" vocab="AAT" href="http://vocab.getty.edu/page/aat/300081138">طوب (مادة)</vra:material>
+      <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">حجر البناء</vra:material>
+      <vra:material type="other" vocab="other">صاروج</vra:material>
+      <vra:display>stone; adobe bricks; sarūj render</vra:display>
+      <vra:material type="other" refid="300081138" vocab="AAT" href="http://vocab.getty.edu/page/aat/300081138">adobe (material)</vra:material>
+      <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">building stone</vra:material>
+      <vra:material type="other" vocab="other">sarūj</vra:material>
+    </vra:materialSet>
+    <vra:relationSet>
+      <vra:display>من مستوطنة المضيرب، عُمان.</vra:display>
+      <vra:relation refid="w_001SET_MUD" type="partOf">مستوطنة المضيرب، عُمان.</vra:relation>
+      <vra:display>From Mudayrib settlement, Oman.</vra:display>
+      <vra:relation refid="w_001SET_MUD" type="partOf">Mudayrib settlement, Oman.</vra:relation>
+    </vra:relationSet>
+    <vra:stylePeriodSet>
+      <vra:display>عُماني شعبي</vra:display>
+      <vra:stylePeriod />
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483"> عُماني</vra:stylePeriod>
+      <vra:display>Omani vernacular</vra:display>
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
+    </vra:stylePeriodSet>
+    <vra:subjectSet>
+      <vra:display>مسكن؛ عمارة طينية</vra:display>
+      <vra:subject>
+        <vra:term refid="300005425" type="descriptiveTopic" vocab="AAT" href="http://vocab.getty.edu/page/aat/300005425">مساكن</vra:term>
+        <vra:term type="descriptiveTopic" refid="300379486" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379486">عمارة طينية</vra:term>
+        <vra:term refid="300005425" type="descriptiveTopic" vocab="AAT" href="http://vocab.getty.edu/page/aat/300005425">dwellings</vra:term>
+        <vra:term type="descriptiveTopic" refid="300379486" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379486">earthen architecture</vra:term>
+      </vra:subject>
+      <vra:display>dwelling; earthen architecture</vra:display>
+    </vra:subjectSet>
+    <vra:techniqueSet>
+      <vra:display>بناء من حجر؛ منشأة طينية</vra:display>
+      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">البناء من حجر</vra:technique>
+      <vra:technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">منشأة طينية</vra:technique>
+      <vra:display>stone masonry; earth construction</vra:display>
+      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">stonemasonry</vra:technique>
+      <vra:technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">earth construction</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>مسكن في المضيرب، عُمان.</vra:display>
+      <vra:title type="descriptive">مسكن في المضيرب، عُمان.</vra:title>
+      <vra:title type="translated">Dwelling in Mudayrib, Oman.</vra:title>
+      <vra:display>Dwelling in Mudayrib, Oman.</vra:display>
+      <vra:title type="descriptive">Dwelling in Mudayrib, Oman.</vra:title>
+      <vra:title type="translated">مسكن في المضيرب، عُمان</vra:title>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>مسكن</vra:display>
+      <vra:worktype refid="300005425" vocab="AAT" href="http://vocab.getty.edu/page/aat/300005425">مساكن</vra:worktype>
+      <vra:display>dwelling</vra:display>
+      <vra:worktype refid="300005425" vocab="AAT" href="http://vocab.getty.edu/page/aat/300005425">dwellings</vra:worktype>
+    </vra:worktypeSet>
+  </vra:work>
+  <vra:image id="i_00001ArMUD" xml:lang="ar">
+    <vra:agentSet>
+      <vra:display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</vra:display>
+      <vra:agent>
+        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
+        <vra:culture>الإنكليزية</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate>2012</vra:earliestDate>
+          <vra:latestDate>present</vra:latestDate>
+          <vra:earliestDate>1976</vra:earliestDate>
+        </vra:dates>
+        <vra:role>مؤلف</vra:role>
+        <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</vra:role>
+        <vra:attribution>جامعة ليفربول. كلية الهندسة المعمارية</vra:attribution>
+        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:culture>English</vra:culture>
+        <vra:role>creator</vra:role>
+        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</vra:role>
+        <vra:attribution>University of Liverpool. School of Architecture</vra:attribution>
+        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</vra:name>
+        <vra:culture>Omani</vra:culture>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</vra:role>
+      </vra:agent>
+      <vra:agent>
+        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</vra:name>
+        <vra:culture>عُماني</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate>1976</vra:earliestDate>
+          <vra:latestDate>present</vra:latestDate>
+        </vra:dates>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</vra:role>
+      </vra:agent>
+      <vra:display>Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman</vra:display>
+    </vra:agentSet>
+    <vra:dateSet>
+      <vra:display>تم إنشاؤها 2016</vra:display>
+      <vra:date type="creation">
+        <vra:earliestDate>2016</vra:earliestDate>
+        <vra:latestDate>2016</vra:latestDate>
+      </vra:date>
+      <vra:display>Created 2016</vra:display>
+    </vra:dateSet>
+    <vra:descriptionSet>
+      <vra:display>نموذج رقمي ثلاثي الأبعاد لبيت سعيد بن محمد الطشاش المحارمي في واحة المضيرب، عُمان. تم إنشاء النموذج باستخدام برنامج AutoCad.</vra:display>
+      <vra:description>نموذج رقمي ثلاثي الأبعاد لبيت سعيد بن محمد الطشاش المحارمي في واحة المضيرب، عُمان. تم إنشاء النموذج باستخدام برنامج AutoCad.</vra:description>
+      <vra:display>Digital 3-D model of Bayt Sa’īd b. Muhammad al Tashash al Maharmi, dwelling in Mudayrib oasis, Oman. The model was generated using AutoCad software.</vra:display>
+      <vra:description>Digital 3-D model of Bayt Sa’īd b. Muhammad al Tashash al Maharmi, dwelling in Mudayrib oasis, Oman. The model was generated using AutoCad software.</vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>تم إنشاؤها في جامعة ليفربول، كلية الهندسة المعمارية (بريطانيا العظمى)</vra:display>
+      <vra:location type="creation">
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">جامعة ليفربول. كلية الهندسة المعمارية</vra:name>
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">University of Liverpool. School of Architecture</vra:name>
+      </vra:location>
+      <vra:display>Created in University of Liverpoool, School of Architecture (Great Britain)</vra:display>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>ملف رقمي</vra:display>
+      <vra:material />
+      <vra:material refid="300404202" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">ملفات (ملفات رقمية)</vra:material>
+      <vra:display>digital file</vra:display>
+      <vra:material refid="300404202" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">files (digital files)</vra:material>
+    </vra:materialSet>
+    <vra:measurementsSet>
+      <vra:display> 28.8 MB حجم الملف</vra:display>
+      <vra:measurements />
+      <vra:measurements type="fileSize" unit="MB">28.8</vra:measurements>
+      <vra:display>File size 28.8 MB</vra:display>
+    </vra:measurementsSet>
+    <vra:relationSet>
+      <vra:display>من مجموعة أركيام: المضيرب. صورة لمسكن في المضيرب، عُمان.</vra:display>
+      <vra:relation relids="w_0000001MUD" type="imageOf">مسكن في المضيرب، عُمان.</vra:relation>
+      <vra:relation refid="c_00000ArMUD" type="partOf">مجموعة أركيام: المضيرب.</vra:relation>
+      <vra:display>From The ArCHIAM Collection: Mudayrib. Image of Dwelling in Mudayrib, Oman. </vra:display>
+      <vra:relation relids="w_0000001MUD" type="imageOf">Dwelling in Mudayrib, Oman.</vra:relation>
+      <vra:relation refid="c_00000ArMUD" type="partOf">The ArCHIAM Collection: Mudayrib.</vra:relation>
+    </vra:relationSet>
+    <vra:rightsSet>
+      <vra:display>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</vra:display>
+      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </vra:notes>
+      <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+        <vra:rightsHolder>وزارة التراث والثقافة في سلطنة عُمان</vra:rightsHolder>
+        <vra:text>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</vra:text>
+        <vra:rightsHolder>Ministry of Heritage and Culture Sultanate of Oman</vra:rightsHolder>
+        <vra:text>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:text>
+      </vra:rights>
+      <vra:display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:display>
+      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG
+            </vra:notes>
+    </vra:rightsSet>
+    <vra:techniqueSet>
+      <vra:display>رسم تصميمي تم إنشاء الملف رقمياً (تصميم بمساعدة الحاسب)</vra:display>
+      <vra:technique refid="300374824" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374824">تم إنشاء الملف رقمياً</vra:technique>
+      <vra:technique refid="300404202" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">تصميم بمساعدة الحاسب (عملية)</vra:technique>
+      <vra:display>born digital CAD (computer-aided design) drawing</vra:display>
+      <vra:technique refid="300374824" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374824">born digital</vra:technique>
+      <vra:technique refid="300404202" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">computer-aided design (process)</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>نموذج رقمي ثلاثي الأبعاد لمسكن في المضيرب، عُمان.</vra:display>
+      <vra:title type="generalView">نموذج رقمي ثلاثي الأبعاد لمسكن في المضيرب، عُمان.</vra:title>
+      <vra:title type="generalView">Digital 3-D model of dwelling in Mudayrib, Oman.</vra:title>
+      <vra:display>Digital 3-D model of dwelling in Mudayrib, Oman.</vra:display>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>نموذج رقمي افتراضي</vra:display>
+      <vra:worktype refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">نماذج رقمية افتراضية</vra:worktype>
+      <vra:display>virtual model</vra:display>
+      <vra:worktype refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">virtual models</vra:worktype>
+    </vra:worktypeSet>
+  </vra:image>
+</vra:vra>

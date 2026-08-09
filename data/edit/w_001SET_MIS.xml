@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='utf-8'?>
+<vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+  <vra:work id="w_001SET_MIS" xml:lang="ar">
+    <vra:culturalContextSet>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:culturalContext>
+    </vra:culturalContextSet>
+    <vra:descriptionSet>
+      <vra:display>تقع مستوطنة مسفاة العبريين الصغيرة على المنحدرات الجنوبية لجبل الأخضر والتابعة لمحافظة الداخلية في
+                عُمان. وتقع داخل المنطقة الإدارية لولاية الحمراء والتي تبعد حوالي 3 كم إلى الجنوب من مدينة مسفاة، وعلى بعد ساعتين بالسيارة إلى الجنوب الغربي لمدينة مسقط.
+                وكما يوحي الاسم، تم تطوير المستوطنة وتعزيزها من قبل قبيلة العبريين بدعم من الإمامة اليعربية الحاكمة في القرن السابع عشر.
+                ومن أحد العوامل الرئيسية في التشكيل العمراني و مورفولوجيا المدينة هو موقعها ضمن منطقة تضاريس متراكبة
+                والتي بنيت عليها المدينة. حيث تقع على تلة شديدة الانحدار عند ملتقى اثنين من أنظمة الوادي في على ارتفاع 945 م،
+                حيث إن البنية العمرانية لقرية مسفاة تأقلمت مع أكثر التضاريس تحدياً في المنطقة. وقد أثرت التضاريس الشديدة
+                الإنحدار على المستوطنة ليتم تشكيلها عمرانياً بشكل عضوي لتتكوّن من مباني متراكبة وممرات مدرّجة.
+                حيث تم تشكيل المخططات الأرضية للمساكن الفردية بشكل غير منتظم، والتي غالبًا ما تم بناؤها على عدة مستويات
+                مختلفة والتي يتم الوصول إليها إما من الداخل أو من الخارج عن طريق سلالم غير منتظمة ومبنية من الحجارة.
+                يتم تنظيم المساكن في مجموعات غير منتظمة والتي تتوافق تقريبًا مع التجمعات العائلية أو في الواقع مع التقسيمات القبلية.
+            </vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen et al, Tourism Development Plan: Misfat al-Abriyin, Al-Hamra, Liverpool: University of Liverpool, 2015">
+                تقع مستوطنة مسفاة العبريين الصغيرة على المنحدرات الجنوبية لجبل الأخضر والتابعة لمحافظة الداخلية في
+                عُمان. وتقع داخل المنطقة الإدارية لولاية الحمراء والتي تبعد حوالي 3 كم إلى الجنوب من مدينة مسفاة، وعلى بعد ساعتين بالسيارة إلى الجنوب الغربي لمدينة مسقط.
+                وكما يوحي الاسم، تم تطوير المستوطنة وتعزيزها من قبل قبيلة العبريين بدعم من الإمامة اليعربية الحاكمة في القرن السابع عشر.
+                ومن أحد العوامل الرئيسية في التشكيل العمراني و مورفولوجيا المدينة هو موقعها ضمن منطقة تضاريس متراكبة
+                والتي بنيت عليها المدينة. حيث تقع على تلة شديدة الانحدار عند ملتقى اثنين من أنظمة الوادي في على ارتفاع 945 م،
+                حيث إن البنية العمرانية لقرية مسفاة تأقلمت مع أكثر التضاريس تحدياً في المنطقة. وقد أثرت التضاريس الشديدة
+                الإنحدار على المستوطنة ليتم تشكيلها عمرانياً بشكل عضوي لتتكوّن من مباني متراكبة وممرات مدرّجة.
+                حيث تم تشكيل المخططات الأرضية للمساكن الفردية بشكل غير منتظم، والتي غالبًا ما تم بناؤها على عدة مستويات
+                مختلفة والتي يتم الوصول إليها إما من الداخل أو من الخارج عن طريق سلالم غير منتظمة ومبنية من الحجارة.
+                يتم تنظيم المساكن في مجموعات غير منتظمة والتي تتوافق تقريبًا مع التجمعات العائلية أو في الواقع مع التقسيمات القبلية.
+            </vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>مسفاة العبريين (عُمان)</vra:display>
+      <vra:location type="site">
+        <vra:name type="geographic" refid="-788062" vocab="GNS">مسفاة العبريين</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">"&gt;سلطنة عمان</vra:name>
+      </vra:location>
+      <vra:location type="other">
+        <vra:name type="geographic" refid="23.140837, 57.311658" vocab="GNS">مسفاة العبريين</vra:name>
+      </vra:location>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>حجر؛ طوب لبن؛ إكساء صاروج</vra:display>
+      <vra:material type="other" refid="300081138" vocab="AAT" href="http://vocab.getty.edu/page/aat/300081138">طوب (مادة)</vra:material>
+      <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">حجر البناء</vra:material>
+      <vra:material type="other" vocab="other">صاروج</vra:material>
+    </vra:materialSet>
+    <vra:stylePeriodSet>
+      <vra:display>عُماني شعبي</vra:display>
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:stylePeriod>
+    </vra:stylePeriodSet>
+    <vra:subjectSet>
+      <vra:display>هيكل البوابة؛ عمارة طينية؛ مستوطنة الواحة</vra:display>
+      <vra:subject>
+        <vra:term type="descriptiveTopic" refid="300387317" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387317">مستوطنات الواحة</vra:term>
+        <vra:term type="descriptiveTopic" refid="300379486" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379486">عمارة طينية</vra:term>
+      </vra:subject>
+    </vra:subjectSet>
+    <vra:techniqueSet>
+      <vra:display>جدار حجري جاف؛ منشأة طينية</vra:display>
+      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">البناء من حجر</vra:technique>
+      <vra:technique refid="300070971" vocab="AAT" href="http://vocab.getty.edu/page/aat/300070971">جدران حجرية جافة بدون طينة</vra:technique>
+      <vra:technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">منشأة طينية</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>مستوطنة مسفاة العبريين، عُمان.</vra:display>
+      <vra:title type="descriptive">مستوطنة مسفاة العبريين، عُمان.</vra:title>
+      <vra:title type="translated">Misfāt al ‘Abrīyin settlement, Oman.</vra:title>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>مستوطنة الواحة</vra:display>
+      <vra:worktype refid="300387317" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387317">مستوطنات الواحة</vra:worktype>
+    </vra:worktypeSet>
+  </vra:work>
+  <vra:image id="i_00002ArMIS" xml:lang="en">
+    <vra:agentSet>
+      <vra:display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة السياحة في عُمان</vra:display>
+      <vra:agent>
+        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
+        <vra:culture>الإنكليزية</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate>2012</vra:earliestDate>
+          <vra:latestDate>present</vra:latestDate>
+        </vra:dates>
+        <vra:role>مؤلف</vra:role>
+        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</vra:role>
+        <vra:attribution>جامعة ليفربول. كلية الهندسة المعمارية</vra:attribution>
+      </vra:agent>
+      <vra:agent>
+        <vra:name type="corporate" vocab="VIAF" refid="123532087" href="https://viaf.org/viaf/123532087">وزارة السياحة</vra:name>
+        <vra:culture>عُماني</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate>2004</vra:earliestDate>
+          <vra:latestDate>present</vra:latestDate>
+        </vra:dates>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</vra:role>
+      </vra:agent>
+    </vra:agentSet>
+    <vra:dateSet>
+      <vra:display>تم إنشاؤها 2014-2015</vra:display>
+      <vra:date type="creation">
+        <vra:earliestDate>2014</vra:earliestDate>
+        <vra:latestDate>2015</vra:latestDate>
+      </vra:date>
+    </vra:dateSet>
+    <vra:descriptionSet>
+      <vra:display>رسم تصميمي بمساعدة الكمبيوتر لمخطط مستوطنة مسفاة العبريين.</vra:display>
+      <vra:description>رسم تصميمي بمساعدة الكمبيوتر لمخطط مستوطنة مسفاة العبريين.</vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>تم إنشاؤها في جامعة ليفربول، كلية الهندسة المعمارية (بريطانيا العظمى)</vra:display>
+      <vra:location type="creation">
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">جامعة ليفربول. كلية الهندسة المعمارية</vra:name>
+      </vra:location>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>ملف رقمي</vra:display>
+      <vra:material refid="300404202" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">ملفات (ملفات رقمية)</vra:material>
+    </vra:materialSet>
+    <vra:measurementsSet>
+      <vra:display> 39.5 MB حجم الملف</vra:display>
+      <vra:measurements />
+      <vra:measurements type="fileSize" unit="MB">39.5</vra:measurements>
+    </vra:measurementsSet>
+    <vra:relationSet>
+      <vra:display>من مجموعة أركيام: مسفاة العبريين. صورة لمستوطنة مسفاة العبريين، عُمان.</vra:display>
+      <vra:relation relids="w_001SET_MIS" type="imageOf">مستوطنة مسفاة العبريين، عُمان.</vra:relation>
+      <vra:relation refid="c_00000ArMIS" type="partOf">مجموعة أركيام: مسفاة العبريين</vra:relation>
+    </vra:relationSet>
+    <vra:rightsSet>
+      <vra:display>©جامعة ليفربول ووزارة السياحة في سلطنة عُمان. CC BY 4.0</vra:display>
+      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </vra:notes>
+      <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+        <vra:rightsHolder>جامعة ليفربول ووزارة السياحة في عُمان</vra:rightsHolder>
+        <vra:text>©جامعة ليفربول ووزارة السياحة في عُمان. CC BY 4.0</vra:text>
+      </vra:rights>
+    </vra:rightsSet>
+    <vra:sourceSet>
+      <vra:display>بانديوبادايا، شومان وآخرون، مخطط الطوير السياحي: مسفاة العبريين، الحمراء، ليفربول، جامعة ليفربول، 2015</vra:display>
+      <vra:source>
+        <vra:name type="other">بانديوبادايا، شومان وآخرون، مخطط الطوير السياحي: مسفاة العبريين، الحمراء، ليفربول، جامعة ليفربول، 2015</vra:name>
+        <vra:refid type="openURL">https://issuu.com/archiam/docs/misfat_al-abriyin_hmp_22.02.2016</vra:refid>
+      </vra:source>
+    </vra:sourceSet>
+    <vra:techniqueSet>
+      <vra:display>رسم تصميمي تم إنشاء الملف رقمياً (تصميم بمساعدة الحاسب)</vra:display>
+      <vra:technique />
+      <vra:technique refid="300374824" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374824">تم إنشاء الملف رقمياً</vra:technique>
+      <vra:technique refid="300054178" vocab="AAT" href="http://vocab.getty.edu/page/aat/300054178">تصميم بمساعدة الحاسب (عملية)</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>رسم تصميمي بمساعدة الكمبيوتر لمستوطنة مسفاة العبريين، عُمان.</vra:display>
+      <vra:title type="generalView">رسم تصميمي بمساعدة الكمبيوتر لمستوطنة مسفاة العبريين، عُمان.</vra:title>
+      <vra:title type="generalView">CAD drawing of Misfāt al ‘Abrīyin settlement, Oman.</vra:title>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>رسم معماري</vra:display>
+      <vra:worktype refid="300034787" vocab="AAT" href="http://vocab.getty.edu/page/aat/300034787">رسومات معمارية (أعمال بصرية)</vra:worktype>
+    </vra:worktypeSet>
+  </vra:image>
+</vra:vra>

@@ -1,37 +1,40 @@
-import configparser, psutil
-import logging
-from functools import reduce
+import configparser
 from pathlib import Path
+from .utils import strip_quotes
+DEFAULT_CONFIG_PATH = Path("~/vra-config.ini").expanduser()
 
-from .utils import get_full_name
+LOCATION_KEYS = ['edit', 'ingest', 'pending', 'rejected', 'reviewed', 'released']
+OPTION_TEXT_KEYS = ['image_pattern', 'collection_pattern', 'work_pattern', 'geonames_username']
 
 
-config = configparser.ConfigParser()
-# Create a ConfigParser instance
-def _get_config():
-    filename = Path('~/vra-config.ini').absolute()
-    if   filename.exists():
-        # Read the INI file
-        config.read(str(filename))
-    else:
-        logging.warning(f"Config file not found: {filename}")
-        config.add_section('locations')
-        config.set('locations','edit','' )
-        config.set('locations', 'ingest', '')
-        config.set('locations', 'pending', '')
-        config.set('locations', 'rejected', '')
-        config.set('locations', 'reviewed', '')
-        config.set('locations', 'released', '')
+def to_bool(value: str) -> bool:
+    return value.strip().lower() in ('1', 'true', 'yes', 'on')
 
-        config.add_section('user')
-        config.set('user', 'FullName', get_full_name())
 
-        config.add_section('options')
-        config.set('options', 'auto_ingest', True)
-        config.set('options', 'image_pattern', 'i_*.xml')
-        config.set('options', 'collection_pattern', 'w_*.xml')
+def load_config(config_path: Path = DEFAULT_CONFIG_PATH) -> configparser.ConfigParser:
+    parser = configparser.ConfigParser()
+    if config_path.exists():
+        parser.read(config_path)
+    return parser
 
-        config.write(open(filename, 'wt'))
 
-        # todo - auto open config page on first run
+def load_locations(config_path: Path = DEFAULT_CONFIG_PATH) -> dict[str, Path]:
+    """Returns {name: Path} for every entry in [locations], expanded.
 
+    Re-reads the file each call so callers always see the latest values
+    (e.g. right after the user edits and saves Settings).
+    """
+    parser = load_config(config_path)
+    if not parser.has_section('locations'):
+        return {}
+    return {
+        key: Path(strip_quotes(value)).expanduser()
+        for key, value in parser['locations'].items()
+    }
+
+
+def load_geonames_username(config_path: Path = DEFAULT_CONFIG_PATH) -> str:
+    parser = load_config(config_path)
+    if not parser.has_section('options'):
+        return ''
+    return strip_quotes(parser['options'].get('geonames_username', ''))

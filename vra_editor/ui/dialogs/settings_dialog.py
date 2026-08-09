@@ -1,0 +1,157 @@
+import configparser
+from pathlib import Path
+from typing import Optional
+
+from PySide6.QtWidgets import (
+    QDialog, QWidget, QFormLayout, QVBoxLayout, QHBoxLayout,
+    QLineEdit, QCheckBox, QPushButton, QFileDialog,
+    QDialogButtonBox, QGroupBox, QMessageBox,
+)
+from ...utils import strip_quotes
+from ...config import (
+    DEFAULT_CONFIG_PATH, LOCATION_KEYS, OPTION_TEXT_KEYS,
+    to_bool,
+)
+
+
+# noinspection PyUnresolvedReferences
+class SettingsDialog(QDialog):
+    """Modal dialog for editing vra-config.ini.
+
+    Usage:
+        dlg = SettingsDialog(parent=self)
+        dlg.exec()   # modal -- blocks until Save/Cancel
+    """
+
+    def __init__(self, config_path: Path = DEFAULT_CONFIG_PATH, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Settings")
+        self.setModal(True)
+        self.resize(480, 360)
+
+        self.config_path = config_path
+        self._location_edits: dict[str, QLineEdit] = {}
+        self._option_edits: dict[str, QLineEdit] = {}
+        self.fullname_edit: Optional[QLineEdit] = None
+        self.auto_ingest_check: Optional[QCheckBox] = None
+
+        self._build_ui()
+        self._load()
+
+    # ------------------------------------------------------------------
+    # UI construction
+    # ------------------------------------------------------------------
+
+    def _build_ui(self):
+        outer = QVBoxLayout(self)
+
+        outer.addWidget(self._build_locations_group())
+        outer.addWidget(self._build_user_group())
+        outer.addWidget(self._build_options_group())
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Save | QDialogButtonBox.Cancel
+        )
+        buttons.accepted.connect(self._on_save)
+        buttons.rejected.connect(self.reject)
+        outer.addWidget(buttons)
+
+    def _build_locations_group(self) -> QGroupBox:
+        group = QGroupBox("Locations")
+        form = QFormLayout(group)
+
+        for key in LOCATION_KEYS:
+            row = QWidget()
+            row_layout = QHBoxLayout(row)
+            row_layout.setContentsMargins(0, 0, 0, 0)
+
+            edit = QLineEdit()
+            browse_btn = QPushButton("Browse...")
+            browse_btn.clicked.connect(lambda _checked, e=edit: self._browse_for(e))
+
+            row_layout.addWidget(edit)
+            row_layout.addWidget(browse_btn)
+
+            self._location_edits[key] = edit
+            form.addRow(f"{key}:", row)
+
+        return group
+
+    def _build_user_group(self) -> QGroupBox:
+        group = QGroupBox("User")
+        form = QFormLayout(group)
+        self.fullname_edit = QLineEdit()
+        form.addRow("Full name:", self.fullname_edit)
+        return group
+
+    def _build_options_group(self) -> QGroupBox:
+        group = QGroupBox("Options")
+        form = QFormLayout(group)
+
+        self.auto_ingest_check = QCheckBox()
+        form.addRow("Auto ingest:", self.auto_ingest_check)
+
+        for key in OPTION_TEXT_KEYS:
+            edit = QLineEdit()
+            self._option_edits[key] = edit
+            form.addRow(f"{key}:", edit)
+
+        return group
+
+    def _browse_for(self, line_edit: QLineEdit):
+        start_dir = line_edit.text() or str(Path.home())
+        chosen = QFileDialog.getExistingDirectory(self, "Select folder", start_dir)
+        if chosen:
+            line_edit.setText(chosen)
+
+    # ------------------------------------------------------------------
+    # Load / save
+    # ------------------------------------------------------------------
+
+    def _load(self):
+        parser = configparser.ConfigParser()
+        if self.config_path.exists():
+            parser.read(self.config_path)
+
+        locations = parser['locations'] if parser.has_section('locations') else {}
+        for key, edit in self._location_edits.items():
+            edit.setText(locations.get(key, ''))
+
+        user = parser['user'] if parser.has_section('user') else {}
+        self.fullname_edit.setText(strip_quotes(user.get('FullName', '')))
+
+        options = parser['options'] if parser.has_section('options') else {}
+        self.auto_ingest_check.setChecked(to_bool(options.get('auto_ingest', 'false')))
+        for key, edit in self._option_edits.items():
+            edit.setText(options.get(key, ''))
+
+    def _on_save(self):
+        parser = configparser.ConfigParser()
+        parser['locations'] = {
+            key: edit.text().strip() for key, edit in self._location_edits.items()
+        }
+        for key, path in parser['locations'].items():
+            if not path:
+                continue
+            try:
+                Path(path).mkdir(parents=True, exist_ok=True)
+            except OSError as exc:
+                QMessageBox.critical(self, "Create dir failed", f"Could not create {path}:\n{exc}")
+
+        parser['user'] = {
+            'FullName': self.fullname_edit.text().strip(),
+        }
+        parser['options'] = {
+            'auto_ingest': 'true' if self.auto_ingest_check.isChecked() else 'false',
+            **{key: edit.text().strip() for key, edit in self._option_edits.items()},
+        }
+
+        try:
+            self.config_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.config_path, 'w') as f:
+                parser.write(f)
+        except OSError as exc:
+            QMessageBox.critical(self, "Save failed", f"Could not write {self.config_path}:\n{exc}")
+            return
+
+        self.accept()

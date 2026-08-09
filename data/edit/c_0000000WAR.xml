@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='utf-8'?>
+<vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+  <vra:collection id="c_0000000WAR" xml:lang="ar">
+    <vra:agentSet>
+      <vra:display>تم إنشاؤها من قبل جون وار؛ جزء من مستودع أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)</vra:display>
+      <vra:agent>
+        <vra:name type="personal">وار، جون</vra:name>
+        <vra:culture>الإنكليزية</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate>1962</vra:earliestDate>
+          <vra:latestDate>1979</vra:latestDate>
+        </vra:dates>
+        <vra:role vocab="AAT" refid="300264406" href="http://vocab.getty.edu/page/aat/300264406">جيوفيزيائي</vra:role>
+        <vra:role>مؤلف</vra:role>
+        <vra:role>مالك سابق</vra:role>
+        <vra:name type="personal">Warr, John</vra:name>
+        <vra:culture>English</vra:culture>
+        <vra:role vocab="AAT" refid="300264406" href="http://vocab.getty.edu/page/aat/300264406">geophysicist</vra:role>
+        <vra:role>creator</vra:role>
+        <vra:role>formerOwner</vra:role>
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:role>repository</vra:role>
+        <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</vra:role>
+      </vra:agent>
+      <vra:agent>
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">مركز لدراسةالهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
+        <vra:role>مستودع</vra:role>
+        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</vra:role>
+      </vra:agent>
+      <vra:display>Created by John Warr; part of ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb) repository</vra:display>
+    </vra:agentSet>
+    <vra:culturalContextSet>
+      <vra:culturalContext vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:culturalContext>
+      <vra:culturalContext vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
+    </vra:culturalContextSet>
+    <vra:dateSet>
+      <vra:display>تم إنشاؤها 1963-1972</vra:display>
+      <vra:date type="creation">
+        <vra:earliestDate>1963</vra:earliestDate>
+        <vra:latestDate>1972</vra:latestDate>
+      </vra:date>
+      <vra:display>Created 1963-1972</vra:display>
+    </vra:dateSet>
+    <vra:descriptionSet>
+      <vra:display>تتألف المجموعة الخاصة للجيوفيزيائي جون وار من صور تاريخية تم تحويلها رقمياً بشكل مسبق والتي تم
+                التقاطها في مواقع مختلفة في سلطنة عُمان.
+                تم إنتاج هذه المادة خلال مشاركته في التنقيب الجيولوجي والجيوفيزيائي عن النفط والغاز في عُمان بين عامي 1963 و 1972 .
+            </vra:display>
+      <vra:description source="Warr, John">تتألف المجموعة الخاصة للجيوفيزيائي جون وار من صور تاريخية تم تحويلها رقمياً
+                بشكل مسبق والتي تم التقاطها في مواقع مختلفة في سلطنة عُمان.
+                تم إنتاج هذه المادة خلال مشاركته في التنقيب الجيولوجي والجيوفيزيائي عن النفط والغاز في عُمان بين عامي 1963 و 1972 .
+            </vra:description>
+      <vra:display>Private collection of geophysicist John Warr, consisting of pre-digitised historical photographs
+                taken in various locations across the Sultanate of Oman. The material was produced during
+                his engagement in geological and geophysical exploration for oil and gas in Oman, between 1963 and 1972.</vra:display>
+      <vra:description source="Warr, John">Private collection of geophysicist John Warr, consisting of pre-digitised
+                historical photographs taken in various locations across the Sultanate of Oman. The material was
+                produced during his engagement in geological and geophysical exploration for oil and gas in Oman, between 1963 and 1972.</vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب) (ليفربول، بريطانيا العظمى)؛ تم إنشاؤها في عُمان</vra:display>
+      <vra:location type="repository">
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">جامعة ليفربول. كلية الهندسة المعمارية</vra:name>
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">University of Liverpool. School of Architecture;</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
+      </vra:location>
+      <vra:location type="creation">
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">"&gt;سلطنة عمان</vra:name>
+      </vra:location>
+      <vra:display>ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb) (Liverpool, Great Britain); created in Oman</vra:display>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>صور ملونة</vra:display>
+      <vra:material type="medium" vocab="AAT" refid="300215302" href="http://vocab.getty.edu/page/aat/300215302">صور ملونة</vra:material>
+      <vra:display>digital images</vra:display>
+      <vra:material type="medium" vocab="AAT" refid="300215302" href="http://vocab.getty.edu/page/aat/300215302">digital images</vra:material>
+    </vra:materialSet>
+    <vra:rightsSet>
+      <vra:display>© جون وار. CC BY 4.0</vra:display>
+      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </vra:notes>
+      <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+        <vra:rightsHolder>جون وار</vra:rightsHolder>
+        <vra:text>© جون وار. CC BY 4.0</vra:text>
+        <vra:rightsHolder>John Warr</vra:rightsHolder>
+        <vra:text>©John Warr. CC BY 4.0</vra:text>
+      </vra:rights>
+      <vra:display>©John Warr. CC BY 4.0</vra:display>
+      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG
+            </vra:notes>
+    </vra:rightsSet>
+    <vra:sourceSet>
+      <vra:display>وار، جون</vra:display>
+      <vra:source>
+        <vra:name type="donor">وار، جون</vra:name>
+        <vra:name type="donor">Warr, John</vra:name>
+      </vra:source>
+      <vra:display>Warr, John</vra:display>
+    </vra:sourceSet>
+    <vra:stylePeriodSet>
+      <vra:display>عُماني شعبي</vra:display>
+      <vra:stylePeriod vocab="AAT" refid="300068483" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:stylePeriod>
+      <vra:display>Omani vernacular</vra:display>
+      <vra:stylePeriod vocab="AAT" refid="300068483" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
+    </vra:stylePeriodSet>
+    <vra:subjectSet>
+      <vra:display>عمارة؛ مستوطنات؛ مناظر طبيعية؛ مناظر طبيعية في مناطق حضرية؛ أثنوغرافيا</vra:display>
+      <vra:subject>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054156" href="http://vocab.getty.edu/page/aat/300054156">عمارة (تخصّص)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300008346" href="http://vocab.getty.edu/page/aat/300008346">مستوطنات ومناظر طبيعية (اسم متسلسل)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300132447" href="http://vocab.getty.edu/page/aat/300132447">مناظر طبيعية في مناطق حضرية</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054319" href="http://vocab.getty.edu/page/aat/300054319">أثنوغرافيا</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054156" href="http://vocab.getty.edu/page/aat/300054156">architecture (discipline)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300008346" href="http://vocab.getty.edu/page/aat/300008346">Settlements and Landscapes (hierarchy name)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300132447" href="http://vocab.getty.edu/page/aat/300132447">urban landscapes</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054319" href="http://vocab.getty.edu/page/aat/300054319">ethnography</vra:term>
+      </vra:subject>
+      <vra:display>architecture; settlements; landscapes; urban landscapes; ethnography</vra:display>
+    </vra:subjectSet>
+    <vra:techniqueSet>
+      <vra:display>TIFFs مرقمنة سابقا؛ صور رقمية؛</vra:display>
+      <vra:technique vocab="AAT" refid="300215302" href="http://vocab.getty.edu/page/aat/300215302">صور رقمية</vra:technique>
+      <vra:technique vocab="AAT" refid="300266226" href="http://vocab.getty.edu/page/aat/300266226">TIFF</vra:technique>
+      <vra:display>pre-digitised; digital images; TIFFs</vra:display>
+      <vra:technique vocab="AAT" refid="300215302" href="http://vocab.getty.edu/page/aat/300215302">digital images</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>مجموعة جون وار.</vra:display>
+      <vra:title type="descriptive">مجموعة جون وار.</vra:title>
+      <vra:title type="descriptive">The John Warr Collection.</vra:title>
+      <vra:display>The John Warr Collection.</vra:display>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>صور مرقمنة</vra:display>
+      <vra:worktype vocab="AAT" refid="300417380" href="http://vocab.getty.edu/page/aat/300417380">صور مرقمنة</vra:worktype>
+      <vra:display>digitized images</vra:display>
+      <vra:worktype vocab="AAT" refid="300417380" href="http://vocab.getty.edu/page/aat/300417380">digitized images</vra:worktype>
+    </vra:worktypeSet>
+  </vra:collection>
+</vra:vra>

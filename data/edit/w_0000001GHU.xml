@@ -1,0 +1,251 @@
+<?xml version='1.0' encoding='utf-8'?>
+<vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+  <vra:work id="w_0000001GHU" xml:lang="en">
+    <vra:culturalContextSet>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:culturalContext>
+    </vra:culturalContextSet>
+    <vra:descriptionSet>
+      <vra:display>Falaj(pl. aflaj) irrigation channel that sinuously winds along a terraced garden with date palm
+                 plantation along the rock incline. The falaj channel in Wādī Ghul, the highest canyon in Oman, is cut into the mountainside rock.
+                 Its construction acts as an earth-retaining structure, forming one of the several terraces that make up
+                 the oasis in this and many other mountain settlements in the upper reaches of Al Jabal al Akhḑar
+                 mountains.</vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen, https://orcid.org/0000-0003-3231-9166">Falaj(pl. aflaj) irrigation channel that sinuously winds along a terraced garden with date palm
+                 plantation along the rock incline. The falaj channel in Wādī Ghul, the highest canyon in Oman, is cut into the mountainside rock.
+                 Its construction acts as an earth-retaining structure, forming one of the several terraces that make up
+                 the oasis in this and many other mountain settlements in the upper reaches of Al Jabal al Akhḑar
+                 mountains.
+             </vra:description>
+      <vra:display>تتدفق قناة الري الفلج (الجمع. أفلاج) بشكل متعرّج على طول حديقة مغطّاة بمزروعات النخيل والتمر على طول المنحدر الصخري.
+                ويُعتبر هذا الجزء من قناة الفلج في وادي غول أعلى وادٍ في عُمان، وقد تم إنشاءه ضمن الصخور الجبلية.
+                ويشكّل البناء هيكل مرتبط بالأرض مما يساهم في تشكيل واحدة من العديد من التراسات والتي تشكّلت الواحة ضمنها
+                بالإضافة إلى العديد من المستوطنات الجبلية الأخرى في الروافد العليا من سلاسل الجبل الأخضر.
+            </vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen, https://orcid.org/0000-0003-3231-9166">
+                تتدفق قناة الري الفلج (الجمع. أفلاج) بشكل متعرّج على طول حديقة مغطّاة بمزروعات النخيل والتمر على طول المنحدر الصخري.
+                ويُعتبر هذا الجزء من قناة الفلج في وادي غول أعلى وادٍ في عُمان، وقد تم إنشاءه ضمن الصخور الجبلية.
+                ويشكّل البناء هيكل مرتبط بالأرض مما يساهم في تشكيل واحدة من العديد من التراسات والتي تشكّلت الواحة ضمنها
+                بالإضافة إلى العديد من المستوطنات الجبلية الأخرى في الروافد العليا من سلاسل الجبل الأخضر.
+            </vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>Ghul (Oman)</vra:display>
+      <vra:location type="site">
+        <vra:name type="geographic" vocab="VIAF" refid="137147093748525002537" href="http://viaf.org/viaf/137147093748525002537">Ghul</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137147093748525002537" href="http://viaf.org/viaf/137147093748525002537">غول</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">"&gt;سلطنة عمان</vra:name>
+        <vra:name type="geographic" refid="23.145069, 57.210217" vocab="GNS">غول</vra:name>
+      </vra:location>
+      <vra:location type="other">
+        <vra:name type="geographic" refid="23.145069, 57.210217" vocab="GNS">Ghul</vra:name>
+      </vra:location>
+      <vra:display>غول (عُمان)</vra:display>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>rock; sarūj or cement render</vra:display>
+      <vra:material type="other" refid="300011692" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011692">rock (inorganic material)</vra:material>
+      <vra:material type="other" refid="300010362" vocab="AAT" href="http://vocab.getty.edu/page/aat/300010362">cement (construction material)</vra:material>
+      <vra:material type="other" vocab="other">sarūj</vra:material>
+      <vra:display>صخر؛ صاروج أو إكساءإسمنت</vra:display>
+      <vra:material type="other" refid="300011692" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011692">صخر (مادة غير عضوية)</vra:material>
+      <vra:material type="other" refid="300010362" vocab="AAT" href="http://vocab.getty.edu/page/aat/300010362">إسمنت (مادة بناء)</vra:material>
+      <vra:material type="other" vocab="other">صاروج</vra:material>
+    </vra:materialSet>
+    <vra:stylePeriodSet>
+      <vra:display>Omani vernacular</vra:display>
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
+      <vra:display>عُماني شعبي</vra:display>
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:stylePeriod>
+    </vra:stylePeriodSet>
+    <vra:subjectSet>
+      <vra:display>falaj; irrigation system; oasis; wadi</vra:display>
+      <vra:subject>
+        <vra:term type="descriptiveTopic" refid="300006167" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006167">falaj</vra:term>
+        <vra:term type="descriptiveTopic" refid="300055262" vocab="AAT" href="http://vocab.getty.edu/page/aat/300055262">irrigation systems</vra:term>
+        <vra:term type="descriptiveTopic" refid="300008686" vocab="AAT" href="http://vocab.getty.edu/page/aat/300008686">oasis</vra:term>
+        <vra:term type="descriptiveTopic" refid="300379998" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379998">wadi</vra:term>
+        <vra:term type="descriptiveTopic" refid="300006167" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006167">فلج</vra:term>
+        <vra:term type="descriptiveTopic" refid="300055262" vocab="AAT" href="http://vocab.getty.edu/page/aat/300055262">أنظمة الري</vra:term>
+        <vra:term type="descriptiveTopic" refid="300008686" vocab="AAT" href="http://vocab.getty.edu/page/aat/300008686">واحة</vra:term>
+        <vra:term type="descriptiveTopic" refid="300379998" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379998">وادي</vra:term>
+      </vra:subject>
+      <vra:display>فلج؛ نظام ري؛ واحة؛ وادي</vra:display>
+    </vra:subjectSet>
+    <vra:techniqueSet>
+      <vra:display>carved into rock; sarūj or cement render</vra:display>
+      <vra:technique vocab="other">sarūj</vra:technique>
+      <vra:technique refid="300010362" vocab="AAT" href="http://vocab.getty.edu/page/aat/300010362">cement (construction material)</vra:technique>
+      <vra:technique refid="300379688" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379688">render (coating)</vra:technique>
+      <vra:technique refid="300011692" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011692">rock (inorganic material)</vra:technique>
+      <vra:technique refid="300053149" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053149">carving (processes)</vra:technique>
+      <vra:display>منحوت في الصخر؛ صاروج أو إكساءإسمنت</vra:display>
+      <vra:technique vocab="other">صاروج</vra:technique>
+      <vra:technique refid="300010362" vocab="AAT" href="http://vocab.getty.edu/page/aat/300010362">إسمنت (مادة بناء)</vra:technique>
+      <vra:technique refid="300379688" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379688">طلاء (تغطية)</vra:technique>
+      <vra:technique refid="300011692" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011692">صخر (مادة غير عضوية)</vra:technique>
+      <vra:technique refid="300053149" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053149">نحت (عمليات)</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>Falaj in Ghul, Oman.</vra:display>
+      <vra:title type="descriptive">Falaj in Ghul, Oman.</vra:title>
+      <vra:title type="translated">فلج في غول، عُمان.</vra:title>
+      <vra:display>فلج في غول، عُمان.</vra:display>
+      <vra:title type="descriptive">فلج في غول، عُمان.</vra:title>
+      <vra:title type="translated">Falaj in Ghul, Oman.</vra:title>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>irrigation system</vra:display>
+      <vra:worktype refid="300055262" vocab="AAT" href="http://vocab.getty.edu/page/aat/300055262">irrigation systems</vra:worktype>
+      <vra:display>نظام ري</vra:display>
+      <vra:worktype refid="300055262" vocab="AAT" href="http://vocab.getty.edu/page/aat/300055262">أنظمة الري</vra:worktype>
+    </vra:worktypeSet>
+  </vra:work>
+  <vra:image id="i_0000001KUN" xml:lang="en">
+    <vra:agentSet>
+      <vra:display>Created by Manfred Kunter; part of ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb) repository</vra:display>
+      <vra:agent>
+        <vra:name type="personal" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">Kunter, Manfred</vra:name>
+        <vra:culture>German</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate circa="true">1957</vra:earliestDate>
+          <vra:latestDate circa="true">1997</vra:latestDate>
+        </vra:dates>
+        <vra:role vocab="AAT" refid="300025583" href="http://vocab.getty.edu/page/aat/300025583">anthropologists</vra:role>
+        <vra:role>creator</vra:role>
+        <vra:role>formerOwner</vra:role>
+        <vra:name type="personal" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">كونتر، مانفريد</vra:name>
+        <vra:culture>ألماني</vra:culture>
+        <vra:role vocab="AAT" refid="300025583" href="http://vocab.getty.edu/page/aat/300025583">علماء الأنثروبولوجيا</vra:role>
+        <vra:role>مؤلف</vra:role>
+        <vra:role>مالك سابق</vra:role>
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
+        <vra:role>مستودع</vra:role>
+        <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</vra:role>
+      </vra:agent>
+      <vra:agent>
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:role>repository</vra:role>
+        <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</vra:role>
+      </vra:agent>
+      <vra:display>تم إنشاؤها من قبل مانفريد كونتر؛ جزء من مستودع أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)</vra:display>
+    </vra:agentSet>
+    <vra:dateSet>
+      <vra:display>Created 1997</vra:display>
+      <vra:date source="Kunter, Manfred" type="creation">
+        <vra:earliestDate>1997</vra:earliestDate>
+        <vra:latestDate>1997</vra:latestDate>
+      </vra:date>
+      <vra:display>تم إنشاؤها 1997</vra:display>
+    </vra:dateSet>
+    <vra:descriptionSet>
+      <vra:display>View of falaj section and palm trees in the background in Ghul oasis, Oman. This part of the falaj is cut in the mountainside rock of Wādī Ghul and rendered in cement.
+            Often, the contemporary sand-cement render replaces the original sarūj, a traditional hydraulic binder made of calcined clay and lime, which was used in the construction of
+            irrigation channels due to its Pozzolanic and water-proofing properties.</vra:display>
+      <vra:description source="Kunter, Manfred">View of falaj section and palm trees in the background in Ghul oasis, Oman. This part of the falaj is cut in the mountainside rock of Wādī Ghul and rendered in cement.
+            Often, the contemporary sand-cement render replaces the original sarūj, a traditional hydraulic binder made of calcined clay and lime, which was used in the construction of
+            irrigation channels due to its Pozzolanic and water-proofing properties.</vra:description>
+      <vra:display>منظر لقسم من الفلج وأشجار النخيل في الخلفية في واحة غول، عُمان.
+                يشق هذا الجزء من الفلج طريقه في الصخرة الجبلية لوادي غول، أعلى وادي في عُمان، وقد تم إكساءة بالإسمنت.
+                غالباً، يحل الإسمنت الرملي المعاصر محل الصاروج الأصلي، وهو مادة هيدروليكية تقليدية تساعد على التماسك  مصنوعة من الطين المكلس والجير،
+                والتي كانت تستخدم في بناء قنوات الري بسبب خصائصها البوزولانية وعازليتها للماء.
+            </vra:display>
+      <vra:description source="Kunter, Manfred">منظر لقسم من الفلج وأشجار النخيل في الخلفية في واحة غول، عُمان.
+                يشق هذا الجزء من الفلج طريقه في الصخرة الجبلية لوادي غول، أعلى وادي في عُمان، وقد تم إكساءة بالإسمنت.
+                غالباً، يحل الإسمنت الرملي المعاصر محل الصاروج الأصلي، وهو مادة هيدروليكية تقليدية تساعد على التماسك  مصنوعة من الطين المكلس والجير،
+                والتي كانت تستخدم في بناء قنوات الري بسبب خصائصها البوزولانية وعازليتها للماء.
+            </vra:description>
+    </vra:descriptionSet>
+    <vra:inscriptionSet>
+      <vra:display>Written on the slide frame, Jebel Akhdar Oman 1997 Ghul, Falaj</vra:display>
+      <vra:inscription>
+        <vra:author refid="73868808" vocab="VIAF" href="https://viaf.org/viaf/73868808">Kunter, Manfred</vra:author>
+        <vra:position>On the slide frame, written</vra:position>
+        <vra:text type="text" xml:lang="en">Jebel Akhdar Oman 1997 Ghul, Falaj</vra:text>
+        <vra:author refid="73868808" vocab="VIAF" href="https://viaf.org/viaf/73868808">كونتر، مانفريد</vra:author>
+        <vra:position>على إطار الشريحة، مكتوب</vra:position>
+      </vra:inscription>
+      <vra:display>مكتوب على إطار الشريحة، Jebel Akhdar Oman 1997 Ghul, Falaj</vra:display>
+    </vra:inscriptionSet>
+    <vra:locationSet>
+      <vra:display>Created in Ghul (Oman)</vra:display>
+      <vra:location type="creation">
+        <vra:name type="geographic" vocab="VIAF" refid="137147093748525002537" href="http://viaf.org/viaf/137147093748525002537">Ghul</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">"&gt;سلطنة عمان</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137147093748525002537" href="http://viaf.org/viaf/137147093748525002537">غول</vra:name>
+      </vra:location>
+      <vra:display>تم إنشاؤها في غول (عُمان)</vra:display>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>35 mm colour slide; photographic film</vra:display>
+      <vra:material refid="300014638" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300014638">photographic film (photographic materials)</vra:material>
+      <vra:material refid="300128366" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128366">color slides</vra:material>
+      <vra:material refid="300263816" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300263816">35mm (photographic film size)</vra:material>
+      <vra:display>فلم فوتوغرافي؛ 35 ملم شريحة ملونة</vra:display>
+      <vra:material refid="300014638" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300014638">فلم فوتوغرافي (مواد التصوير)</vra:material>
+      <vra:material refid="300128366" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128366">شرائح ملونة</vra:material>
+      <vra:material refid="300263816" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300263816">35 ملم (قياس الفلم الفوتوغرافي)</vra:material>
+    </vra:materialSet>
+    <vra:measurementsSet>
+      <vra:display>Digitised image dimensions 6600 px(W) x 4329 px(H) </vra:display>
+      <vra:measurements type="width" unit="px">6600</vra:measurements>
+      <vra:measurements type="height" unit="px">4329</vra:measurements>
+      <vra:display>6600 px(W) x 4329 px(H) أبعاد الصورة الرقمية</vra:display>
+    </vra:measurementsSet>
+    <vra:relationSet>
+      <vra:display>From The Manfred Kunter Collection. Image of Falaj in Ghul.</vra:display>
+      <vra:relation relids="w_0000001GHU" type="imageOf">Falaj in Ghul, Oman.</vra:relation>
+      <vra:relation refid="c_0000000KUN" type="partOf">The Manfred Kunter Collection.</vra:relation>
+      <vra:display>من مجموعة مانفريد كونتر. صورة لفلج في غول.</vra:display>
+      <vra:relation relids="w_0000001GHU" type="imageOf">فلج في غول، عُمان.</vra:relation>
+      <vra:relation refid="c_0000000KUN" type="partOf">مجموعة مانفريد كونتر.</vra:relation>
+    </vra:relationSet>
+    <vra:rightsSet>
+      <vra:display>© Manfred Kunter. CC BY 4.0</vra:display>
+      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                   and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG</vra:notes>
+      <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+        <vra:rightsHolder>Manfred Kunter</vra:rightsHolder>
+        <vra:text>© Manfred Kunter. CC BY 4.0</vra:text>
+        <vra:rightsHolder>مانفريد كونتر</vra:rightsHolder>
+        <vra:text>© مانفريد كونتر. CC BY 4.0</vra:text>
+      </vra:rights>
+      <vra:display>© مانفريد كونتر. CC BY 4.0</vra:display>
+      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </vra:notes>
+    </vra:rightsSet>
+    <vra:sourceSet>
+      <vra:display>Kunter, Manfred</vra:display>
+      <vra:source>
+        <vra:name type="donor" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">Manfred Kunter</vra:name>
+        <vra:name type="donor" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">مانفريد كونتر</vra:name>
+      </vra:source>
+      <vra:display>كونتر، مانفريد</vra:display>
+    </vra:sourceSet>
+    <vra:techniqueSet>
+      <vra:display>color photography; color transparency</vra:display>
+      <vra:technique refid="300134530" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134530">color photography</vra:technique>
+      <vra:technique refid="300128364" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128364">color transparencies</vra:technique>
+      <vra:display>تصوير ملون؛ شفافية ملونة</vra:display>
+      <vra:technique refid="300134530" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134530">تصوير ملون</vra:technique>
+      <vra:technique refid="300128364" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128364">شفافيات ملونة</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>Photograph of falaj and oasis in Ghul, Oman.</vra:display>
+      <vra:title type="generalView">Photograph of falaj and oasis in Ghul, Oman.</vra:title>
+      <vra:title type="generalView">صورة لفلج وواحة في غول، عُمان.</vra:title>
+      <vra:display>صورة لفلج وواحة في غول، عُمان.</vra:display>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>color transparency</vra:display>
+      <vra:worktype vocab="AAT" refid="300128364" href="http://vocab.getty.edu/page/aat/300128364">color transparencies</vra:worktype>
+      <vra:display>شفافية ملونة</vra:display>
+      <vra:worktype vocab="AAT" refid="300128364" href="http://vocab.getty.edu/page/aat/300128364">شفافيات ملونة</vra:worktype>
+    </vra:worktypeSet>
+  </vra:image>
+</vra:vra>

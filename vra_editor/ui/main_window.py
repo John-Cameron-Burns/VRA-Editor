@@ -1,18 +1,18 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QPushButton, QLabel,
-    QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy, QMessageBox,
+    QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy, QMessageBox, QInputDialog,
 )
 
-from settings_dialog import SettingsDialog
-from file_picker import VraFilePickerDialog
-from config import load_locations
-
-# Assumes these exist elsewhere in your project, as in the original code:
-# from your_app import DocumentController, VraTreePanel, FormContainerPanel, XmlPreviewPanel
-#
-# NOTE: file_loaded / user_changed / archive_changed below are illustrative --
-# swap in whatever signals DocumentController (or other panels) actually emit.
+from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
+from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
+from vra_editor.config import load_locations
+from vra_editor.utils import user_name
+from vra_editor.core.commit_to_git import add_file_to_repo
+from vra_editor.controllers.document_controller import DocumentController
+from vra_editor.ui.panels.tree_panel.tree_widget import VraTreePanel
+from vra_editor.ui.panels.form_panel.form_container import FormContainerPanel
+from vra_editor.ui.panels.xml_preview.code_editor import XmlPreviewPanel
 
 
 class ModeBar(QWidget):
@@ -104,12 +104,12 @@ class MainWindow(QMainWindow):
     # Central place for what's visible in each mode. Extend this if
     # other widgets (not just buttons) need to change with mode --
     # see register_mode_widget / apply_mode below.
-    BASE_BUTTONS = ['Home', 'Open', 'Create', 'Review']
+    BASE_BUTTONS = ['Home', 'Open', 'Create', 'Review', 'Import']
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'About'],
         edit=BASE_BUTTONS + ['Save', 'Submit', 'Cancel', 'About'],
         review=BASE_BUTTONS + ['Approve', 'Reject', 'Cancel', 'About'],
-        settings=BASE_BUTTONS + ['Autofill', 'Import', 'Save', 'Cancel', 'About'],
+        settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'About'],
     )
 
     def __init__(self):
@@ -149,6 +149,7 @@ class MainWindow(QMainWindow):
         splitter.setSizes([250, 425, 425])
 
         self.status_bar = StatusBar()
+        self.status_bar.set_user(user_name())  # fetched once; doesn't change
 
         central = QWidget()
         main_layout = QVBoxLayout(central)
@@ -159,15 +160,18 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.status_bar)
         self.setCentralWidget(central)
 
-        self.tree_panel.element_selected.connect(self.form_panel.show_editor)
-        self.form_panel.agent_data_changed.connect(self.doc_controller.update_agent_data)
+        self.tree_panel.element_selected.connect(self._on_element_selected)
+        self.tree_panel.add_child_requested.connect(self._on_add_child_requested)
+        self.tree_panel.remove_requested.connect(self._on_remove_requested)
+        self.doc_controller.document_loaded.connect(self.tree_panel.load_document)
+        self.form_panel.element_data_changed.connect(self.doc_controller.update_element_data)
+        self.form_panel.display_data_changed.connect(self.doc_controller.update_display_data)
         self.doc_controller.xml_updated.connect(self.xml_preview_panel.update_xml_text)
 
         # Status bar updates as a side effect of other actions: connect
         # each relevant signal straight to the matching setter. No other
         # code needs to know the status bar exists.
         self.doc_controller.file_loaded.connect(self.status_bar.set_file)
-        self.doc_controller.user_changed.connect(self.status_bar.set_user)
         self.doc_controller.archive_changed.connect(self.status_bar.set_archive)
         # If a signal doesn't map 1:1 onto a setter, connect to a small
         # slot instead, e.g.:
@@ -176,6 +180,20 @@ class MainWindow(QMainWindow):
         # )
 
         self.xml_preview_panel.update_xml_text(self.doc_controller.get_initial_xml())
+
+    def _on_element_selected(self, node_type: str, data: dict, element):
+        """Tree selection changed: track which lxml element subsequent
+        form edits should write into, then show the matching editor."""
+        self.doc_controller.set_current_element(element)
+        self.form_panel.show_editor(node_type, data)
+
+    def _on_add_child_requested(self, parent_element, tag: str, sibling_order: list):
+        new_elem = self.doc_controller.insert_child(parent_element, tag, sibling_order)
+        self.tree_panel.select_element(new_elem)
+
+    def _on_remove_requested(self, element):
+        self.doc_controller.remove_element(element)
+        self.form_panel.show_editor('', {})
 
     def _build_top_bar(self) -> QWidget:
         top_bar = QWidget()
@@ -264,10 +282,42 @@ class MainWindow(QMainWindow):
         # dlg.exec() returning doesn't itself change app mode; Settings
         # remains an overlay on whatever mode was active before it opened.
     def _on_about(self): ...
-    def _on_save(self): ...
+    def _on_save(self):
+        ok, message = self.doc_controller.save_file()
+        if not ok:
+            QMessageBox.warning(self, "Schema validation failed", message)
+            return
+        self.status_bar.set_file(message)
+        self._prompt_and_commit(self.doc_controller.current_file)
+
     def _on_submit(self): ...
     def _on_cancel(self): self.apply_mode('initial')
-    def _on_approve(self): ...
+
+    def _on_approve(self):
+        ok, result = self.doc_controller.approve_file()
+        if not ok:
+            QMessageBox.warning(self, "Approve failed", result)
+            return
+        self.status_bar.set_file(f"{result} (approved)")
+        self._prompt_and_commit(result)
+
     def _on_reject(self): ...
+
+    def _prompt_and_commit(self, path: str):
+        """Asks the user for a commit comment and, if they give one,
+        commits `path` to the shared edit/reviewed version-control
+        repo under their login name. Cancelling or leaving the comment
+        blank skips the commit -- the save/approve itself already
+        happened either way."""
+        comment, accepted = QInputDialog.getMultiLineText(
+            self, "Commit comment", "Describe this change for the version history:",
+        )
+        if not accepted or not comment.strip():
+            return
+        if not add_file_to_repo(path, comment.strip()):
+            QMessageBox.warning(
+                self, "Commit failed",
+                f"{path} was saved, but could not be committed to the version-control repository.",
+            )
     def _on_autofill(self): ...
     def _on_import(self): ...

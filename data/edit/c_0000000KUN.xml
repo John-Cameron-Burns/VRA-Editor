@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='utf-8'?>
+<vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
+  <vra:collection id="c_0000000KUN" xml:lang="en">
+    <vra:agentSet>
+      <vra:display>Created by Manfred Kunter; part of ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb) repository</vra:display>
+      <vra:agent>
+        <vra:name type="personal" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">Kunter, Manfred</vra:name>
+        <vra:culture>German</vra:culture>
+        <vra:dates type="activity">
+          <vra:earliestDate circa="true">1957</vra:earliestDate>
+          <vra:latestDate circa="true">1997</vra:latestDate>
+        </vra:dates>
+        <vra:role>creator</vra:role>
+        <vra:role>formerOwner</vra:role>
+        <vra:role vocab="AAT" refid="300025583" href="http://vocab.getty.edu/page/aat/300025583">anthropologists</vra:role>
+        <vra:name type="personal" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">مانفريد كونتر</vra:name>
+        <vra:culture>ألماني</vra:culture>
+        <vra:role>مؤلف</vra:role>
+        <vra:role>مالك سابق</vra:role>
+        <vra:role vocab="AAT" refid="300025583" href="http://vocab.getty.edu/page/aat/300025583">علماءالأنثروبولوجيا</vra:role>
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">مركز لدراسةالهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
+        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</vra:role>
+        <vra:role>مالك</vra:role>
+        <vra:role>مستودع</vra:role>
+      </vra:agent>
+      <vra:agent>
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</vra:role>
+        <vra:role>owner</vra:role>
+        <vra:role>repository</vra:role>
+      </vra:agent>
+      <vra:display>تم إنشاؤها من قبل مانفريد كونتر؛ جزء من مستودع أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)</vra:display>
+    </vra:agentSet>
+    <vra:culturalContextSet>
+      <vra:culturalContext vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
+      <vra:culturalContext vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:culturalContext>
+    </vra:culturalContextSet>
+    <vra:dateSet>
+      <vra:display>Created 1957-1997</vra:display>
+      <vra:date type="creation">
+        <vra:earliestDate>1957</vra:earliestDate>
+        <vra:latestDate>1997</vra:latestDate>
+      </vra:date>
+      <vra:display>تم إنشاؤها 1957-1997</vra:display>
+    </vra:dateSet>
+    <vra:descriptionSet>
+      <vra:display>Private collection of anthropologist Prof Manfred Kunter, consisting of 35mm photographic slides taken in various locations across the Sultanate of Oman.
+            The collection dates between the 1980s and 1990s.</vra:display>
+      <vra:description source="Kunter, Manfred">Private collection of anthropologist Prof Manfred Kunter, consisting of 35mm photographic slides taken in various locations across the Sultanate of Oman.
+            The collection dates between the 1980s and 1990s.
+            </vra:description>
+      <vra:display>تتألف المجموعة الخاصة للعالم بعلم الإنسان البروفسور مانفريد كونتر من شرائح تصوير فوتوغرافي بقياس 35 mm والتي تم التقاطها في مواقع مختلفة في جميع أنحاء سلطنة عُمان.
+                تم إنشاء المجموعة بين فترتي الثمانينات والتسعينات.
+            </vra:display>
+      <vra:description source="Kunter, Manfred">تتألف المجموعة الخاصة للعالم بعلم الإنسان البروفسور مانفريد كونتر من شرائح تصوير فوتوغرافي بقياس 35 mm والتي تم التقاطها في مواقع مختلفة في جميع أنحاء سلطنة عُمان.
+                تم إنشاء المجموعة بين فترتي الثمانينات والتسعينات.
+            </vra:description>
+    </vra:descriptionSet>
+    <vra:locationSet>
+      <vra:display>ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb) (Liverpool, Great Britain); created in Oman</vra:display>
+      <vra:location type="repository">
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">University of Liverpool. School of Architecture</vra:name>
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">مركز لدراسةالهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">جامعة ليفربول. كلية الهندسة المعمارية</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">"&gt;سلطنة عمان</vra:name>
+      </vra:location>
+      <vra:location type="creation">
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
+      </vra:location>
+      <vra:display>أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب) (ليفربول، بريطانيا العظمى)؛ تم إنشاؤها في عُمان</vra:display>
+    </vra:locationSet>
+    <vra:materialSet>
+      <vra:display>35 mm colour slides; photographic film</vra:display>
+      <vra:material type="medium" vocab="AAT" refid="300014638" href="http://vocab.getty.edu/page/aat/300014638">photographic film (photographic materials)</vra:material>
+      <vra:material type="support" vocab="AAT" refid="300128366" href="http://vocab.getty.edu/page/aat/300128366">color slides</vra:material>
+      <vra:material type="medium" vocab="AAT" refid="300263816" href="http://vocab.getty.edu/page/aat/300263816">35mm (photographic film size)</vra:material>
+      <vra:display>فلم فوتوغرافي؛ 35 ملم شرائح ملونة</vra:display>
+      <vra:material type="medium" vocab="AAT" refid="300014638" href="http://vocab.getty.edu/page/aat/300014638">فلم فوتوغرافي (مواد التصوير)</vra:material>
+      <vra:material type="support" vocab="AAT" refid="300128366" href="http://vocab.getty.edu/page/aat/300128366">شرائح ملونة</vra:material>
+      <vra:material type="medium" vocab="AAT" refid="300263816" href="http://vocab.getty.edu/page/aat/300263816">35 ملم (قياس الفلم الفوتوغرافي)</vra:material>
+    </vra:materialSet>
+    <vra:rightsSet>
+      <vra:display>©Manfred Kunter. CC BY 4.0</vra:display>
+      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia and
+                the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG
+            </vra:notes>
+      <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+        <vra:rightsHolder>Manfred Kunter</vra:rightsHolder>
+        <vra:text>© Manfred Kunter. CC BY 4.0</vra:text>
+        <vra:rightsHolder>مانفريد كونتر</vra:rightsHolder>
+        <vra:text>© مانفريد كونتر. CC BY 4.0</vra:text>
+      </vra:rights>
+      <vra:display>© مانفريد كونتر. CC BY 4.0</vra:display>
+      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </vra:notes>
+    </vra:rightsSet>
+    <vra:sourceSet>
+      <vra:display>Kunter, Manfred</vra:display>
+      <vra:source>
+        <vra:name type="donor" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">Kunter, Manfred</vra:name>
+        <vra:name type="donor" vocab="VIAF" refid="73868808" href="https://viaf.org/viaf/73868808">مانفريد كونتر</vra:name>
+      </vra:source>
+      <vra:display>كونتر، مانفريد</vra:display>
+    </vra:sourceSet>
+    <vra:stylePeriodSet>
+      <vra:display>Pre-Islamic and Islamic Omani vernacular</vra:display>
+      <vra:stylePeriod vocab="AAT" refid="300264429" href="http://vocab.getty.edu/page/aat/300264429">pre-Islamic</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300380013" href="http://vocab.getty.edu/page/aat/300380013">Islamic (culture or style)</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300068483" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
+      <vra:display>عُماني شعبي إسلامي وما قبل الإسلام</vra:display>
+      <vra:stylePeriod vocab="AAT" refid="300264429" href="http://vocab.getty.edu/page/aat/300264429">قبل الإسلام</vra:stylePeriod>
+      <vra:stylePeriod refid="300380013" vocab="AAT" href="http://vocab.getty.edu/page/aat/300380013">إسلامي (ثقافة أو طراز)</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300068483" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:stylePeriod>
+    </vra:stylePeriodSet>
+    <vra:subjectSet>
+      <vra:display>architecture; settlements; landscapes; ethnography</vra:display>
+      <vra:subject>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054156" href="http://vocab.getty.edu/page/aat/300054156">architecture (discipline)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300008346" href="http://vocab.getty.edu/page/aat/300008346">Settlements and Landscapes (hierarchy name)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054319" href="http://vocab.getty.edu/page/aat/300054319">ethnography</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054156" href="http://vocab.getty.edu/page/aat/300054156">عمارة (تخصّص)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300008346" href="http://vocab.getty.edu/page/aat/300008346">مستوطنات ومناظر طبيعية (اسم متسلسل)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054319" href="http://vocab.getty.edu/page/aat/300054319">أثنوغرافيا</vra:term>
+      </vra:subject>
+      <vra:display>عمارة؛ مستوطنات؛ مناظر طبيعية؛ أثنوغرافيا</vra:display>
+    </vra:subjectSet>
+    <vra:techniqueSet>
+      <vra:display>material digitised using a Canon EOS 5Dsr Full frame DSLR camera; TIFFs</vra:display>
+      <vra:technique vocab="AAT" refid="300202383" href="http://vocab.getty.edu/page/aat/300202383">digitizing</vra:technique>
+      <vra:technique vocab="AAT" refid="300266792" href="http://vocab.getty.edu/page/aat/300266792">digital cameras</vra:technique>
+      <vra:technique vocab="AAT" refid="300266226" href="http://vocab.getty.edu/page/aat/300266226">TIFF</vra:technique>
+      <vra:display>TIFFs ;Canon EOS 5Dsr Full frame DSLR مواد مرقمنة بواسطة كاميرا</vra:display>
+      <vra:technique vocab="AAT" refid="300202383" href="http://vocab.getty.edu/page/aat/300202383">رقمنة</vra:technique>
+      <vra:technique vocab="AAT" refid="300266792" href="http://vocab.getty.edu/page/aat/300266792">كاميرات رقمية</vra:technique>
+    </vra:techniqueSet>
+    <vra:titleSet>
+      <vra:display>The Manfred Kunter Collection.</vra:display>
+      <vra:title type="descriptive">The Manfred Kunter Collection.</vra:title>
+      <vra:title type="descriptive">مجموعة مانفريد كونتر.</vra:title>
+      <vra:display>مجموعة مانفريد كونتر.</vra:display>
+    </vra:titleSet>
+    <vra:worktypeSet>
+      <vra:display>digital images; color transparencies</vra:display>
+      <vra:worktype vocab="AAT" refid="300215302" href="http://vocab.getty.edu/page/aat/300215302">digital images</vra:worktype>
+      <vra:worktype vocab="AAT" refid="300128364" href="http://vocab.getty.edu/page/aat/300128364">color transparencies</vra:worktype>
+      <vra:display>صور رقمية؛ شفافيات ملونة</vra:display>
+      <vra:worktype vocab="AAT" refid="300215302" href="http://vocab.getty.edu/page/aat/300215302">صور رقمية</vra:worktype>
+      <vra:worktype vocab="AAT" refid="300128364" href="http://vocab.getty.edu/page/aat/300128364">شفافيات ملونة</vra:worktype>
+    </vra:worktypeSet>
+  </vra:collection>
+</vra:vra>

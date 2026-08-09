@@ -1,36 +1,50 @@
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QWidget, QStackedLayout, QLabel
 
-from vra_editor.ui.panels.form_panel.agent_editor import AgentEditorPanel
-from vra_editor.ui.panels.form_panel.title_editor import TitleEditorPanel
+from vra_editor.ui.panels.form_panel.element_editor import ElementEditorPanel
+from vra_editor.ui.panels.form_panel.display_editor import DisplayEditorPanel
 
 class FormContainerPanel(QWidget):
     """Panel container displaying the active form based on selection."""
 
-    agent_data_changed = Signal(str, str)
-    title_data_changed = Signal(str, str)
+    element_data_changed = Signal(str, str, str, str)  # text, vocab, refid, href
+    display_data_changed = Signal(dict)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.layout = QStackedLayout(self)
 
-        self.placeholder = QLabel("Select an element from the structure tree on the left.")
+        self.placeholder = QLabel("-Select  an element from the structure tree on the left.")
         self.layout.addWidget(self.placeholder)
 
-        self.agent_editor = AgentEditorPanel()
-        self.agent_editor.agent_changed.connect(self.agent_data_changed.emit)
-        self.layout.addWidget(self.agent_editor)
+        self.container_info = QLabel()
+        self.container_info.setWordWrap(True)
+        self.layout.addWidget(self.container_info)
 
-        self.title_editor = TitleEditorPanel()
-        self.title_editor.title_changed.connect(self.title_data_changed.emit)
-        self.layout.addWidget(self.title_editor)
+        self.element_editor = ElementEditorPanel()
+        self.element_editor.element_changed.connect(self.element_data_changed.emit)
+        self.layout.addWidget(self.element_editor)
+
+        self.display_editor = DisplayEditorPanel()
+        self.display_editor.display_changed.connect(self.display_data_changed.emit)
+        self.layout.addWidget(self.display_editor)
 
     def show_editor(self, node_type: str, data: dict):
-        if node_type == "agent":
-            self.agent_editor.set_agent_data(data.get("name", ""), data.get("role", ""))
-            self.layout.setCurrentWidget(self.agent_editor)
-        elif node_type == "title":
-            self.title_editor.set_title_data(data.get("title", ""), data.get("type", ""))
-            self.layout.setCurrentWidget(self.title_editor)
+        if node_type == "leaf":
+            self.element_editor.set_element_data(
+                data.get("tag", ""), data.get("text", ""), data.get("has_vocab", False),
+                data.get("vocab", ""), data.get("refid", ""), data.get("href", ""),
+            )
+            self.layout.setCurrentWidget(self.element_editor)
+        elif node_type == "display":
+            self.display_editor.set_display_data(data.get("translations", {}))
+            self.layout.setCurrentWidget(self.display_editor)
+        elif node_type in ("record", "set", "container"):
+            tag = data.get("tag", node_type)
+            self.container_info.setText(
+                f"<b>{tag}</b><br><br>Right-click this item in the tree to add or "
+                f"remove its sub-elements."
+            )
+            self.layout.setCurrentWidget(self.container_info)
         else:
             self.layout.setCurrentWidget(self.placeholder)
