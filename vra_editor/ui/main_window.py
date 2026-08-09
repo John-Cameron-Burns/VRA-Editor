@@ -1,18 +1,12 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QPushButton, QLabel,
-    QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy,
+    QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy, QMessageBox,
 )
 
-# application imports
-from ..config import config as CONFIG
-from vra_editor.controllers.document_controller import DocumentController
-from vra_editor.ui.panels.form_panel.form_container import FormContainerPanel
-from vra_editor.ui.panels.tree_panel.tree_widget import VraTreePanel
-from vra_editor.ui.panels.settings_dialog import SettingsDialog
-
-from vra_editor.ui.panels.xml_preview.code_editor import XmlPreviewPanel
-from ..utils import user_name as system_user_name
+from settings_dialog import SettingsDialog
+from file_picker import VraFilePickerDialog
+from config import load_locations
 
 # Assumes these exist elsewhere in your project, as in the original code:
 # from your_app import DocumentController, VraTreePanel, FormContainerPanel, XmlPreviewPanel
@@ -173,11 +167,8 @@ class MainWindow(QMainWindow):
         # each relevant signal straight to the matching setter. No other
         # code needs to know the status bar exists.
         self.doc_controller.file_loaded.connect(self.status_bar.set_file)
-        #self.doc_controller.user_changed.connect(self.status_bar.set_user)
-        #self.doc_controller.archive_changed.connect(self.status_bar.set_archive)
-        # todo -- implement archive stats
-        self.status_bar.set_archive('<na>/<na>')
-        self.status_bar.set_user(system_user_name())
+        self.doc_controller.user_changed.connect(self.status_bar.set_user)
+        self.doc_controller.archive_changed.connect(self.status_bar.set_archive)
         # If a signal doesn't map 1:1 onto a setter, connect to a small
         # slot instead, e.g.:
         # self.doc_controller.document_saved.connect(
@@ -243,13 +234,35 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _on_home(self): ...
-    def _on_open(self): ...
+
+    def _on_open(self):
+        self._open_from_folder('edit', dialog_title="Open Record")
+
     def _on_create(self): self.apply_mode('edit')
-    def _on_review(self): self.apply_mode('review')
+
+    def _on_review(self):
+        self._open_from_folder('pending', dialog_title="Select Record to Review")
+        self.apply_mode('review')
+
+    def _open_from_folder(self, location_key: str, dialog_title: str):
+        locations = load_locations()  # re-read so it reflects the latest Settings
+        folder = locations.get(location_key)
+        if folder is None:
+            QMessageBox.warning(
+                self, "Missing location",
+                f"No '{location_key}' folder is configured in vra-config.ini.",
+            )
+            return
+
+        dlg = VraFilePickerDialog(directory=folder, title=dialog_title, parent=self)
+        if dlg.exec() and dlg.selected_path is not None:
+            self.doc_controller.load_file(str(dlg.selected_path))
+
     def _on_settings(self):
         dlg = SettingsDialog(parent=self)
         dlg.exec()  # modal -- blocks until the user Saves or Cancels
-
+        # dlg.exec() returning doesn't itself change app mode; Settings
+        # remains an overlay on whatever mode was active before it opened.
     def _on_about(self): ...
     def _on_save(self): ...
     def _on_submit(self): ...
