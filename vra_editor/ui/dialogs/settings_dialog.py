@@ -7,11 +7,12 @@ from PySide6.QtWidgets import (
     QLineEdit, QCheckBox, QPushButton, QFileDialog,
     QDialogButtonBox, QGroupBox, QMessageBox,
 )
-from ...utils import strip_quotes
+
 from ...config import (
     DEFAULT_CONFIG_PATH, LOCATION_KEYS, OPTION_TEXT_KEYS,
     to_bool,
 )
+from ...utils import strip_quotes
 
 
 # noinspection PyUnresolvedReferences

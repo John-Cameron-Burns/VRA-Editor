@@ -27,12 +27,12 @@ def _q(tag: str) -> str:
 class ChildSpec:
     tag: str
     is_leaf: bool
-    has_vocab: bool         # basicString-derived leaves only (not e.g. dateWrapperType)
+    has_vocab: bool  # basicString-derived leaves only (not e.g. dateWrapperType)
     min_occurs: int
     max_occurs: Optional[int]  # None means unbounded
-    type_name: Optional[str]   # lets callers recurse via children_of_type() even for
-                                # locally-declared tags (e.g. "dates", "display") that
-                                # aren't in the schema's global element table
+    type_name: Optional[str]  # lets callers recurse via children_of_type() even for
+    # locally-declared tags (e.g. "dates", "display") that
+    # aren't in the schema's global element table
 
 
 @dataclass(frozen=True)

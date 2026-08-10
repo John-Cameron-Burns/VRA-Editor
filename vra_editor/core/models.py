@@ -1,15 +1,18 @@
 from dataclasses import dataclass, field
 from typing import List
 
+
 @dataclass
 class VraAgent:
     name: str = ""
     role: str = ""
 
+
 @dataclass
 class VraTitle:
     title: str = ""
     type_: str = ""
+
 
 @dataclass
 class VraWork:

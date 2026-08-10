@@ -1,10 +1,12 @@
 import configparser
 from pathlib import Path
+
 from .utils import strip_quotes
+
 DEFAULT_CONFIG_PATH = Path("~/vra-config.ini").expanduser()
 
 LOCATION_KEYS = ['edit', 'ingest', 'pending', 'rejected', 'reviewed', 'released']
-OPTION_TEXT_KEYS = ['image_pattern', 'collection_pattern', 'work_pattern', 'geonames_username']
+OPTION_TEXT_KEYS = ['image_pattern', 'collection_pattern', 'work_pattern']
 
 
 def to_bool(value: str) -> bool:
@@ -31,10 +33,3 @@ def load_locations(config_path: Path = DEFAULT_CONFIG_PATH) -> dict[str, Path]:
         key: Path(strip_quotes(value)).expanduser()
         for key, value in parser['locations'].items()
     }
-
-
-def load_geonames_username(config_path: Path = DEFAULT_CONFIG_PATH) -> str:
-    parser = load_config(config_path)
-    if not parser.has_section('options'):
-        return ''
-    return strip_quotes(parser['options'].get('geonames_username', ''))

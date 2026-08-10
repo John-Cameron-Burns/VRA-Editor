@@ -17,6 +17,7 @@ class DisplayEditorPanel(QWidget):
         super().__init__(parent)
         self._rows: list[tuple[QLineEdit, QLineEdit, QWidget]] = []
         self._loading = False
+        self._original: dict = {}  # translations as loaded, for Cancel
 
         outer = QVBoxLayout(self)
 
@@ -26,12 +27,16 @@ class DisplayEditorPanel(QWidget):
         self._rows_layout = QVBoxLayout()
         outer.addLayout(self._rows_layout)
 
-        add_row = QHBoxLayout()
+        button_row = QHBoxLayout()
         add_btn = QPushButton("+ Add language")
         add_btn.clicked.connect(lambda: self._add_row('', '', emit_changed=True))
-        add_row.addWidget(add_btn)
-        add_row.addStretch()
-        outer.addLayout(add_row)
+        button_row.addWidget(add_btn)
+        button_row.addStretch()
+        self.cancel_button = QPushButton("Cancel edit")
+        self.cancel_button.setToolTip("Revert this element back to its value before you started editing it.")
+        self.cancel_button.clicked.connect(self._on_cancel_clicked)
+        button_row.addWidget(self.cancel_button)
+        outer.addLayout(button_row)
         outer.addStretch()
 
     # ------------------------------------------------------------------
@@ -90,13 +95,23 @@ class DisplayEditorPanel(QWidget):
     # ------------------------------------------------------------------
 
     def set_display_data(self, translations: dict):
+        self._original = dict(translations)
         self._loading = True
+        self._load_rows(translations)
+        self._loading = False
+
+    def _load_rows(self, translations: dict):
         self._clear_rows()
         for lang, text in translations.items():
             self._add_row(lang, text, emit_changed=False)
         if not translations:
             self._add_row('en', '', emit_changed=False)
+
+    def _on_cancel_clicked(self):
+        self._loading = True
+        self._load_rows(self._original)
         self._loading = False
+        self._emit_changed()
 
     def get_translations(self) -> dict:
         result = {}

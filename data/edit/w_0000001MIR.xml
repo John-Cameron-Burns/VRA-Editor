@@ -1,17 +1,46 @@
 <?xml version='1.0' encoding='utf-8'?>
 <vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
-  <vra:work id="w_0000001MIR" xml:lang="en">
+  <vra:work id="w_0000001MIR" xml:lang="ar">
     <vra:culturalContextSet>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483"> عُماني</vra:culturalContext>
       <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
     </vra:culturalContextSet>
     <vra:dateSet>
-      <vra:display>Created probably ca. 18th century</vra:display>
+      <vra:display>تم إنشاؤها في القرن الثامن عشر تقريباً</vra:display>
       <vra:date type="creation" source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Mirbat, Dhofar Governorate, Liverpool: University of Liverpool, 2017">
         <vra:earliestDate circa="true">1701</vra:earliestDate>
         <vra:latestDate circa="true">1800</vra:latestDate>
       </vra:date>
+      <vra:display>Created probably ca. 18th century</vra:display>
     </vra:dateSet>
     <vra:descriptionSet>
+      <vra:display>مرباط، على الرغم من أهميته النسبية كميناء ومكان للتجارة في الماضي فلم يكن محصّن إلى حد كبير، وذلك
+                على عكس المواقع الأخرى على طول ساحل ظُفَار، مثل البليد والذي تم تشييده في العصور الوسطى أو ميناء تجارة
+                البخور سومرهام (المعروف حديثاُ باسم خور روري) والذي تم تشييده في عصر أقدم والواقع في الجنوب.
+                استأثرت المستوطنة بأربعة قلاع تقع على طول الأطراف الشمالية والشرقية والجنوبية للمدينة بدلا من الجدران
+                والأبراج الكبيرة. ومن أشهرها على الأرجح والمعروف باسماء مختلفة أشهرها قلعة مرباط أوقلعة الوالي أو الدرك
+                وتعود إلى تاريخ بناء غير مؤكد ولكن من المرجّح أن يكون القرن الثامن عشر،
+                وقد تم ترميم هذه القلعة مؤخرًا وتحويلها إلى متحف التاريخ والإنسان في ظُفَار. وتعتبر القلعة من أهم
+                الهياكل الدفاعية الأربعة في مرباط، حيث تحتفظ بوظائف إدارية تقليدية و كانت تعتبر مكان إقامة الوالي أو
+                الحاكم ،كما تطل على السوق وتحمي الطرق الشمالية للمدينة.
+                بالإضافة إلى ذلك، تُطل على الجانب البحري من المرفأ القديم وهو عبارة عن بناء كبير مستطيل الشكل مبني من
+                الحجارة مع برج مثمن الشكل يقع في الركن الجنوبي الشرقي من الواجهة المقابلة للسوق.
+                لم يكن الهدف من إنشاء القلعة الدفاعية توفير الحماية الكاملة ما عدا نيران الأسلحة الصغيرة، بل كانت بمثابة منصّة للرصد.
+            </vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Mirbat, Dhofar Governorate, Liverpool: University of Liverpool, 2017" dataDate="">
+            مرباط، على الرغم من أهميته النسبية كميناء ومكان للتجارة في الماضي فلم يكن محصّن إلى حد كبير، وذلك على عكس
+            المواقع الأخرى على طول ساحل ظُفَار، مثل البليد والذي تم تشييده في العصور الوسطى أو ميناء تجارة البخور
+            سومرهام (المعروف حديثاُ باسم خور روري) والذي تم تشييده في عصر أقدم والواقع في الجنوب.
+            استأثرت المستوطنة بأربعة قلاع تقع على طول الأطراف الشمالية والشرقية والجنوبية للمدينة بدلا من الجدران
+            والأبراج الكبيرة. ومن أشهرها على الأرجح والمعروف باسماء مختلفة أشهرها قلعة مرباط أوقلعة الوالي أو الدرك
+            وتعود إلى تاريخ بناء غير مؤكد ولكن من المرجّح أن يكون القرن الثامن عشر،
+            وقد تم ترميم هذه القلعة مؤخرًا وتحويلها إلى متحف التاريخ والإنسان في ظُفَار. وتعتبر القلعة من أهم الهياكل
+            الدفاعية الأربعة في مرباط، حيث تحتفظ بوظائف إدارية تقليدية و كانت تعتبر مكان إقامة الوالي أو الحاكم ، كما
+            تطل على السوق وتحمي الطرق الشمالية للمدينة.
+            بالإضافة إلى ذلك، تُطل على الجانب البحري من المرفأ القديم وهو عبارة عن بناء كبير مستطيل الشكل مبني من
+            الحجارة مع برج مثمن الشكل يقع في الركن الجنوبي الشرقي من الواجهة المقابلة للسوق.
+            لم يكن الهدف من إنشاء القلعة الدفاعية توفير الحماية الكاملة ما عدا نيران الأسلحة الصغيرة، بل كانت بمثابة منصّة للرصد.
+            </vra:description>
       <vra:display>Mirbāṭ, despite its relative importance once as a port and a place of trade, was never
                 substantially fortified, unlike other locations along the Dhofari coast, such as medieval Al Balīd or
                 the earlier South Arabian frankincense-trading port of Sumhuram (modern Khawr Rawrī).
@@ -35,161 +64,296 @@
                 It is a large rectangular stone-built structure with an octagonal tower located on its south-eastern corner facing the sūq.
                 Its defensive capabilities were not intended to outmatch anything other than small-arms fire, acting instead more as an observational platform.
             </vra:description>
+      <vra:display>  &gt;مرباط، على الرغم من أهميته النسبية كميناء ومكان للتجارة في الماضي فلم يكن محصّن إلى حد كبير، وذلك
+                على عكس المواقع الأخرى على طول ساحل ظُفَار، مثل البليد والذي تم تشييده في العصور الوسطى أو ميناء تجارة
+                البخور سومرهام (المعروف حديثاُ باسم خور روري) والذي تم تشييده في عصر أقدم والواقع في الجنوب.
+                استأثرت المستوطنة بأربعة قلاع تقع على طول الأطراف الشمالية والشرقية والجنوبية للمدينة بدلا من الجدران
+                والأبراج الكبيرة. ومن أشهرها على الأرجح والمعروف باسماء مختلفة أشهرها قلعة مرباط أوقلعة الوالي أو الدرك
+                وتعود إلى تاريخ بناء غير مؤكد ولكن من المرجّح أن يكون القرن الثامن عشر،
+                وقد تم ترميم هذه القلعة مؤخرًا وتحويلها إلى متحف التاريخ والإنسان في ظُفَار. وتعتبر القلعة من أهم
+                الهياكل الدفاعية الأربعة في مرباط، حيث تحتفظ بوظائف إدارية تقليدية و كانت تعتبر مكان إقامة الوالي أو
+                الحاكم، كما تطل على السوق وتحمي الطرق الشمالية للمدينة.
+                بالإضافة إلى ذلك، تُطل على الجانب البحري من المرفأ القديم وهو عبارة عن بناء كبير مستطيل الشكل مبني من
+                الحجارة مع برج مثمن الشكل يقع في الركن الجنوبي الشرقي من الواجهة المقابلة للسوق.
+                لم يكن الهدف من إنشاء القلعة الدفاعية توفير الحماية الكاملة ما عدا نيران الأسلحة الصغيرة، بل كانت بمثابة
+                منصّة للرصد.
+            </vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Mirbat, Dhofar Governorate, Liverpool: University of Liverpool, 2017">
+            مرباط، على الرغم من أهميته النسبية كميناء ومكان للتجارة في الماضي فلم يكن محصّن إلى حد كبير، وذلك على عكس
+            المواقع الأخرى على طول ساحل ظُفَار، مثل البليد والذي تم تشييده في العصور الوسطى أو ميناء تجارة البخور
+            سومرهام (المعروف حديثاُ باسم خور روري) والذي تم تشييده في عصر أقدم والواقع في الجنوب.
+            استأثرت المستوطنة بأربعة قلاع تقع على طول الأطراف الشمالية والشرقية والجنوبية للمدينة بدلا من الجدران
+            والأبراج الكبيرة. ومن أشهرها على الأرجح والمعروف باسماء مختلفة أشهرها قلعة مرباط أوقلعة الوالي أو الدرك
+            وتعود إلى تاريخ بناء غير مؤكد ولكن من المرجّح أن يكون القرن الثامن عشر،
+            وقد تم ترميم هذه القلعة مؤخرًا وتحويلها إلى متحف التاريخ والإنسان في ظُفَار. وتعتبر القلعة من أهم الهياكل
+            الدفاعية الأربعة في مرباط، حيث تحتفظ بوظائف إدارية تقليدية و كانت تعتبر مكان إقامة الوالي أو الحاكم، كما
+            تطل على السوق وتحمي الطرق الشمالية للمدينة.
+            بالإضافة إلى ذلك، تُطل على الجانب البحري من المرفأ القديم وهو عبارة عن بناء كبير مستطيل الشكل مبني من
+            الحجارة مع برج مثمن الشكل يقع في الركن الجنوبي الشرقي من الواجهة المقابلة للسوق.
+            لم يكن الهدف من إنشاء القلعة الدفاعية توفير الحماية الكاملة ما عدا نيران الأسلحة الصغيرة، بل كانت بمثابة
+            منصّة للرصد.
+            </vra:description>
     </vra:descriptionSet>
     <vra:locationSet>
-      <vra:display>Mirbāṭ (Dhofar Governorate, Oman)</vra:display>
+      <vra:display>مرباط (محافظة ظفار، عُمان)</vra:display>
       <vra:location type="site">
+        <vra:name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">مرباط (عُمان)</vra:name>
+        <vra:name type="geographic" vocab="GNS" refid="374691">ظفار</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">سلطنة عمان</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">Mirbāṭ (Oman)</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="154778103" href="http://viaf.org/viaf/154778103">Dhofar (Oman)</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
         <vra:name type="geographic" refid="16.984721, 54.691469" vocab="GNS">Mirbāṭ</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">مرباط
+                    (عُمان)
+                </vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">سلطنة
+                    عمان
+                </vra:name>
+        <vra:name type="geographic" refid="16.984721, 54.691469" vocab="GNS">مرباط</vra:name>
       </vra:location>
       <vra:location type="other">
-        <vra:name type="geographic" refid="16.984721, 54.691469" vocab="GNS">Mirbāṭ</vra:name>
+        <vra:name type="geographic" refid="16.984721, 54.691469" vocab="GNS">مرباط</vra:name>
       </vra:location>
+      <vra:display>Mirbāṭ (Dhofar Governorate, Oman)</vra:display>
     </vra:locationSet>
     <vra:materialSet>
+      <vra:display>حجر كلسي مرجاني؛ بناء خشبي؛ إكساء صاروج</vra:display>
+      <vra:material type="other" refid="300011291" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011291">حجر كلسي مرجاني</vra:material>
+      <vra:material type="other" refid="300012827" vocab="AAT" href="http://vocab.getty.edu/page/aat/300012827">عارضة (من الخشب)</vra:material>
+      <vra:material type="other" vocab="other">صاروج</vra:material>
       <vra:display>coral limestone and timber construction; sarūj render</vra:display>
       <vra:material type="other" refid="300011291" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011291">coral limestone</vra:material>
       <vra:material type="other" refid="300012827" vocab="AAT" href="http://vocab.getty.edu/page/aat/300012827">timber (wood by origin)</vra:material>
       <vra:material type="other" vocab="other">sarūj</vra:material>
     </vra:materialSet>
     <vra:relationSet>
+      <vra:display>من مستوطنة مرباط، عُمان.</vra:display>
+      <vra:relation refid="w_001SET_MIR" type="partOf">مستوطنة مرباط، عُمان.</vra:relation>
       <vra:display>From Mirbāṭ settlement, Oman.</vra:display>
       <vra:relation relids="w_001set_MIR" type="partOf">Mirbāṭ settlement, Oman.</vra:relation>
       <vra:relation refid="w_001SET_MIR" type="partOf">Mirbāṭ settlement, Oman.</vra:relation>
     </vra:relationSet>
     <vra:stylePeriodSet>
+      <vra:display>عُماني شعبي</vra:display>
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483"> عُماني</vra:stylePeriod>
       <vra:display>Omani vernacular</vra:display>
       <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
       <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
     </vra:stylePeriodSet>
     <vra:subjectSet>
-      <vra:display>castle; military building; coastal settlement</vra:display>
+      <vra:display>قلعة؛ مبنى دفاعي؛ مستوطنة ساحلية</vra:display>
       <vra:subject>
+        <vra:term type="descriptiveTopic" refid="300387314" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387314">مستوطنات ساحلية</vra:term>
+        <vra:term type="descriptiveTopic" refid=" 300006887" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006887">مباني دفاعية</vra:term>
+        <vra:term type="descriptiveTopic" refid="300006891" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006891">قلاع (تحصينات)</vra:term>
         <vra:term type="descriptiveTopic" refid="300387314" vocab="AAT" href="http://vocab.getty.edu/page/aat/300387314">coastal settlements</vra:term>
         <vra:term type="descriptiveTopic" refid=" 300006887" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006887">military buildings</vra:term>
         <vra:term type="descriptiveTopic" refid="300006891" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006891">castles (fortifications)</vra:term>
       </vra:subject>
+      <vra:display>castle; military building; coastal settlement</vra:display>
     </vra:subjectSet>
     <vra:techniqueSet>
+      <vra:display>بناء حجر؛ هيكل خشبي</vra:display>
+      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">البناء من حجر</vra:technique>
+      <vra:technique refid="300012822" vocab="AAT" href="http://vocab.getty.edu/page/aat/300012822"> هيكل خشبي</vra:technique>
       <vra:display>stone masonry; timber construction</vra:display>
       <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">stonemasonry</vra:technique>
       <vra:technique refid="300012822" vocab="AAT" href="http://vocab.getty.edu/page/aat/300012822">structural timber</vra:technique>
     </vra:techniqueSet>
     <vra:titleSet>
+      <vra:display>قلعة مرباط، عُمان.</vra:display>
+      <vra:title type="descriptive">قلعة مرباط، عُمان.</vra:title>
+      <vra:title type="translated">Mirbāṭ Castle, Oman.</vra:title>
       <vra:display>Mirbāṭ Castle, Oman.</vra:display>
       <vra:title type="descriptive">Mirbāṭ Castle, Oman.</vra:title>
       <vra:title type="translated">قلعة مرباط، عُمان.</vra:title>
       <vra:title type="translated">قلعة مرباط،عُمان.</vra:title>
     </vra:titleSet>
     <vra:worktypeSet>
+      <vra:display>قلعة</vra:display>
+      <vra:worktype refid="300006891" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006891">قلاع (تحصينات)</vra:worktype>
       <vra:display>castle</vra:display>
       <vra:worktype refid="300006891" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006891">castles (fortifications)</vra:worktype>
     </vra:worktypeSet>
   </vra:work>
-  <vra:image id="i_00002ArMIR" xml:lang="en">
+  <vra:image id="i_00002ArMIR" xml:lang="ar">
     <vra:agentSet>
-      <vra:display>Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman</vra:display>
+      <vra:display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</vra:display>
       <vra:agent>
-        <vra:name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
-        <vra:culture>English</vra:culture>
+        <vra:name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
+        <vra:culture>الإنكليزية</vra:culture>
         <vra:dates type="activity">
           <vra:earliestDate>2012</vra:earliestDate>
           <vra:latestDate>present</vra:latestDate>
           <vra:earliestDate>1976</vra:earliestDate>
         </vra:dates>
+        <vra:role>مؤلف</vra:role>
+        <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</vra:role>
+        <vra:attribution>جامعة ليفربول. كلية الهندسة المعمارية</vra:attribution>
+        <vra:name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:culture>English</vra:culture>
         <vra:role>creator</vra:role>
         <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</vra:role>
         <vra:attribution>University of Liverpool. School of Architecture</vra:attribution>
+        <vra:name type="corporate" refid="134225770" vocab="VIAF" href="https://viaf.org/viaf/134225770">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</vra:name>
+        <vra:culture>Omani</vra:culture>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</vra:role>
+        <vra:name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة
+                    الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.
+                </vra:name>
+        <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث
+                    (مؤسّسات)
+                </vra:role>
+        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة
+                    التراث القومي والثقافة
+                </vra:name>
+        <vra:culture>عُماني</vra:culture>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</vra:role>
         <vra:attribution>University of Liverpool. School of Architecture;</vra:attribution>
         <vra:name type="corporate" refid="134225770" vocab="VIAF" href="https://viaf.org/viaf/134225770">Ministry of Heritage and Culture Sultanate of Oman
                     (Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah)</vra:name>
-        <vra:culture>Omani</vra:culture>
-        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</vra:role>
       </vra:agent>
       <vra:agent>
-        <vra:name type="corporate" refid="134225770" vocab="VIAF" href="https://viaf.org/viaf/134225770">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</vra:name>
-        <vra:culture>Omani</vra:culture>
+        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</vra:name>
+        <vra:culture>عُماني</vra:culture>
         <vra:dates type="activity">
           <vra:earliestDate>1976</vra:earliestDate>
           <vra:latestDate>present</vra:latestDate>
         </vra:dates>
-        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</vra:role>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</vra:role>
       </vra:agent>
+      <vra:display>Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman</vra:display>
+      <vra:display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة
+                العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان
+            </vra:display>
     </vra:agentSet>
     <vra:dateSet>
-      <vra:display>Created 2015</vra:display>
+      <vra:display>تم إنشاؤها 2015</vra:display>
       <vra:date type="creation">
         <vra:earliestDate>2015</vra:earliestDate>
         <vra:latestDate>2015</vra:latestDate>
       </vra:date>
+      <vra:display>Created 2015</vra:display>
     </vra:dateSet>
     <vra:descriptionSet>
+      <vra:display>فيديو لرحلة تصوير طائرة صغيرة بدون طيار لقلعة مرباط، عُمان.</vra:display>
+      <vra:description>فيديو لرحلة تصوير طائرة صغيرة بدون طيار لقلعة مرباط، عُمان.</vra:description>
       <vra:display>Video of drone flight of Mirbāṭ castle, Oman.</vra:display>
       <vra:description>Video of drone flight of Mirbāṭ castle, Oman.</vra:description>
+      <vra:display>نموذج متحرّك ثلاثي الأبعاد لقلعة مرباط، عُمان. تم إنتاج النموذج باستخدام برنامج Agisoft.</vra:display>
+      <vra:description>نموذج متحرّك ثلاثي الأبعاد لقلعة مرباط، عُمان. تم إنتاج النموذج باستخدام برنامج Agisoft.
+            </vra:description>
       <vra:display>Digital navigable 3-D model of Mirbāṭ castle, Oman.The model is created using Agisoft software.</vra:display>
       <vra:description>Digital navigable 3-D model of Mirbāṭ castle, Oman.The model is created using Agisoft software.</vra:description>
     </vra:descriptionSet>
     <vra:locationSet>
-      <vra:display>Mirbāṭ (Dhofar Governorate, Oman)</vra:display>
+      <vra:display> مرباط (محافظة ظفار ،عُمان)</vra:display>
       <vra:location type="creation">
+        <vra:name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">مرباط (عُمان)</vra:name>
+        <vra:name type="geographic" vocab="GNS" refid="374691">ظفار</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">"&gt;سلطنة عمان</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="305361911" href="http://viaf.org/viaf/305361911">Mirbāṭ (Oman)</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="154778103" href="http://viaf.org/viaf/154778103">Dhofar (Oman)</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">جامعة ليفربول.
+                    كلية الهندسة المعمارية
+                </vra:name>
         <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">University of Liverpool. School of Architecture</vra:name>
       </vra:location>
+      <vra:display>Mirbāṭ (Dhofar Governorate, Oman)</vra:display>
+      <vra:display>تم إنشاؤها في جامعة ليفربول، كلية الهندسة المعمارية (بريطانيا العظمى)</vra:display>
       <vra:display>Created in University of Liverpoool, School of Architecture (Great Britain)</vra:display>
     </vra:locationSet>
     <vra:materialSet>
+      <vra:display>تسجيل فيديو</vra:display>
+      <vra:material type="medium" refid="300028682" vocab="AAT" href="http://vocab.getty.edu/page/aat/300028682">تسجيلات فيديو (إنتاج صنعي ملموس)</vra:material>
       <vra:display>video recording</vra:display>
       <vra:material type="medium" refid="300028682" vocab="AAT" href="http://vocab.getty.edu/page/aat/300028682">video recordings (physical artifacts)</vra:material>
+      <vra:display>ملف رقمي</vra:display>
+      <vra:material refid="300404202" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">
+                ملفات (ملفات رقمية)
+            </vra:material>
       <vra:display>digital file</vra:display>
       <vra:material refid="300404202" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404202">files (digital files)</vra:material>
     </vra:materialSet>
     <vra:measurementsSet>
-      <vra:display>File size 1.61 GB; Video duration 3:50 min</vra:display>
+      <vra:display>حجم الملف 1.61 GB؛ مدة الفيديو 3:50 min</vra:display>
       <vra:measurements type="fileSize" unit="GB">1.61</vra:measurements>
       <vra:measurements type="runningTime" unit="min">3:50</vra:measurements>
-      <vra:display>File size 37.7 MB</vra:display>
+      <vra:display>File size 1.61 GB; Video duration 3:50 min</vra:display>
+      <vra:display>حجم الملف 37.7 MB</vra:display>
       <vra:measurements type="fileSize" unit="MB">37.7</vra:measurements>
+      <vra:display>File size 37.7 MB</vra:display>
     </vra:measurementsSet>
     <vra:relationSet>
+      <vra:display>من مجموعة أركيام: مرباط. صورة لقلعة مرباط، عُمان.</vra:display>
+      <vra:relation relids="w_0000001MIR" type="imageOf">قلعة مرباط، عُمان.</vra:relation>
+      <vra:relation refid="c_00000ArMIR" type="partOf">مجموعة أركيام: مرباط.</vra:relation>
       <vra:display>From The ArCHIAM Collection: Mirbāṭ. Image of Mirbāṭ Castle, Oman.</vra:display>
       <vra:relation relids="w_0000001MIR" type="imageOf">Mirbāṭ Castle, Oman.</vra:relation>
       <vra:relation refid="c_00000ArMIR" type="partOf">The ArCHIAM Collection: Mirbāṭ.</vra:relation>
+      <vra:display>من جموعة أركيام: مرباط. صورة لقلعة مرباط، عُمان.</vra:display>
     </vra:relationSet>
     <vra:rightsSet>
-      <vra:display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:display>
-      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
-                   and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG</vra:notes>
-      <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0/legalcode">
+      <vra:display>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</vra:display>
+      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                   والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG</vra:notes>
+      <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
+        <vra:rightsHolder>وزارة التراث والثقافة في سلطنة عُمان</vra:rightsHolder>
+        <vra:text>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</vra:text>
         <vra:rightsHolder>Ministry of Heritage and Culture Sultanate of Oman</vra:rightsHolder>
         <vra:text>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:text>
       </vra:rights>
+      <vra:display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:display>
+      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                   and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG</vra:notes>
+      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
+            </vra:notes>
     </vra:rightsSet>
     <vra:techniqueSet>
-      <vra:display>drone video; aerial photography</vra:display>
+      <vra:display>فيديو بواسطة طائرة صغيرة بدون طيار؛ تصوير جوي</vra:display>
       <vra:technique />
+      <vra:technique refid="300053443" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053443">تصوير جوي</vra:technique>
+      <vra:technique refid="300374932" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374932">طائرة صغيرة بدون طيار</vra:technique>
+      <vra:technique refid="300417974" vocab="AAT" href="http://vocab.getty.edu/page/aat/300417974">تسجيل فيديو (عملية)</vra:technique>
+      <vra:display>drone video; aerial photography</vra:display>
       <vra:technique refid="300053443" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053443">aerial photography</vra:technique>
       <vra:technique refid="300374932" vocab="AAT" href="http://vocab.getty.edu/page/aat/300374932">drone aircraft</vra:technique>
       <vra:technique refid="300417974" vocab="AAT" href="http://vocab.getty.edu/page/aat/300417974">video recording (process)</vra:technique>
+      <vra:display>تصوير جوي مساحي نموذج افتراضي ثلاثي الأبعاد</vra:display>
+      <vra:technique refid="300053581" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053581">تصوير جوي مساحي
+            </vra:technique>
+      <vra:technique refid="300010331" vocab="AAT" href="http://vocab.getty.edu/page/aat/300010331">ثلاثي أبعاد
+            </vra:technique>
+      <vra:technique refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">نماذج رقمية
+                افتراضية
+            </vra:technique>
       <vra:display>aerial photogrammetry 3-D virtual model</vra:display>
       <vra:technique refid="300053581" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053581">aerial photogrammetry</vra:technique>
       <vra:technique refid="300010331" vocab="AAT" href="http://vocab.getty.edu/page/aat/300010331">three-dimensional</vra:technique>
       <vra:technique refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">virtual models</vra:technique>
     </vra:techniqueSet>
     <vra:titleSet>
-      <vra:display>Video of drone flight of Mirbāṭ castle, Oman.</vra:display>
-      <vra:title type="generalView">Video of drone flight of Mirbāṭ castle, Oman.</vra:title>
+      <vra:display>فيديو لرحلة تصوير طائرة صغيرة بدون طيار لقلعة مرباط، عُمان.</vra:display>
       <vra:title type="generalView">فيديو لرحلة تصوير طائرة صغيرة بدون طيار لقلعة مرباط، عُمان.</vra:title>
-      <vra:display>Digital 3-D model of Mirbāṭ castle, Oman.</vra:display>
-      <vra:title type="generalView">Digital 3-D model of Mirbāṭ castle, Oman.</vra:title>
+      <vra:title type="generalView">Video of drone flight of Mirbāṭ castle, Oman.</vra:title>
+      <vra:display>Video of drone flight of Mirbāṭ castle, Oman.</vra:display>
+      <vra:display>نموذج رقمي ثلاثي الأبعاد لقلعة مرباط، عُمان.</vra:display>
       <vra:title type="generalView">نموذج رقمي ثلاثي الأبعاد لقلعة مرباط، عُمان.</vra:title>
+      <vra:title type="generalView">Digital 3-D model of Mirbāṭ castle, Oman.</vra:title>
+      <vra:display>Digital 3-D model of Mirbāṭ castle, Oman.</vra:display>
     </vra:titleSet>
     <vra:worktypeSet>
+      <vra:display>تسجيل فيديو</vra:display>
+      <vra:worktype refid="300028682" vocab="AAT" href="http://vocab.getty.edu/page/aat/300028682">تسجيلات فيديو (إنتاج صنعي ملموس)</vra:worktype>
       <vra:display>video recording</vra:display>
       <vra:worktype refid="300028682" vocab="AAT" href="http://vocab.getty.edu/page/aat/300028682">video recordings (physical artifacts)</vra:worktype>
+      <vra:display>نموذج افتراضي</vra:display>
+      <vra:worktype refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">نماذج افتراضية
+            </vra:worktype>
       <vra:display>virtual model</vra:display>
       <vra:worktype refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">virtual models</vra:worktype>
     </vra:worktypeSet>

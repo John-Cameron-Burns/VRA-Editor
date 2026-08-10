@@ -1,4 +1,5 @@
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QFont, QKeySequence, QShortcut
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTreeWidget, QTreeWidgetItem, QMenu
 
 from vra_editor.core.xml_parser import VraXmlParser, VraTreeNode
@@ -14,7 +15,7 @@ class VraTreePanel(QWidget):
 
     element_selected = Signal(str, dict, object)  # node_type, data, lxml element
     add_child_requested = Signal(object, str, list)  # parent element, tag, sibling schema order
-    remove_requested = Signal(object)                # lxml element to remove
+    remove_requested = Signal(object)  # lxml element to remove
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -28,6 +29,11 @@ class VraTreePanel(QWidget):
         self.tree.itemClicked.connect(self._on_item_clicked)
         self.tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tree.customContextMenuRequested.connect(self._on_context_menu)
+
+        for key in (QKeySequence.StandardKey.Delete, QKeySequence("Backspace")):
+            shortcut = QShortcut(key, self.tree)
+            shortcut.setContext(Qt.ShortcutContext.WidgetShortcut)
+            shortcut.activated.connect(self._delete_selected)
 
     def load_document(self, parser: VraXmlParser):
         """Rebuilds the tree from whatever document `parser` currently
@@ -66,6 +72,10 @@ class VraTreePanel(QWidget):
         item.setData(0, _NODE_DATA_ROLE, node.data)
         item.setData(0, _NODE_ELEMENT_ROLE, node.element)
         item.setData(0, _NODE_CHILD_SPECS_ROLE, node.child_specs)
+        if node.node_type == 'set':
+            font = item.font(0)
+            font.setBold(True)
+            item.setFont(0, font)
         for child in node.children:
             self._add_node(item, child)
         return item
@@ -97,7 +107,7 @@ class VraTreePanel(QWidget):
                     self.add_child_requested.emit(e, t, order)
                 )
 
-        if node_type != 'record' and element is not None:
+        if self._is_removable(item):
             remove_action = menu.addAction("Remove")
             remove_action.triggered.connect(
                 lambda _checked=False, e=element: self.remove_requested.emit(e)
@@ -105,3 +115,14 @@ class VraTreePanel(QWidget):
 
         if not menu.isEmpty():
             menu.exec(self.tree.viewport().mapToGlobal(pos))
+
+    def _is_removable(self, item: QTreeWidgetItem) -> bool:
+        node_type = item.data(0, _NODE_TYPE_ROLE)
+        element = item.data(0, _NODE_ELEMENT_ROLE)
+        return node_type != 'record' and element is not None
+
+    def _delete_selected(self):
+        item = self.tree.currentItem()
+        if item is None or not self._is_removable(item):
+            return
+        self.remove_requested.emit(item.data(0, _NODE_ELEMENT_ROLE))

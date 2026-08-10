@@ -31,7 +31,8 @@
                 لم يكن الهدف من إنشاء القلعة الدفاعية توفير الحماية الكاملة ما عدا نيران الأسلحة الصغيرة، بل كانت بمثابة منصّة للرصد.
             </display>
             <description
-            source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Mirbat, Dhofar Governorate, Liverpool: University of Liverpool, 2017">
+            source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Mirbat, Dhofar Governorate, Liverpool: University of Liverpool, 2017" dataDate=""
+            >
             مرباط، على الرغم من أهميته النسبية كميناء ومكان للتجارة في الماضي فلم يكن محصّن إلى حد كبير، وذلك على عكس
             المواقع الأخرى على طول ساحل ظُفَار، مثل البليد والذي تم تشييده في العصور الوسطى أو ميناء تجارة البخور
             سومرهام (المعروف حديثاُ باسم خور روري) والذي تم تشييده في عصر أقدم والواقع في الجنوب.
@@ -44,6 +45,7 @@
             بالإضافة إلى ذلك، تُطل على الجانب البحري من المرفأ القديم وهو عبارة عن بناء كبير مستطيل الشكل مبني من
             الحجارة مع برج مثمن الشكل يقع في الركن الجنوبي الشرقي من الواجهة المقابلة للسوق.
             لم يكن الهدف من إنشاء القلعة الدفاعية توفير الحماية الكاملة ما عدا نيران الأسلحة الصغيرة، بل كانت بمثابة منصّة للرصد.
+            </description>
         </descriptionSet>
         <!--<inscriptionSet>
             <inscription></inscription>

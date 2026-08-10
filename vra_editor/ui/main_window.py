@@ -1,19 +1,26 @@
+from pathlib import Path
+
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QKeySequence, QShortcut
+from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QPushButton, QLabel,
     QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy, QMessageBox, QInputDialog,
 )
 
-from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
+from vra_editor.config import load_locations
+from vra_editor.controllers.document_controller import DocumentController
+from vra_editor.core.commit_to_git import add_file_to_repo
 from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
 from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
-from vra_editor.config import load_locations
-from vra_editor.utils import user_name
-from vra_editor.core.commit_to_git import add_file_to_repo
-from vra_editor.controllers.document_controller import DocumentController
-from vra_editor.ui.panels.tree_panel.tree_widget import VraTreePanel
+from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
 from vra_editor.ui.panels.form_panel.form_container import FormContainerPanel
+from vra_editor.ui.panels.tree_panel.tree_widget import VraTreePanel
 from vra_editor.ui.panels.xml_preview.code_editor import XmlPreviewPanel
+from vra_editor.utils import user_name
+
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "images"
+LOGO_PATH = IMAGES_DIR / "idm_logo.svg"
 
 
 class ModeBar(QWidget):
@@ -101,15 +108,14 @@ class StatusBar(QWidget):
 
 
 class MainWindow(QMainWindow):
-
     # Central place for what's visible in each mode. Extend this if
     # other widgets (not just buttons) need to change with mode --
     # see register_mode_widget / apply_mode below.
     BASE_BUTTONS = ['Home', 'Open', 'Create', 'Review', 'Import']
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Submit', 'Cancel', 'About'],
-        review=BASE_BUTTONS + ['Approve', 'Reject', 'Cancel', 'About'],
+        edit=BASE_BUTTONS + ['Save', 'Undo', 'Submit', 'Cancel', 'About'],
+        review=BASE_BUTTONS + ['Approve', 'Undo', 'Reject', 'Cancel', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'About'],
     )
 
@@ -121,9 +127,9 @@ class MainWindow(QMainWindow):
         self.doc_controller = DocumentController()
 
         self.mode_bar: ModeBar | None = None
-        self.tree_panel = None          # Shows the elements tree
+        self.tree_panel = None  # Shows the elements tree
         self.form_panel = None
-        self.xml_preview_panel = None   # Shows the current XML
+        self.xml_preview_panel = None  # Shows the current XML
         self.status_bar: StatusBar | None = None
 
         # Registry of any widget (not just mode-bar buttons) that should
@@ -132,6 +138,9 @@ class MainWindow(QMainWindow):
 
         self.initialise_layout()
         self.apply_mode('initial')
+
+        undo_shortcut = QShortcut(QKeySequence.StandardKey.Undo, self)
+        undo_shortcut.activated.connect(self._on_undo)
 
     # ------------------------------------------------------------------
     # Layout construction
@@ -167,7 +176,7 @@ class MainWindow(QMainWindow):
         self.doc_controller.document_loaded.connect(self.tree_panel.load_document)
         self.form_panel.element_data_changed.connect(self.doc_controller.update_element_data)
         self.form_panel.display_data_changed.connect(self.doc_controller.update_display_data)
-        self.doc_controller.xml_updated.connect(self.xml_preview_panel.update_xml_text)
+        self.doc_controller.xml_updated.connect(self._on_xml_updated)
 
         # Status bar updates as a side effect of other actions: connect
         # each relevant signal straight to the matching setter. No other
@@ -187,6 +196,7 @@ class MainWindow(QMainWindow):
         form edits should write into, then show the matching editor."""
         self.doc_controller.set_current_element(element)
         self.form_panel.show_editor(node_type, data)
+        self._highlight_current_element()
 
     def _on_add_child_requested(self, parent_element, tag: str, sibling_order: list):
         new_elem = self.doc_controller.insert_child(parent_element, tag, sibling_order)
@@ -195,12 +205,36 @@ class MainWindow(QMainWindow):
     def _on_remove_requested(self, element):
         self.doc_controller.remove_element(element)
         self.form_panel.show_editor('', {})
+        self._highlight_current_element()
+
+    def _on_xml_updated(self, xml_text: str):
+        """The preview text got replaced (any edit, insert, or remove) --
+        update it, then re-highlight whatever's currently selected,
+        since its position in the text may have shifted."""
+        self.xml_preview_panel.update_xml_text(xml_text)
+        self._highlight_current_element()
+
+    def _highlight_current_element(self):
+        element = self.doc_controller.current_element
+        if element is None:
+            self.xml_preview_panel.clear_highlight()
+            return
+        span = self.doc_controller.xml_doc.find_element_span(element, self.doc_controller.get_initial_xml())
+        if span is None:
+            self.xml_preview_panel.clear_highlight()
+            return
+        self.xml_preview_panel.highlight_span(*span)
 
     def _build_top_bar(self) -> QWidget:
         top_bar = QWidget()
         top_bar.setFixedHeight(40)
         top_layout = QHBoxLayout(top_bar)
         top_layout.setContentsMargins(5, 5, 5, 5)
+
+        if LOGO_PATH.exists():
+            logo = QSvgWidget(str(LOGO_PATH))
+            logo.setFixedSize(20, 30)  # matches the SVG's own ~2:3 aspect ratio
+            top_layout.addWidget(logo)
 
         self.mode_bar = ModeBar(self.VARIANTS)
         top_layout.addWidget(self.mode_bar)
@@ -225,6 +259,7 @@ class MainWindow(QMainWindow):
         buttons['Settings'].clicked.connect(self._on_settings)
         buttons['About'].clicked.connect(self._on_about)
         buttons['Save'].clicked.connect(self._on_save)
+        buttons['Undo'].clicked.connect(self._on_undo)
         buttons['Submit'].clicked.connect(self._on_submit)
         buttons['Cancel'].clicked.connect(self._on_cancel)
         buttons['Approve'].clicked.connect(self._on_approve)
@@ -252,13 +287,15 @@ class MainWindow(QMainWindow):
     # Button handlers -- implement these; mode-independent by design
     # ------------------------------------------------------------------
 
-    def _on_home(self): ...
+    def _on_home(self):
+        ...
 
     def _on_open(self):
         self._open_from_folder('edit', dialog_title="Open Record")
         self.apply_mode('edit')
 
-    def _on_create(self): self.apply_mode('edit')
+    def _on_create(self):
+        self.apply_mode('edit')
 
     def _on_review(self):
         self._open_from_folder('pending', dialog_title="Select Record to Review")
@@ -283,6 +320,7 @@ class MainWindow(QMainWindow):
         dlg.exec()  # modal -- blocks until the user Saves or Cancels
         # dlg.exec() returning doesn't itself change app mode; Settings
         # remains an overlay on whatever mode was active before it opened.
+
     def _on_about(self):
         QMessageBox.about(
             self, "About VRA Core 4 XML Editor",
@@ -294,6 +332,7 @@ class MainWindow(QMainWindow):
             "(CC BY-NC 4.0).</p>"
             "<p>See the LICENSE file included with this application for the full license text.</p>",
         )
+
     def _on_save(self):
         ok, message = self.doc_controller.save_file()
         if not ok:
@@ -302,8 +341,16 @@ class MainWindow(QMainWindow):
         self.status_bar.set_file(message)
         self._prompt_and_commit(self.doc_controller.current_file)
 
-    def _on_submit(self): ...
-    def _on_cancel(self): self.apply_mode('initial')
+    def _on_undo(self):
+        if not self.doc_controller.undo():
+            return
+        self.form_panel.show_editor('', {})
+
+    def _on_submit(self):
+        ...
+
+    def _on_cancel(self):
+        self.apply_mode('initial')
 
     def _on_approve(self):
         ok, result = self.doc_controller.approve_file()
@@ -313,7 +360,8 @@ class MainWindow(QMainWindow):
         self.status_bar.set_file(f"{result} (approved)")
         self._prompt_and_commit(result)
 
-    def _on_reject(self): ...
+    def _on_reject(self):
+        ...
 
     def _prompt_and_commit(self, path: str):
         """Asks the user for a commit comment and, if they give one,
@@ -331,7 +379,9 @@ class MainWindow(QMainWindow):
                 self, "Commit failed",
                 f"{path} was saved, but could not be committed to the version-control repository.",
             )
-    def _on_autofill(self): ...
+
+    def _on_autofill(self):
+        ...
 
     def _on_import(self):
         locations = load_locations()  # re-read so it reflects the latest Settings

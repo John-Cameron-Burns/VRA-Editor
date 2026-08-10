@@ -9,11 +9,10 @@ from PySide6.QtWidgets import (
 from vra_editor.core.authority_lookup import (
     VOCABULARIES, AuthorityResult, AuthorityLookupError, search,
 )
-from vra_editor.config import load_geonames_username
 
 
 class VocabularySearchDialog(QDialog):
-    """Modal controlled-vocabulary lookup: pick VIAF/AAT/TGN/ULAN/GeoNames,
+    """Modal controlled-vocabulary lookup: pick VIAF/AAT/TGN/ULAN/GNS,
     search, and select a result. The caller reads `selected_result` after
     exec() returns Accepted.
 
@@ -75,7 +74,7 @@ class VocabularySearchDialog(QDialog):
         self.repaint()  # show "Searching..." before the blocking network call below
 
         try:
-            results = search(vocab, query, geonames_username=load_geonames_username())
+            results = search(vocab, query)
         except AuthorityLookupError as e:
             self.status_label.setText(str(e))
             self.search_button.setEnabled(True)

@@ -1,8 +1,15 @@
-from PySide6.QtCore import Signal
+from pathlib import Path
+
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtWidgets import QWidget, QStackedLayout, QLabel
 
-from vra_editor.ui.panels.form_panel.element_editor import ElementEditorPanel
 from vra_editor.ui.panels.form_panel.display_editor import DisplayEditorPanel
+from vra_editor.ui.panels.form_panel.element_editor import ElementEditorPanel
+
+IMAGES_DIR = Path(__file__).resolve().parent.parent.parent.parent / "images"
+BACKGROUND_IMAGE_PATH = IMAGES_DIR / "background-1.jpg"
+
 
 class FormContainerPanel(QWidget):
     """Panel container displaying the active form based on selection."""
@@ -12,6 +19,7 @@ class FormContainerPanel(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self._background = QPixmap(str(BACKGROUND_IMAGE_PATH)) if BACKGROUND_IMAGE_PATH.exists() else QPixmap()
         self.layout = QStackedLayout(self)
 
         self.placeholder = QLabel("-Select  an element from the structure tree on the left.")
@@ -28,6 +36,18 @@ class FormContainerPanel(QWidget):
         self.display_editor = DisplayEditorPanel()
         self.display_editor.display_changed.connect(self.display_data_changed.emit)
         self.layout.addWidget(self.display_editor)
+
+    def paintEvent(self, event):
+        if not self._background.isNull():
+            painter = QPainter(self)
+            scaled = self._background.scaled(
+                self.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            x = (self.width() - scaled.width()) // 2
+            y = (self.height() - scaled.height()) // 2
+            painter.drawPixmap(x, y, scaled)
+        super().paintEvent(event)
 
     def show_editor(self, node_type: str, data: dict):
         if node_type == "leaf":

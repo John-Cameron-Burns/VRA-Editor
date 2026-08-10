@@ -1,5 +1,6 @@
 from lxml import etree
 
+
 class SchemaValidator:
     """Validates XML against VRA Core 4 XSD definitions."""
 

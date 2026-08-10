@@ -1,8 +1,7 @@
-import os
 import shutil
 import xml.etree.ElementTree as ET
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
 
 # Register standard VRA Core 4 and XML namespaces to maintain clean tag formatting
 NAMESPACES = {
@@ -20,17 +19,17 @@ def extract_vra_id(root: ET.Element) -> str:
     # Check root attribute
     if 'id' in root.attrib:
         return root.attrib['id']
-    
+
     # Check top-level VRA elements (work, image, collection)
     for child in root:
         if 'id' in child.attrib:
             return child.attrib['id']
-            
+
     # Fallback search anywhere in the tree
     for elem in root.iter():
         if 'id' in elem.attrib:
             return elem.attrib['id']
-            
+
     return None
 
 
@@ -86,6 +85,7 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
     Falls back to plain print() when no callback is given, so this
     still works as a standalone script.
     """
+
     def report(current: int, total: int, message: str):
         if progress_callback:
             progress_callback(current, total, message)

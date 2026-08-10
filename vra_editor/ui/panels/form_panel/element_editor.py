@@ -10,7 +10,7 @@ class ElementEditorPanel(QWidget):
     than one hand-written editor per tag. Elements that carry
     vocab/refid/href (nearly all of them; see vra_structure.has_vocab)
     get an authority-vocabulary search button that fills in all four
-    fields from a VIAF/AAT/TGN/ULAN/GeoNames lookup.
+    fields from a VIAF/AAT/TGN/ULAN/GNS lookup.
     """
 
     element_changed = Signal(str, str, str, str)  # text, vocab, refid, href
@@ -18,6 +18,7 @@ class ElementEditorPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._loading = False
+        self._original = ('', '', '', '')  # (text, vocab, refid, href) as loaded, for Cancel
 
         layout = QFormLayout(self)
 
@@ -48,6 +49,11 @@ class ElementEditorPanel(QWidget):
         self.search_button.clicked.connect(self._on_search_clicked)
         layout.addRow(self.search_button)
 
+        self.cancel_button = QPushButton("Cancel edit")
+        self.cancel_button.setToolTip("Revert this element back to its value before you started editing it.")
+        self.cancel_button.clicked.connect(self._on_cancel_clicked)
+        layout.addRow(self.cancel_button)
+
         self._vocab_widgets = (
             self.vocab_label, self.vocab_input,
             self.refid_label, self.refid_input,
@@ -73,6 +79,14 @@ class ElementEditorPanel(QWidget):
         for widget in self._vocab_widgets:
             widget.setVisible(has_vocab)
         self._loading = False
+        self._original = (text, vocab, refid, href)
+
+    def _on_cancel_clicked(self):
+        text, vocab, refid, href = self._original
+        self.text_input.setPlainText(text)
+        self.vocab_input.setText(vocab)
+        self.refid_input.setText(refid)
+        self.href_input.setText(href)
 
     def _on_search_clicked(self):
         dlg = VocabularySearchDialog(initial_query=self.text_input.toPlainText(), parent=self)

@@ -1,11 +1,12 @@
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional, Union
 
 from lxml import etree
 
-from vra_editor.core.display_i18n import DisplayTranslations, get_display, set_display
 from vra_editor.core import vra_structure
+from vra_editor.core.display_i18n import DisplayTranslations, get_display, set_display
 
 VRA_NS = "http://www.vraweb.org/vracore4.htm"
 NSMAP = {None: VRA_NS}
@@ -23,10 +24,10 @@ class VraTreeNode:
     that later edits know what to write into.
     """
     label: str
-    node_type: str            # "record" | "set" | "container" | "leaf" | "display"
-    data: dict                # payload shape matches FormContainerPanel.show_editor's expectations
-    element: Any               # the lxml element itself, or None for purely structural nodes
-    child_specs: tuple = ()   # vra_structure.ChildSpec entries valid to insert under this node
+    node_type: str  # "record" | "set" | "container" | "leaf" | "display"
+    data: dict  # payload shape matches FormContainerPanel.show_editor's expectations
+    element: Any  # the lxml element itself, or None for purely structural nodes
+    child_specs: tuple = ()  # vra_structure.ChildSpec entries valid to insert under this node
     children: list = field(default_factory=list)
 
 
@@ -145,6 +146,76 @@ class VraXmlParser:
     @staticmethod
     def _localname(element) -> str:
         return etree.QName(element).localname
+
+    def find_element_span(self, element, xml_text: str) -> Optional[tuple]:
+        """Returns (start, end) character offsets within xml_text
+        spanning element's complete serialized block (its opening tag's
+        line through its closing tag's line), or None if it can't be
+        located.
+
+        Doesn't try to reproduce lxml's serialization of `element` in
+        isolation and search for that -- namespace prefixes and
+        attribute declarations come out differently for a standalone
+        element than for the same element serialized in place inside
+        the full document, so that match would frequently fail.
+        Instead: lxml's pretty-printer always starts an element's
+        opening tag at the beginning of its own line, in document
+        order, so counting which occurrence of this tag `element` is
+        among same-tagged elements and finding that same occurrence's
+        opening-tag line in xml_text locates it exactly, regardless of
+        prefix/attribute-order/escaping details.
+        """
+        root = element.getroottree().getroot()
+        localname = self._localname(element)
+        same_tag_elements = list(root.iter(element.tag))
+        try:
+            target_index = same_tag_elements.index(element)
+        except ValueError:
+            return None
+
+        tag_pattern = r'(?:\w+:)?' + re.escape(localname)
+        open_re = re.compile(r'^\s*<' + tag_pattern + r'(?=[\s/>])')
+        open_count_re = re.compile(r'<' + tag_pattern + r'(?=[\s/>])')
+        close_re = re.compile(r'</' + tag_pattern + r'>')
+        selfclose_re = re.compile(r'<' + tag_pattern + r'\b[^>]*/>')
+
+        lines = xml_text.split('\n')
+        line_offsets = []
+        offset = 0
+        for line in lines:
+            line_offsets.append(offset)
+            offset += len(line) + 1  # +1 for the '\n' consumed by split()
+
+        occurrence = -1
+        open_line_idx = None
+        for i, line in enumerate(lines):
+            if open_re.match(line):
+                occurrence += 1
+                if occurrence == target_index:
+                    open_line_idx = i
+                    break
+        if open_line_idx is None:
+            return None
+
+        depth = 0
+        end_line_idx = None
+        for i in range(open_line_idx, len(lines)):
+            line = lines[i]
+            opens = len(open_count_re.findall(line))
+            selfcloses = len(selfclose_re.findall(line))
+            closes = len(close_re.findall(line))
+            depth += (opens - selfcloses) - closes
+            if depth == 0:
+                end_line_idx = i
+                break
+        if end_line_idx is None:
+            return None
+
+        open_line = lines[open_line_idx]
+        start = line_offsets[open_line_idx] + (len(open_line) - len(open_line.lstrip()))
+        close_line = lines[end_line_idx]
+        end = line_offsets[end_line_idx] + len(close_line.rstrip())
+        return start, end
 
     # ------------------------------------------------------------------
     # Tree mutation -- insert/remove elements anywhere in the document.

@@ -1,12 +1,12 @@
 from pathlib import Path
 from typing import Optional
 
-from lxml import etree
 from PySide6.QtCore import QObject, Signal
+from lxml import etree
 
-from vra_editor.core.xml_parser import VraXmlParser
-from vra_editor.core.schema_validator import SchemaValidator
 from vra_editor.config import load_locations
+from vra_editor.core.schema_validator import SchemaValidator
+from vra_editor.core.xml_parser import VraXmlParser
 
 DEFAULT_XSD_PATH = Path(__file__).resolve().parent.parent / "resources" / "vra_core4.xsd"
 
@@ -22,19 +22,21 @@ class DocumentController(QObject):
     (or a subclass of QObject) and the attribute is a Signal.
     """
 
-    file_loaded = Signal(str)          # emits the file path
-    archive_changed = Signal(str)      # emits the archive name
-    xml_updated = Signal(str)          # emits the new XML text
-    document_loaded = Signal(object)   # emits the VraXmlParser, once a file has been parsed
+    file_loaded = Signal(str)  # emits the file path
+    archive_changed = Signal(str)  # emits the archive name
+    xml_updated = Signal(str)  # emits the new XML text
+    document_loaded = Signal(object)  # emits the VraXmlParser, once a file has been parsed
 
     def __init__(self):
         super().__init__()  # QObject.__init__ must run for signals to work
         self.xml_doc = VraXmlParser()
         self._current_file: Optional[str] = None
         self._current_archive: Optional[str] = None
-        self._current_element = None   # the lxml element currently selected in the tree
+        self._current_element = None  # the lxml element currently selected in the tree
         self._xml_text: str = ""
         self._validator = SchemaValidator(str(DEFAULT_XSD_PATH))
+        self._undo_stack: list = []  # serialized (bytes) snapshots, most recent last
+        self._undo_snapshot_element = None  # element the top-of-stack snapshot precedes editing
 
     # ------------------------------------------------------------------
     # Actions that change state -- each emits the matching signal once
@@ -46,6 +48,8 @@ class DocumentController(QObject):
         self._current_file = path
         self._current_element = None  # nothing selected yet in the freshly-loaded doc
         self._xml_text = xml_string or ""
+        self._undo_stack.clear()  # a new document starts with a clean undo history
+        self._undo_snapshot_element = None
         self.file_loaded.emit(path)
         self.document_loaded.emit(self.xml_doc)  # tree panel rebuilds itself from this
         self.xml_updated.emit(self._xml_text)
@@ -66,6 +70,7 @@ class DocumentController(QObject):
         technique, subject/term, ...) -- covers every basicString-derived
         tag uniformly rather than one method per tag."""
         if self._current_element is not None:
+            self._snapshot_before_edit(self._current_element)
             self.xml_doc.set_element_data(self._current_element, text, vocab, refid, href)
         self._xml_text = self._rebuild_xml()
         self.xml_updated.emit(self._xml_text)
@@ -76,6 +81,7 @@ class DocumentController(QObject):
         child tags in sequence order (from the tree node's child_specs).
         Returns the new lxml element so the caller (main_window) can
         re-select it in the tree."""
+        self._snapshot_before_structural_change()
         new_elem = self.xml_doc.add_child(parent_element, tag, sibling_order)
         self._xml_text = self._rebuild_xml()
         self.xml_updated.emit(self._xml_text)
@@ -85,6 +91,7 @@ class DocumentController(QObject):
     def remove_element(self, element):
         if element is None:
             return
+        self._snapshot_before_structural_change()
         self.xml_doc.remove_element(element)
         if self._current_element is element:
             self._current_element = None
@@ -94,9 +101,63 @@ class DocumentController(QObject):
 
     def update_display_data(self, translations: dict):
         if self._current_element is not None:
+            self._snapshot_before_edit(self._current_element)
             self.xml_doc.set_display_translations(self._current_element, translations)
         self._xml_text = self._rebuild_xml()
         self.xml_updated.emit(self._xml_text)
+
+    # ------------------------------------------------------------------
+    # Undo -- whole-document snapshots rather than fine-grained command
+    # objects, since these documents are small enough (a few hundred
+    # lines) that this is negligible cost and much simpler to get right.
+    # ------------------------------------------------------------------
+
+    _UNDO_STACK_LIMIT = 100
+
+    def _push_undo_snapshot(self):
+        if self.xml_doc.xml_root is None:
+            return
+        self._undo_stack.append(etree.tostring(self.xml_doc.xml_root))
+        if len(self._undo_stack) > self._UNDO_STACK_LIMIT:
+            self._undo_stack.pop(0)
+
+    def _snapshot_before_edit(self, element):
+        """For field edits, which fire on every keystroke: only push a
+        new snapshot when the edit target changes, so continuous typing
+        into one field collapses into a single undo step instead of one
+        per character."""
+        if self._undo_stack and self._undo_snapshot_element is element:
+            return
+        self._push_undo_snapshot()
+        self._undo_snapshot_element = element
+
+    def _snapshot_before_structural_change(self):
+        """Insert/remove always get their own undo step, and force the
+        next field edit (even to the same element as before) to start a
+        fresh step too, rather than coalescing across the structural
+        change."""
+        self._push_undo_snapshot()
+        self._undo_snapshot_element = None
+
+    @property
+    def can_undo(self) -> bool:
+        return bool(self._undo_stack)
+
+    def undo(self) -> bool:
+        """Reverts to the state before the last edit/insert/remove.
+        Returns False if there's nothing to undo."""
+        if not self._undo_stack:
+            return False
+        snapshot = self._undo_stack.pop()
+        self._undo_snapshot_element = None
+        new_root = etree.fromstring(snapshot)
+        self.xml_doc.xml_root = new_root
+        self.xml_doc.xml_etree = etree.ElementTree(new_root)
+        self._current_element = None
+        self._xml_text = self._rebuild_xml()
+        self.xml_updated.emit(self._xml_text)
+        self.document_loaded.emit(self.xml_doc)
+        return True
 
     def get_initial_xml(self) -> str:
         return self._xml_text
@@ -104,6 +165,10 @@ class DocumentController(QObject):
     @property
     def current_file(self) -> Optional[str]:
         return self._current_file
+
+    @property
+    def current_element(self):
+        return self._current_element
 
     def save_file(self) -> tuple[bool, str]:
         """Validates the current document against the VRA Core 4 schema

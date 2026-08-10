@@ -2,9 +2,9 @@ import getpass
 import logging
 from pathlib import Path
 
-from ..config import load_locations
-
 from dulwich import porcelain
+
+from ..config import load_locations
 
 
 def git_author_identity() -> bytes:

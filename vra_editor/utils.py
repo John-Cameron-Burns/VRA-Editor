@@ -1,7 +1,6 @@
 import getpass
 import os
 import platform
-import pwd
 from typing import Optional
 
 import regex
@@ -13,21 +12,26 @@ def strip_quotes(value: str) -> str:
     :param value:
     :return:
     """
-    return regex.sub(r'^[\s\p{Quotation_Mark}]+|[\s\p{Quotation_Mark}]+$','' , value)
+    return regex.sub(r'^[\s\p{Quotation_Mark}]+|[\s\p{Quotation_Mark}]+$', '', value)
+
 
 if platform.system() == "Windows":
     # noinspection PyUnresolvedReferences
-    def get_user_name():
+    def get_full_name():
         import ctypes
         GetUserNameEx = ctypes.windll.secur32.GetUserNameExW
         NameDisplay = 3
         size = ctypes.pointer(ctypes.c_ulong(0))
         GetUserNameEx(NameDisplay, None, size)
+        if size.contents.value == 0:
+            return None
         name_buffer = ctypes.create_unicode_buffer(size.contents.value)
-        GetUserNameEx(NameDisplay, name_buffer, size)
-        return name_buffer.value
+        if not GetUserNameEx(NameDisplay, name_buffer, size):
+            return None
+        return name_buffer.value or None
 else:
     def get_full_name():
+        import pwd  # POSIX-only; deferred so importing this module doesn't fail on Windows
         # Get user info by UID
         user_info = pwd.getpwuid(os.getuid())
         if hasattr(user_info, 'pw_gecos'): return user_info.pw_gecos.split(',', maxsplit=1)[0]
