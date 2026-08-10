@@ -7,9 +7,10 @@
         <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
         <vra:culture>English</vra:culture>
         <vra:dates type="activity">
-          <vra:earliestDate>2012</vra:earliestDate>
-          <vra:latestDate>present</vra:latestDate>
+
           <vra:earliestDate>1976</vra:earliestDate>
+          <vra:latestDate>present</vra:latestDate>
+
         </vra:dates>
         <vra:role>creator</vra:role>
         <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</vra:role>
@@ -34,7 +35,9 @@
         </vra:dates>
         <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</vra:role>
       </vra:agent>
-      <vra:display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</vra:display>
+      <vra:display dataDate="">
+        تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان
+      </vra:display>
     </vra:agentSet>
     <vra:culturalContextSet>
       <vra:culturalContext vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>

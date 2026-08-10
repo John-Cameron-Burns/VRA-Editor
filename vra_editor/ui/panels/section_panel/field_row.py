@@ -1,8 +1,9 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QTextEdit, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton
 
 from vra_editor.core.friendly_labels import FIELD_LABELS, friendly_label
 from vra_editor.ui.dialogs.vocabulary_search_dialog import VocabularySearchDialog
+from vra_editor.ui.widgets.auto_grow_text_edit import AutoGrowTextEdit
 
 # The vocab/refid/href trio is what every current leaf actually exposes;
 # kept as a list (not three named fields) so adding another vraAttributes
@@ -42,9 +43,8 @@ class FieldRow(QWidget):
         label.setMinimumWidth(110)
         main_row.addWidget(label)
 
-        self.text_input = QTextEdit()
+        self.text_input = AutoGrowTextEdit(min_height=46, max_height=240)
         self.text_input.setPlainText(text)
-        self.text_input.setFixedHeight(46)
         self.text_input.textChanged.connect(self._on_changed)
         main_row.addWidget(self.text_input, stretch=1)
 

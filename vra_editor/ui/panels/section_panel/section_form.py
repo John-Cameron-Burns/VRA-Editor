@@ -41,6 +41,14 @@ class SectionFormPanel(QWidget):
         self.display_editor.display_changed.connect(self._on_display_changed)
         outer.addWidget(self.display_editor)
 
+        self.add_display_button = QPushButton("+ Add translations (Display)")
+        self.add_display_button.setToolTip(
+            "Add a language-tagged summary for this section, shown in place "
+            "of (or alongside) the individual items below."
+        )
+        self.add_display_button.clicked.connect(self._on_add_display_clicked)
+        outer.addWidget(self.add_display_button)
+
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.cards_container = QWidget()
@@ -93,11 +101,14 @@ class SectionFormPanel(QWidget):
 
         node = self._current_node
         display_node = next((c for c in node.children if c.node_type == 'display'), None)
+        display_addable = any(spec.tag == 'display' for spec in node.child_specs)
         if display_node is not None:
             self.display_editor.set_display_data(display_node.data.get('translations', {}))
             self.display_editor.show()
+            self.add_display_button.hide()
         else:
             self.display_editor.hide()
+            self.add_display_button.setVisible(display_addable)
 
         item_nodes = [c for c in node.children if c.node_type != 'display']
         for item_node in item_nodes:
@@ -203,3 +214,14 @@ class SectionFormPanel(QWidget):
             return
         self._doc_controller.set_current_element(self._current_node.element)
         self._doc_controller.update_display_data(translations)
+
+    def _on_add_display_clicked(self):
+        if self._current_node is None:
+            return
+        # Defensive: display's maxOccurs is 1, so this must not run if one
+        # already exists, even though the button itself is only ever
+        # visible when it doesn't.
+        if any(c.node_type == 'display' for c in self._current_node.children):
+            return
+        sibling_order = [spec.tag for spec in self._current_node.child_specs]
+        self._doc_controller.insert_child(self._current_node.element, 'display', sibling_order)

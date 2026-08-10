@@ -38,6 +38,7 @@ QPushButton {
     border: none;
     border-radius: 4px;
     padding: 6px 16px;
+    min-height: 20px;
 }
 QPushButton:hover {
     background-color: #266449;
@@ -341,7 +342,11 @@ class MainWindow(QMainWindow):
 
     def _build_top_bar(self) -> QWidget:
         top_bar = QWidget()
-        top_bar.setFixedHeight(40)
+        # A floor, not a ceiling -- a fixed height clipped the bold/padded
+        # Submit and Approve buttons on some platforms, since their styled
+        # sizeHint could exceed a hard 40px cap the other, unstyled buttons
+        # never approached.
+        top_bar.setMinimumHeight(40)
         top_layout = QHBoxLayout(top_bar)
         top_layout.setContentsMargins(5, 5, 5, 5)
 

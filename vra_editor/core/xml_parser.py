@@ -102,11 +102,17 @@ class VraXmlParser:
             child_specs=tuple(child_specs),
         )
 
-        translations = self.get_display_translations(elem)
-        if translations:
-            preview = next(iter(translations.values()), '')
+        # Keyed on the <display> element's existence, not on whether it
+        # currently has any parseable content -- a freshly-added, still-
+        # empty <display/> (the moment after clicking "+ Add translations")
+        # has no translations yet either, but must still show up as an
+        # editable Display entry rather than silently vanishing until
+        # the user has typed something.
+        if elem.find(f'{{{VRA_NS}}}display') is not None:
+            translations = self.get_display_translations(elem)
+            preview = next(iter(translations.values()), '') if translations else ''
             node.children.append(VraTreeNode(
-                label=f"Display: {preview}",
+                label=f"Display: {preview}" if preview else "Display",
                 node_type='display',
                 data={'translations': translations},
                 element=elem,  # display methods take the containing element, not <display> itself
@@ -264,13 +270,25 @@ class VraXmlParser:
         (xmlns="http://www.vraweb.org/vracore4.htm"), a plain
         element.find('display') silently returns None -- it has to be
         namespace-qualified, hence the {VRA_NS}display lookup below.
+
+        Falls back to {'': text} when <display> exists but its content
+        isn't in this app's own div-per-language format -- real VRA
+        exports often have a plain-text <display>, predating (or simply
+        not using) that convention. Surfacing it with a blank language
+        key, rather than returning {} and hiding it entirely, is what
+        lets the UI show it as "specify the language" instead of
+        silently losing access to existing content.
         """
         if element is None:
             return {}
         display_elem = element.find(f'{{{VRA_NS}}}display')
         if display_elem is None:
             return {}
-        return get_display(display_elem)
+        translations = get_display(display_elem)
+        if translations:
+            return translations
+        plain_text = (display_elem.text or '').strip()
+        return {'': plain_text} if plain_text else {}
 
     def set_display_translations(self, element, translations: DisplayTranslations):
         """Writes translations onto element's <display> child, creating

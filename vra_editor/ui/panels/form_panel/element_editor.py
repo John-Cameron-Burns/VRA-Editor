@@ -1,8 +1,9 @@
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QPushButton, QTextEdit
+from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QPushButton
 
 from vra_editor.core.friendly_labels import FIELD_LABELS, friendly_label
 from vra_editor.ui.dialogs.vocabulary_search_dialog import VocabularySearchDialog
+from vra_editor.ui.widgets.auto_grow_text_edit import AutoGrowTextEdit
 
 
 class ElementEditorPanel(QWidget):
@@ -26,8 +27,7 @@ class ElementEditorPanel(QWidget):
         self.tag_label = QLabel()
         layout.addRow(self.tag_label)
 
-        self.text_input = QTextEdit()
-        self.text_input.setFixedHeight(80)
+        self.text_input = AutoGrowTextEdit(min_height=80, max_height=400)
         self.text_input.textChanged.connect(self._on_field_changed)
         layout.addRow("Text:", self.text_input)
 
