@@ -3,6 +3,8 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from pathlib import Path
 
+from .display_i18n import build_display_html, parse_display_html
+
 # Register standard VRA Core 4 and XML namespaces to maintain clean tag formatting
 NAMESPACES = {
     'vra': 'http://www.vraweb.org/vracore4.htm',
@@ -12,6 +14,51 @@ NAMESPACES = {
 
 for prefix, uri in NAMESPACES.items():
     ET.register_namespace(prefix, uri)
+
+_XML_LANG_ATTR = '{http://www.w3.org/XML/1998/namespace}lang'
+
+# display/notes: the schema allows only one per Set, so a same-tag
+# "conflict" here isn't a second item -- it's the same field in another
+# language, and has to be merged into the one element that's allowed to
+# exist (this app's own div-per-language convention), not appended as an
+# invalid second sibling.
+_SINGLE_PER_SET_TAGS = {'display', 'notes'}
+
+# The only leaf element type in the schema (dateWrapperType, used only by
+# earliestDate/latestDate) that carries no vraAttributes at all -- xml:lang
+# isn't a valid attribute on these, so a same-tag conflict here is a
+# genuine data discrepancy between the source files, not a translation.
+_NO_LANG_TAGS = {'earliestDate', 'latestDate'}
+
+
+def _localname(tag: str) -> str:
+    return tag.split('}', 1)[1] if tag.startswith('{') else tag
+
+
+def _record_lang(root: ET.Element) -> str:
+    """The xml:lang declared on a source file's own record element
+    (<work>/<image>/<collection>), or '' if it doesn't declare one."""
+    if _localname(root.tag) in ('work', 'image', 'collection'):
+        return root.get(_XML_LANG_ATTR, '')
+    for child in root:
+        if isinstance(child.tag, str) and _localname(child.tag) in ('work', 'image', 'collection'):
+            return child.get(_XML_LANG_ATTR, '')
+    return ''
+
+
+def _merge_single_per_set(target_elem: ET.Element, source_elem: ET.Element,
+                           target_lang: str, source_lang: str) -> None:
+    """Folds source_elem's text into target_elem (a <display> or <notes>)
+    as an additional language entry, instead of leaving it a separate,
+    schema-invalid second element."""
+    translations = parse_display_html(target_elem.text)
+    if not translations:
+        existing_text = (target_elem.text or '').strip()
+        translations = {target_lang: existing_text} if existing_text else {}
+    new_text = (source_elem.text or '').strip()
+    if new_text:
+        translations[source_lang] = new_text
+    target_elem.text = build_display_html(translations)
 
 
 def extract_vra_id(root: ET.Element) -> str:
@@ -46,26 +93,69 @@ def is_identical_element(e1: ET.Element, e2: ET.Element) -> bool:
     return all(is_identical_element(c1, c2) for c1, c2 in zip(e1, e2))
 
 
-def merge_xml_elements(target: ET.Element, source: ET.Element):
+def merge_xml_elements(target: ET.Element, source: ET.Element,
+                        target_lang: str = '', source_lang: str = '', report=None):
     """
     Recursively merges `source` XML nodes into `target`.
     Combines set containers (e.g., <titleSet>) and appends unique language elements.
+
+    target_lang/source_lang are each source file's own declared xml:lang
+    (see _record_lang), threaded through the recursion unchanged so a
+    leaf collision several levels deep (e.g. agent > dates > earliestDate)
+    still knows which language each side came from. report, if given, is
+    called with a message string for anything that needed a judgment call
+    -- currently only genuine data conflicts on elements that can't carry
+    xml:lang (see _NO_LANG_TAGS).
     """
+    if report is None:
+        report = lambda _msg: None
+
     # Copy any missing attributes from source element to target
     for attr_key, attr_val in source.attrib.items():
         if attr_key not in target.attrib:
             target.attrib[attr_key] = attr_val
 
     for source_child in list(source):
+        tag = _localname(source_child.tag)
         matching_targets = [t for t in target if t.tag == source_child.tag]
 
-        # If source_child is a container set with child elements, recurse into target container
         if matching_targets and len(source_child) > 0:
-            merge_xml_elements(matching_targets[0], source_child)
+            # A container with an existing same-tag sibling -- recurse to
+            # merge its own fields rather than treating the whole thing
+            # as one leaf value to compare/duplicate.
+            merge_xml_elements(matching_targets[0], source_child, target_lang, source_lang, report)
+            continue
+
+        if not matching_targets:
+            # Genuinely new -- nothing to reconcile against. Leaves still
+            # get tagged with source_lang (when eligible) so they read as
+            # "this field, in that language" rather than an untraceable
+            # extra value.
+            if source_lang and len(source_child) == 0 and tag not in _NO_LANG_TAGS:
+                source_child.set(_XML_LANG_ATTR, source_lang)
+            target.append(source_child)
+            continue
+
+        # A same-tag leaf already exists in target. Either it's a plain
+        # duplicate (skip), or the same field expressed in another
+        # language -- which used to get silently appended as an
+        # untagged, and sometimes schema-invalid, extra sibling.
+        if any(is_identical_element(t, source_child) for t in matching_targets):
+            continue
+
+        if tag in _SINGLE_PER_SET_TAGS:
+            _merge_single_per_set(matching_targets[0], source_child, target_lang, source_lang)
+        elif tag in _NO_LANG_TAGS:
+            report(
+                f"    [!] <{tag}> conflict: keeping '{matching_targets[0].text}', "
+                f"discarding source's '{source_child.text}' -- this element can't "
+                f"carry xml:lang, so the two source files disagreeing here needs "
+                f"a human to reconcile, not a merge."
+            )
         else:
-            # If it's a leaf node or new element, append if it doesn't already exist
-            if not any(is_identical_element(t, source_child) for t in target):
-                target.append(source_child)
+            if source_lang:
+                source_child.set(_XML_LANG_ATTR, source_lang)
+            target.append(source_child)
 
 
 def process_vra_directory(input_dir: str, output_dir: str, progress_callback=None):
@@ -127,8 +217,14 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
 
         if len(files) > 1:
             report(index, total, f" -> Merging {len(files)} files for ID '{rec_id}'...")
+            primary_lang = _record_lang(primary_root)
             for _, secondary_tree in files[1:]:
-                merge_xml_elements(primary_root, secondary_tree.getroot())
+                secondary_root = secondary_tree.getroot()
+                secondary_lang = _record_lang(secondary_root)
+                merge_xml_elements(
+                    primary_root, secondary_root, primary_lang, secondary_lang,
+                    report=lambda msg: report(index, total, msg),
+                )
         else:
             report(index, total, f" -> Writing single file for ID '{rec_id}'...")
 

@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -5,8 +6,10 @@ from PySide6.QtCore import QObject, Signal
 from lxml import etree
 
 from vra_editor.config import load_locations
+from vra_editor.core import review_notes
 from vra_editor.core.schema_validator import SchemaValidator
 from vra_editor.core.xml_parser import VraXmlParser
+from vra_editor.utils import user_name
 
 DEFAULT_XSD_PATH = Path(__file__).resolve().parent.parent / "resources" / "vra_core4.xsd"
 
@@ -103,6 +106,45 @@ class DocumentController(QObject):
         if self._current_element is not None:
             self._snapshot_before_edit(self._current_element)
             self.xml_doc.set_display_translations(self._current_element, translations)
+        self._xml_text = self._rebuild_xml()
+        self.xml_updated.emit(self._xml_text)
+
+    # ------------------------------------------------------------------
+    # Review notes -- a reviewer's todo list for the editor, stored as an
+    # XML comment rather than document content (see core/review_notes.py).
+    # ------------------------------------------------------------------
+
+    def get_review_notes(self) -> list:
+        return review_notes.get_review_notes(self.xml_doc.xml_root)
+
+    def add_review_note(self, text: str):
+        text = text.strip()
+        if not text:
+            return
+        notes = self.get_review_notes()
+        notes.append({
+            'text': text,
+            'author': user_name() or '',
+            'date': datetime.date.today().isoformat(),
+            'resolved': False,
+        })
+        self._write_review_notes(notes)
+
+    def set_review_note_resolved(self, index: int, resolved: bool):
+        notes = self.get_review_notes()
+        if 0 <= index < len(notes):
+            notes[index]['resolved'] = resolved
+            self._write_review_notes(notes)
+
+    def remove_review_note(self, index: int):
+        notes = self.get_review_notes()
+        if 0 <= index < len(notes):
+            notes.pop(index)
+            self._write_review_notes(notes)
+
+    def _write_review_notes(self, notes: list):
+        self._snapshot_before_structural_change()
+        review_notes.set_review_notes(self.xml_doc.xml_root, notes)
         self._xml_text = self._rebuild_xml()
         self.xml_updated.emit(self._xml_text)
 

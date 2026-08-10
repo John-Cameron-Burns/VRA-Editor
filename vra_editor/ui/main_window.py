@@ -16,6 +16,7 @@ from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
 from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
 from vra_editor.ui.error_messages import friendly_validation_error
 from vra_editor.ui.panels.form_panel.form_container import FormContainerPanel
+from vra_editor.ui.panels.review_notes_panel import ReviewNotesPanel
 from vra_editor.ui.panels.section_panel.section_form import SectionFormPanel
 from vra_editor.ui.panels.section_panel.section_list import SectionListPanel
 from vra_editor.ui.panels.tree_panel.tree_widget import VraTreePanel
@@ -143,8 +144,8 @@ class MainWindow(QMainWindow):
     BASE_BUTTONS = ['Home', 'Open', 'Create', 'Review', 'Import']
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Advanced View', 'Submit', 'Cancel', 'About'],
-        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Advanced View', 'Reject', 'Cancel', 'About'],
+        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Submit', 'Cancel', 'About'],
+        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Reject', 'Cancel', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'About'],
     )
 
@@ -199,12 +200,15 @@ class MainWindow(QMainWindow):
 
         splitter = QSplitter(Qt.Horizontal)
         self.xml_preview_panel = XmlPreviewPanel()
+        self.review_notes_panel = ReviewNotesPanel(self.doc_controller)
         splitter.addWidget(self.nav_stack)
         splitter.addWidget(self.form_stack)
+        splitter.addWidget(self.review_notes_panel)
         splitter.addWidget(self.xml_preview_panel)
-        splitter.setSizes([250, 425, 425])
+        splitter.setSizes([250, 425, 250, 425])
         self._splitter = splitter
         self.xml_preview_panel.setVisible(False)  # hidden by default; toggled via the "Show XML" button
+        self.review_notes_panel.setVisible(False)  # toggled via "Review Notes"; auto-shown if there's unresolved work
 
         self.status_bar = StatusBar()
         self.status_bar.set_user(user_name())  # fetched once; doesn't change
@@ -241,6 +245,7 @@ class MainWindow(QMainWindow):
         # each relevant signal straight to the matching setter. No other
         # code needs to know the status bar exists.
         self.doc_controller.file_loaded.connect(self.status_bar.set_file)
+        self.doc_controller.file_loaded.connect(self._on_file_loaded)
         self.doc_controller.archive_changed.connect(self.status_bar.set_archive)
         # If a signal doesn't map 1:1 onto a setter, connect to a small
         # slot instead, e.g.:
@@ -308,6 +313,17 @@ class MainWindow(QMainWindow):
         underlying lxml elements do."""
         self.tree_panel.load_document(self.doc_controller.xml_doc)
         self._refresh_navigation()
+        self.review_notes_panel.refresh()
+
+    def _on_file_loaded(self, _path: str):
+        """Surfaced automatically, not just available behind the
+        toggle, so an editor opening a record a reviewer left work on
+        can't miss it. Deliberately tied to file_loaded rather than
+        document_loaded -- the latter also fires on every insert/remove,
+        which would reopen the panel right after the user closes it if
+        they then add or delete a Set."""
+        if self.review_notes_panel.has_unresolved_notes():
+            self.mode_bar.buttons['Review Notes'].setChecked(True)
 
     def _refresh_navigation(self):
         """Re-syncs the Simple view (both the section list and whichever
@@ -387,6 +403,10 @@ class MainWindow(QMainWindow):
         show_xml_button.setCheckable(True)
         show_xml_button.toggled.connect(self._on_toggle_xml)
 
+        review_notes_button = self.mode_bar.buttons['Review Notes']
+        review_notes_button.setCheckable(True)
+        review_notes_button.toggled.connect(self._on_toggle_review_notes)
+
         advanced_button = self.mode_bar.buttons['Advanced View']
         advanced_button.setCheckable(True)
         advanced_button.toggled.connect(self._on_toggle_advanced)
@@ -416,6 +436,11 @@ class MainWindow(QMainWindow):
     def _on_toggle_xml(self, checked: bool):
         self.xml_preview_panel.setVisible(checked)
         self.mode_bar.buttons['Show XML'].setText('Hide XML' if checked else 'Show XML')
+
+    def _on_toggle_review_notes(self, checked: bool):
+        self.review_notes_panel.setVisible(checked)
+        if checked:
+            self.review_notes_panel.refresh()
 
     def _on_toggle_advanced(self, checked: bool):
         self.nav_stack.setCurrentIndex(1 if checked else 0)

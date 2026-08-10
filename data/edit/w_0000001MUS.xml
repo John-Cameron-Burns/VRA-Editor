@@ -1,38 +1,19 @@
 <?xml version='1.0' encoding='utf-8'?>
 <vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
-  <vra:work id="w_0000001MUS" xml:lang="en">
+  <vra:work id="w_0000001MUS" xml:lang="ar">
     <vra:culturalContextSet>
-      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
       <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:culturalContext>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483" xml:lang="en">Omani</vra:culturalContext>
     </vra:culturalContextSet>
     <vra:dateSet>
-      <vra:display>Created ca. 1586-1588</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تم إنشاؤها حوالي 1586-1588&lt;/div&gt;&lt;div lang="en"&gt;Created ca. 1586-1588&lt;/div&gt;</vra:display>
       <vra:date type="creation">
         <vra:earliestDate circa="true">1586</vra:earliestDate>
         <vra:latestDate circa="true">1588</vra:latestDate>
       </vra:date>
-      <vra:display>تم إنشاؤها حوالي 1586-1588</vra:display>
     </vra:dateSet>
     <vra:descriptionSet>
-      <vra:display>
-                Al Jalali Fort, also known as Qal‘at al Jalālī, is the eastern of the two impressive defensive installations overlooking Muscat bay.
-                The fort, along with al Mirani Fort (Qal‘at al Mīrānī) on the western edge of the bay, was built by the Portuguese,
-                between 1586 -1588 CE on pre-existing foundations – possibly of native Omani or Hormuzi origin, its construction followed the second Ottoman attack on Muscat in 1582 CE.
-                The fort strategically sits on a rocky outcrop in order to guard the bay, thus reinforcing the natural protection afforded by the topographic configuration of the town
-                against both sea and land attacks. The fort consists of a fortified boundary wall, surrounding small garrison buildings, a watch tower and a large gun platform overlooking the bay,
-                equipped with six iron and six bronze cannons, and a cistern cut into the rock. Around 1633 CE, the Portuguese Viceroy of India, Dom Miguell de Noronha, ordered the construction
-                of additional fortifications and the location of the residence of the Muscat garrison and the ammunitions stores be accommodated in Al Jalali Fort.
-                Throughout much of the twentieth century Al Jalali Fort continued as the country’s main prison.</vra:display>
-      <vra:description source="Diwan of Royal Court Sultanate of Oman, Muscat Gate Museum: Memoirs of History, Muscat: Allegro Communications, 2001">
-                Al Jalali Fort, also known as Qal‘at al Jalālī, is the eastern of the two impressive defensive installations overlooking Muscat bay.
-                The fort, along with al Mirani Fort (Qal‘at al Mīrānī) on the western edge of the bay, was built by the Portuguese,
-                between 1586 -1588 CE on pre-existing foundations – possibly of native Omani or Hormuzi origin, its construction followed the second Ottoman attack on Muscat in 1582 CE.
-                The fort strategically sits on a rocky outcrop in order to guard the bay, thus reinforcing the natural protection afforded by the topographic configuration of the town
-                against both sea and land attacks. The fort consists of a fortified boundary wall, surrounding small garrison buildings, a watch tower and a large gun platform overlooking the bay,
-                equipped with six iron and six bronze cannons, and a cistern cut into the rock. Around 1633 CE, the Portuguese Viceroy of India, Dom Miguell de Noronha, ordered the construction
-                of additional fortifications and the location of the residence of the Muscat garrison and the ammunitions stores be accommodated in Al Jalali Fort.
-                Throughout much of the twentieth century Al Jalali Fort continued as the country’s main prison.</vra:description>
-      <vra:display>تُشكّل قلعة الجلالي، والمعروفة أيضاً بقلعة الجَلالي، الجزء الشرقي من مُنشأتين دفاعيتين رائعتين
+      <vra:display>&lt;div lang="ar"&gt;تُشكّل قلعة الجلالي، والمعروفة أيضاً بقلعة الجَلالي، الجزء الشرقي من مُنشأتين دفاعيتين رائعتين
                 تُطلان على خليج مسقط. تم تشييد القلعة جنباً إلى جنب مع حصن الميراني (قلعة الميراني) على الحافة الغربية للخليج من قبل
                 البرتغاليين بين عامي 1586-1588 م على أسس موجودة من قبل – والتي قد تعود إلى أصل عُماني أو هرموزي،
                 وقد تم بنائها بعد الهجوم العثماني الثاني على مسقط في عام 1582 م. تتمركز القلعة بشكل استراتيجي على قاعدة
@@ -40,8 +21,14 @@
                 تتألف القلعة من جدار حدودي محصّن يحيط بمباني الحامية الصغيرة وبرج مراقبة ومنصة مدفعية كبيرة تطل على
                 الخليج مجهزة بستة مدافع من الحديد وستة مدافع برونزية وخزان أرضي محفور في الصخر.
                 وفي حوالي عام 1633 أمرَ نائب الملك البرتغالي في الهند، دوم ميغيل دونورونا، ببناء تحصينات إضافية وبإنشاء
-                موقع لإقامة حامية مسقط ومخازن الذخيرة في  قلعة الجلالي. استمرت  قلعة الجلالي خلال معظم القرن العشرين بصفتها السجن الرئيسي للبلاد.
-            </vra:display>
+                موقع لإقامة حامية مسقط ومخازن الذخيرة في  قلعة الجلالي. استمرت  قلعة الجلالي خلال معظم القرن العشرين بصفتها السجن الرئيسي للبلاد.&lt;/div&gt;&lt;div lang="en"&gt;Al Jalali Fort, also known as Qal‘at al Jalālī, is the eastern of the two impressive defensive installations overlooking Muscat bay.
+                The fort, along with al Mirani Fort (Qal‘at al Mīrānī) on the western edge of the bay, was built by the Portuguese,
+                between 1586 -1588 CE on pre-existing foundations – possibly of native Omani or Hormuzi origin, its construction followed the second Ottoman attack on Muscat in 1582 CE.
+                The fort strategically sits on a rocky outcrop in order to guard the bay, thus reinforcing the natural protection afforded by the topographic configuration of the town
+                against both sea and land attacks. The fort consists of a fortified boundary wall, surrounding small garrison buildings, a watch tower and a large gun platform overlooking the bay,
+                equipped with six iron and six bronze cannons, and a cistern cut into the rock. Around 1633 CE, the Portuguese Viceroy of India, Dom Miguell de Noronha, ordered the construction
+                of additional fortifications and the location of the residence of the Muscat garrison and the ammunitions stores be accommodated in Al Jalali Fort.
+                Throughout much of the twentieth century Al Jalali Fort continued as the country’s main prison.&lt;/div&gt;</vra:display>
       <vra:description source="Diwan of Royal Court Sultanate of Oman, Muscat Gate Museum: Memoirs of History, Muscat: Allegro Communications, 2001">
                 تُشكّل قلعة الجلالي، والمعروفة أيضاً بقلعة الجَلالي، الجزء الشرقي من مُنشأتين دفاعيتين رائعتين
                 تُطلان على خليج مسقط. تم تشييد القلعة جنباً إلى جنب مع حصن الميراني (قلعة الميراني) على الحافة الغربية للخليج من قبل
@@ -53,202 +40,186 @@
                 وفي حوالي عام 1633 أمرَ نائب الملك البرتغالي في الهند، دوم ميغيل دونورونا، ببناء تحصينات إضافية وبإنشاء
                 موقع لإقامة حامية مسقط ومخازن الذخيرة في  قلعة الجلالي. استمرت  قلعة الجلالي خلال معظم القرن العشرين بصفتها السجن الرئيسي للبلاد.
             </vra:description>
+      <vra:description source="Diwan of Royal Court Sultanate of Oman, Muscat Gate Museum: Memoirs of History, Muscat: Allegro Communications, 2001" xml:lang="en">
+                Al Jalali Fort, also known as Qal‘at al Jalālī, is the eastern of the two impressive defensive installations overlooking Muscat bay.
+                The fort, along with al Mirani Fort (Qal‘at al Mīrānī) on the western edge of the bay, was built by the Portuguese,
+                between 1586 -1588 CE on pre-existing foundations – possibly of native Omani or Hormuzi origin, its construction followed the second Ottoman attack on Muscat in 1582 CE.
+                The fort strategically sits on a rocky outcrop in order to guard the bay, thus reinforcing the natural protection afforded by the topographic configuration of the town
+                against both sea and land attacks. The fort consists of a fortified boundary wall, surrounding small garrison buildings, a watch tower and a large gun platform overlooking the bay,
+                equipped with six iron and six bronze cannons, and a cistern cut into the rock. Around 1633 CE, the Portuguese Viceroy of India, Dom Miguell de Noronha, ordered the construction
+                of additional fortifications and the location of the residence of the Muscat garrison and the ammunitions stores be accommodated in Al Jalali Fort.
+                Throughout much of the twentieth century Al Jalali Fort continued as the country’s main prison.</vra:description>
     </vra:descriptionSet>
     <vra:locationSet>
-      <vra:display>Muscat (Oman)</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;مسقط (عُمان)&lt;/div&gt;&lt;div lang="en"&gt;Muscat (Oman)&lt;/div&gt;</vra:display>
       <vra:location type="site">
-        <vra:name type="geographic" vocab="VIAF" refid="130198269" href="http://viaf.org/viaf/130198269">Muscat (Oman)</vra:name>
-        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="130198269" href="http://viaf.org/viaf/130198269">مسقط</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">"&gt;سلطنة عمان</vra:name>
-        <vra:name type="geographic" refid="23.616659, 58.597791" vocab="GNS">قلعة الجلالي</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="130198269" href="http://viaf.org/viaf/130198269" xml:lang="en">Muscat (Oman)</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373" xml:lang="en">Óman</vra:name>
+        <vra:name type="geographic" refid="23.616659, 58.597791" vocab="GNS" xml:lang="en">Qal‘at al Jalālī</vra:name>
       </vra:location>
       <vra:location type="other">
-        <vra:name type="geographic" refid="23.616659, 58.597791" vocab="GNS">Qal‘at al Jalālī</vra:name>
+        <vra:name type="geographic" refid="23.616659, 58.597791" vocab="GNS">قلعة الجلالي</vra:name>
       </vra:location>
-      <vra:display>مسقط (عُمان)</vra:display>
     </vra:locationSet>
     <vra:materialSet>
-      <vra:display>stone; sarūj render</vra:display>
-      <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">building stone</vra:material>
-      <vra:material type="other" vocab="other">sarūj</vra:material>
-      <vra:display>حجر؛ إكساء صاروج</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;حجر؛ إكساء صاروج&lt;/div&gt;&lt;div lang="en"&gt;stone; sarūj render&lt;/div&gt;</vra:display>
       <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">حجر البناء</vra:material>
       <vra:material type="other" vocab="other">صاروج</vra:material>
+      <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700" xml:lang="en">building stone</vra:material>
+      <vra:material type="other" vocab="other" xml:lang="en">sarūj</vra:material>
     </vra:materialSet>
     <vra:stylePeriodSet>
-      <vra:display>Portuguese colonial; Omani vernacular</vra:display>
-      <vra:stylePeriod refid="300107030" vocab="AAT" href="http://vocab.getty.edu/page/aat/300107030">Portuguese Colonial</vra:stylePeriod>
-      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
-      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
-      <vra:display>مستعمرة برتغالية؛ عُماني شعبي</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;مستعمرة برتغالية؛ عُماني شعبي&lt;/div&gt;&lt;div lang="en"&gt;Portuguese colonial; Omani vernacular&lt;/div&gt;</vra:display>
       <vra:stylePeriod refid="300107030" vocab="AAT" href="http://vocab.getty.edu/page/aat/300107030">مستعمرة برتغالية</vra:stylePeriod>
       <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</vra:stylePeriod>
       <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:stylePeriod>
+      <vra:stylePeriod refid="300107030" vocab="AAT" href="http://vocab.getty.edu/page/aat/300107030" xml:lang="en">Portuguese Colonial</vra:stylePeriod>
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483" xml:lang="en">vernacular architecture</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483" xml:lang="en">Omani</vra:stylePeriod>
     </vra:stylePeriodSet>
     <vra:subjectSet>
-      <vra:display>Al Jalali Fort; military building</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;قلعة الجلالي؛ مبنى دفاعي&lt;/div&gt;&lt;div lang="en"&gt;Al Jalali Fort; military building&lt;/div&gt;</vra:display>
       <vra:subject>
-        <vra:term type="otherName" vocab="other">Al Jalali Fort</vra:term>
-        <vra:term type="descriptiveTopic" refid="300006909" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006909">forts</vra:term>
-        <vra:term type="descriptiveTopic" refid="300006887" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006887">military buildings</vra:term>
         <vra:term type="otherName">الجلالي</vra:term>
         <vra:term type="descriptiveTopic" refid="300006909" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006909">حصون</vra:term>
         <vra:term refid=" 300006887" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006887">مباني دفاعية</vra:term>
+        <vra:term type="otherName" vocab="other" xml:lang="en">Al Jalali Fort</vra:term>
+        <vra:term type="descriptiveTopic" refid="300006909" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006909" xml:lang="en">forts</vra:term>
+        <vra:term type="descriptiveTopic" refid="300006887" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006887" xml:lang="en">military buildings</vra:term>
       </vra:subject>
-      <vra:display>قلعة الجلالي؛ مبنى دفاعي</vra:display>
     </vra:subjectSet>
     <vra:techniqueSet>
-      <vra:display>stone masonry</vra:display>
-      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">stonemasonry</vra:technique>
-      <vra:display>البناء من حجر</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;البناء من حجر&lt;/div&gt;&lt;div lang="en"&gt;stone masonry&lt;/div&gt;</vra:display>
       <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">البناء من حجر</vra:technique>
+      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948" xml:lang="en">stonemasonry</vra:technique>
     </vra:techniqueSet>
     <vra:titleSet>
-      <vra:display>Al Jalali Fort in old Muscat, Oman.</vra:display>
-      <vra:title type="descriptive">Al Jalali Fort in old Muscat, Oman.</vra:title>
-      <vra:title type="translated">قلعة الجلالي في مسقط القديمة، عُمان.</vra:title>
-      <vra:display>قلعة الجلالي في مسقط القديمة، عُمان.</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;قلعة الجلالي في مسقط القديمة، عُمان.&lt;/div&gt;&lt;div lang="en"&gt;Al Jalali Fort in old Muscat, Oman.&lt;/div&gt;</vra:display>
       <vra:title type="descriptive">قلعة الجلالي في مسقط القديمة، عُمان.</vra:title>
       <vra:title type="translated">Al Jalali Fort in old Muscat, Oman.</vra:title>
+      <vra:title type="descriptive" xml:lang="en">Al Jalali Fort in old Muscat, Oman.</vra:title>
+      <vra:title type="translated" xml:lang="en">قلعة الجلالي في مسقط القديمة، عُمان.</vra:title>
     </vra:titleSet>
     <vra:worktypeSet>
-      <vra:display>fort</vra:display>
-      <vra:worktype refid="300006909" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006909">forts</vra:worktype>
-      <vra:display>حصن</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;حصن&lt;/div&gt;&lt;div lang="en"&gt;fort&lt;/div&gt;</vra:display>
       <vra:worktype refid="300006909" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006909">حصون</vra:worktype>
+      <vra:worktype refid="300006909" vocab="AAT" href="http://vocab.getty.edu/page/aat/300006909" xml:lang="en">forts</vra:worktype>
     </vra:worktypeSet>
   </vra:work>
-  <vra:image id="i_0000001WAR" xml:lang="en">
+  <vra:image id="i_0000001WAR" xml:lang="ar">
     <vra:agentSet>
-      <vra:display>Created by John Warr; part of ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb) repository</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تم إنشاؤها من قبل جون وار؛ جزء من مستودع أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)&lt;/div&gt;&lt;div lang="en"&gt;Created by John Warr; part of ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb) repository&lt;/div&gt;</vra:display>
       <vra:agent>
-        <vra:name type="personal">Warr, John</vra:name>
-        <vra:culture>English</vra:culture>
+        <vra:name type="personal">وار، جون</vra:name>
+        <vra:culture>الإنكليزية</vra:culture>
         <vra:dates type="activity">
           <vra:earliestDate>1962</vra:earliestDate>
           <vra:latestDate>1979</vra:latestDate>
         </vra:dates>
-        <vra:role refid="300264406" vocab="AAT" href="http://vocab.getty.edu/page/aat/300264406">geophysicists</vra:role>
-        <vra:role>creator</vra:role>
-        <vra:role>formerOwner</vra:role>
-        <vra:name type="personal">وار، جون</vra:name>
-        <vra:culture>الإنكليزية</vra:culture>
         <vra:role refid="300264406" vocab="AAT" href="http://vocab.getty.edu/page/aat/300264406">جيوفيزيائي</vra:role>
         <vra:role>مؤلف</vra:role>
         <vra:role>مالك سابق</vra:role>
+        <vra:name type="personal" xml:lang="en">Warr, John</vra:name>
+        <vra:culture xml:lang="en">English</vra:culture>
+        <vra:role refid="300264406" vocab="AAT" href="http://vocab.getty.edu/page/aat/300264406" xml:lang="en">geophysicists</vra:role>
+        <vra:role xml:lang="en">creator</vra:role>
+        <vra:role xml:lang="en">formerOwner</vra:role>
+        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441" xml:lang="en">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:role xml:lang="en">repository</vra:role>
+        <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398" xml:lang="en">research centers (institutions)</vra:role>
+      </vra:agent>
+      <vra:agent>
         <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
         <vra:role>مستودع</vra:role>
         <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</vra:role>
       </vra:agent>
-      <vra:agent>
-        <vra:name type="corporate" vocab="VIAF" refid="315560441" href="http://viaf.org/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
-        <vra:role>repository</vra:role>
-        <vra:role vocab="AAT" refid="300343398" href="http://vocab.getty.edu/page/aat/300343398">research centers (institutions)</vra:role>
-      </vra:agent>
-      <vra:display>تم إنشاؤها من قبل جون وار؛ جزء من مستودع أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)</vra:display>
     </vra:agentSet>
     <vra:dateSet>
-      <vra:display>Created between 1971-72</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تم إنشاؤها 1971&lt;/div&gt;&lt;div lang="en"&gt;Created between 1971-72&lt;/div&gt;</vra:display>
       <vra:date source="Warr, John" type="creation">
-        <vra:earliestDate circa="true">1971</vra:earliestDate>
-        <vra:latestDate circa="true">1971</vra:latestDate>
         <vra:earliestDate>1971</vra:earliestDate>
         <vra:latestDate>1971</vra:latestDate>
       </vra:date>
-      <vra:display>تم إنشاؤها 1971</vra:display>
     </vra:dateSet>
     <vra:descriptionSet>
-      <vra:display>Photograph of Al Jalali Fort, taken from the quay of Muscat port looking
+      <vra:display>&lt;div lang="ar"&gt;صورة لقلعةالجلالي وميناء مسقط، تم التقاطها من رصيف ميناء مسقط الذي يُطل على الغرب وتُظهر عدم
+                إمكانية الوصول إلى القلعة نسبياً وتتضمن لمحة عن القصر القديم، بيت العَلَم.&lt;/div&gt;&lt;div lang="en"&gt;Photograph of Al Jalali Fort, taken from the quay of Muscat port looking
                 west, shows the relative inaccessibility of the fort and includes a glimpse of the old palace, Bayt
-                Al-‘Alam.
-            </vra:display>
-      <vra:description source="Warr, John">Photograph of Al Jalali Fort, taken from the quay of Muscat port looking
-                west, shows the relative inaccessibility of the fort and includes a glimpse of the old palace, Bayt
-                Al-‘Alam.
-            </vra:description>
-      <vra:display>صورة لقلعةالجلالي وميناء مسقط، تم التقاطها من رصيف ميناء مسقط الذي يُطل على الغرب وتُظهر عدم
-                إمكانية الوصول إلى القلعة نسبياً وتتضمن لمحة عن القصر القديم، بيت العَلَم.
-            </vra:display>
+                Al-‘Alam.&lt;/div&gt;</vra:display>
       <vra:description source="Warr, John">صورة لقلعةالجلالي وميناء مسقط، تم التقاطها من رصيف ميناء مسقط الذي يُطل على
                 الغرب وتُظهر عدم إمكانية الوصول إلى القلعة نسبياً وتتضمن لمحة عن القصر القديم، بيت العَلَم.
             </vra:description>
+      <vra:description source="Warr, John" xml:lang="en">Photograph of Al Jalali Fort, taken from the quay of Muscat port looking
+                west, shows the relative inaccessibility of the fort and includes a glimpse of the old palace, Bayt
+                Al-‘Alam.
+            </vra:description>
     </vra:descriptionSet>
     <vra:locationSet>
-      <vra:display>Created in Muscat (Oman)</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تم إنشاؤها في مسقط (عُمان)&lt;/div&gt;&lt;div lang="en"&gt;Created in Muscat (Oman)&lt;/div&gt;</vra:display>
       <vra:location type="creation">
-        <vra:name type="geographic" vocab="VIAF" refid="130198269" href="http://viaf.org/viaf/130198269">Muscat (Oman)</vra:name>
-        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="130198269" href="http://viaf.org/viaf/130198269">مسقط</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">سلطنة عمان</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="130198269" href="http://viaf.org/viaf/130198269" xml:lang="en">Muscat (Oman)</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373" xml:lang="en">Óman</vra:name>
       </vra:location>
-      <vra:display>تم إنشاؤها في مسقط (عُمان)</vra:display>
     </vra:locationSet>
     <vra:materialSet>
-      <vra:display>35 mm colour transparency; Kodachrome film</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;35 ملم شفافية ملونة؛ فلم Kodachrome&lt;/div&gt;&lt;div lang="en"&gt;35 mm colour transparency; Kodachrome film&lt;/div&gt;</vra:display>
       <vra:material refid="300133430" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300133430">Kodachrome (TM)</vra:material>
-      <vra:material refid="300128364" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128364">color transparencies </vra:material>
-      <vra:material refid="300263816" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300263816">35mm (photographic film size)</vra:material>
-      <vra:display>35 ملم شفافية ملونة؛ فلم Kodachrome</vra:display>
       <vra:material refid="300128364" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128364">شفافيات ملونة</vra:material>
       <vra:material refid="300263816" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300263816">35 ملم (قياس الفلم الفوتوغرافي)</vra:material>
+      <vra:material refid="300128364" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128364" xml:lang="en">color transparencies </vra:material>
+      <vra:material refid="300263816" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300263816" xml:lang="en">35mm (photographic film size)</vra:material>
     </vra:materialSet>
     <vra:measurementsSet>
-      <vra:display>Digitised image dimensions 2583 px(W) x 1756 px(H) </vra:display>
+      <vra:display>&lt;div lang="ar"&gt;2583 px(W) x 1756 px(H) أبعاد الصورة الرقمية&lt;/div&gt;&lt;div lang="en"&gt;Digitised image dimensions 2583 px(W) x 1756 px(H)&lt;/div&gt;</vra:display>
       <vra:measurements type="width" unit="px">2583</vra:measurements>
       <vra:measurements type="height" unit="px">1756</vra:measurements>
-      <vra:display>2583 px(W) x 1756 px(H) أبعاد الصورة الرقمية</vra:display>
     </vra:measurementsSet>
     <vra:relationSet>
-      <vra:display>From The John Warr Collection. Image of Al Jalali Fort in old Masqaṭ, Oman.</vra:display>
-      <vra:relation relids="w_0000001MUS" type="imageOf">Al Jalali Fort in old Masqaṭ, Oman.</vra:relation>
-      <vra:relation relids="c_0000000WAR" type="partOf">The John Warr Collection.</vra:relation>
-      <vra:display>من مجموعة جون وار. صورة لقلعةالجلالي في مسقط القديمة، عُمان.</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;من مجموعة جون وار. صورة لقلعةالجلالي في مسقط القديمة، عُمان.&lt;/div&gt;&lt;div lang="en"&gt;From The John Warr Collection. Image of Al Jalali Fort in old Masqaṭ, Oman.&lt;/div&gt;</vra:display>
       <vra:relation relids="w_0000001MUS" type="imageOf">قلعة الجلالي في مسقط القديمة، عُمان.</vra:relation>
       <vra:relation refid="c_0000000WAR" type="partOf">مجموعة جون وار</vra:relation>
+      <vra:relation relids="w_0000001MUS" type="imageOf" xml:lang="en">Al Jalali Fort in old Masqaṭ, Oman.</vra:relation>
+      <vra:relation relids="c_0000000WAR" type="partOf" xml:lang="en">The John Warr Collection.</vra:relation>
     </vra:relationSet>
     <vra:rightsSet>
-      <vra:display>©John Warr. CC BY 4.0</vra:display>
-      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
-                   and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG</vra:notes>
+      <vra:display>&lt;div lang="ar"&gt;© جون وار. CC BY 4.0&lt;/div&gt;&lt;div lang="en"&gt;©John Warr. CC BY 4.0&lt;/div&gt;</vra:display>
+      <vra:notes>&lt;div lang="ar"&gt;معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG&lt;/div&gt;&lt;div lang="en"&gt;Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                   and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG&lt;/div&gt;</vra:notes>
       <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
-        <vra:rightsHolder>John Warr</vra:rightsHolder>
-        <vra:text>©John Warr. CC BY 4.0</vra:text>
         <vra:rightsHolder>جون وار</vra:rightsHolder>
         <vra:text>© جون وار. CC BY 4.0</vra:text>
+        <vra:rightsHolder xml:lang="en">John Warr</vra:rightsHolder>
+        <vra:text xml:lang="en">©John Warr. CC BY 4.0</vra:text>
       </vra:rights>
-      <vra:display>© جون وار. CC BY 4.0</vra:display>
-      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
-                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
-            </vra:notes>
     </vra:rightsSet>
     <vra:sourceSet>
-      <vra:display>Warr, John</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;وار، جون&lt;/div&gt;&lt;div lang="en"&gt;Warr, John&lt;/div&gt;</vra:display>
       <vra:source>
-        <vra:name type="donor">Warr, John</vra:name>
         <vra:name type="donor">وار، جون</vra:name>
+        <vra:name type="donor" xml:lang="en">Warr, John</vra:name>
       </vra:source>
-      <vra:display>وار، جون</vra:display>
     </vra:sourceSet>
     <vra:techniqueSet>
-      <vra:display>color photography; color transparency</vra:display>
-      <vra:technique refid="300134530" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134530">color photography</vra:technique>
-      <vra:technique refid="300128364" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128364">color transparencies</vra:technique>
-      <vra:display>تصوير ملون؛ شفافية ملونة</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تصوير ملون؛ شفافية ملونة&lt;/div&gt;&lt;div lang="en"&gt;color photography; color transparency&lt;/div&gt;</vra:display>
       <vra:technique refid="300134530" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134530">تصوير ملون</vra:technique>
       <vra:technique refid="300128364" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128364">شفافيات ملونة</vra:technique>
+      <vra:technique refid="300134530" vocab="AAT" href="http://vocab.getty.edu/page/aat/300134530" xml:lang="en">color photography</vra:technique>
+      <vra:technique refid="300128364" vocab="AAT" href="http://vocab.getty.edu/page/aat/300128364" xml:lang="en">color transparencies</vra:technique>
     </vra:techniqueSet>
     <vra:titleSet>
-      <vra:display>Photograph of Al Jalali Fort in old Masqaṭ, Oman.</vra:display>
-      <vra:title type="generalView">Photograph of Al Jalali Fort in old Masqaṭ, Oman.</vra:title>
+      <vra:display>&lt;div lang="ar"&gt;صورة لقلعة الجلالي في مسقط القديمة، عُمان.&lt;/div&gt;&lt;div lang="en"&gt;Photograph of Al Jalali Fort in old Masqaṭ, Oman.&lt;/div&gt;</vra:display>
       <vra:title type="generalView">صورة لقلعة الجلالي في مسقط القديمة، عُمان.</vra:title>
-      <vra:display>صورة لقلعة الجلالي في مسقط القديمة، عُمان.</vra:display>
+      <vra:title type="generalView">Photograph of Al Jalali Fort in old Masqaṭ, Oman.</vra:title>
     </vra:titleSet>
     <vra:worktypeSet>
-      <vra:display>digitized image</vra:display>
-      <vra:worktype vocab="AAT" refid="300417380" href="http://vocab.getty.edu/page/aat/300417380">digitized images</vra:worktype>
-      <vra:display>صورة رقمية</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;صورة رقمية&lt;/div&gt;&lt;div lang="en"&gt;digitized image&lt;/div&gt;</vra:display>
       <vra:worktype vocab="AAT" refid="300417380" href="http://vocab.getty.edu/page/aat/300417380">صور رقمية</vra:worktype>
+      <vra:worktype vocab="AAT" refid="300417380" href="http://vocab.getty.edu/page/aat/300417380" xml:lang="en">digitized images</vra:worktype>
     </vra:worktypeSet>
   </vra:image>
 </vra:vra>

@@ -3,18 +3,24 @@
   <vra:work id="w_0000001BAM" xml:lang="ar">
     <vra:culturalContextSet>
       <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:culturalContext>
-      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483" xml:lang="en">Omani</vra:culturalContext>
     </vra:culturalContextSet>
     <vra:descriptionSet>
-      <vra:display>تُشكّل حارة برج المكاسير واحدة من المستوطنات التقليدية الثلاثة لواحة بركة الموز، والحارتين
+      <vra:display>&lt;div lang="ar"&gt;تُشكّل حارة برج المكاسير واحدة من المستوطنات التقليدية الثلاثة لواحة بركة الموز، والحارتين
                 المتبقيتين هما حارة السيباني وحارة الوادي (أو حلّة السوق).
                 يُشتق الاسم من البرج الدائري المستدير (برج) الموجود على قاعدة صخرية والذي يهيمن على مساحة المستوطنة
                 السكنية، ويرتفع فوق مجموعة من المساكن الصغيرة المتمركزة حول قاعدته. حيث تقع في التلال الجنوبية لسلاسل
                 الجبل الأخضر مع حارة السيباني وهي تُشكّل الزاوية الشمالية للواحة.
                 ويمرالفلج (الجمع. أفلاج) وهو قناة الري التي تمتد إلى الشرق من حارة السيباني عبر المستوطنة حيث تقوم
                 بتوفير المياه المنزلية وتروي الروافد العليا من مزارع النخيل والتمر المحيطة بها.
-                وتمر أيضاً قناة فلج أُخرى من الشمال إلى الجنوب عبر الواحة بالقرب من حارة برج المكاسير كمجرد قناة مائية بارزة.
-            </vra:display>
+                وتمر أيضاً قناة فلج أُخرى من الشمال إلى الجنوب عبر الواحة بالقرب من حارة برج المكاسير كمجرد قناة مائية بارزة.&lt;/div&gt;&lt;div lang="en"&gt;Ḩārat Burj al-Mākāsir is one of the three traditional settlement quarters of Birkat al-Mawz oasis,
+                the others being Ḩārat as-Saybani and Ḩārat al-Wādī (or Ḩillat as Sūq). The name is derived from the prominent round-plan tower (burj) located on a rocky outcrop
+                that dominates the settlement quarter, rising above a cluster of small dwellings formed around its base.
+                Located at the southern foothills of Al Jabal al Akhḑar mountains, along with Saybani it defines the
+                northern edge of the oasis. A falaj (pl. aflāj) irrigation channel that extends eastwards from Ḩārat as-Saybani passes through the
+                settlement quarter and provides domestic water and irrigates the upper reaches of the date palm
+                plantations surrounding it. Another falaj channel cuts across north to south through the oasis near Ḩārat Burj al-Mākāsir as a
+                prominent raised aqueduct.&lt;/div&gt;</vra:display>
       <vra:description source="Ministry of Heritage and Culture Sultanate of Oman, Birkat al-Mawz: Harat as-Saybani. Documentation and Heritage Management Plan, Masqaṭ: Mazoon Printing and Advertising L.L.C., 2014">
                 تُشكّل حارة برج المكاسير واحدة من المستوطنات التقليدية الثلاثة لواحة بركة الموز، والحارتين المتبقيتين
                 هما حارة السيباني وحارة الوادي (أو حلّة السوق).
@@ -25,15 +31,7 @@
                 بتوفير المياه المنزلية وتروي الروافد العليا من مزارع النخيل والتمر المحيطة بها.
                 وتمر أيضاً قناة فلج أُخرى من الشمال إلى الجنوب عبر الواحة بالقرب من حارة برج المكاسير كمجرد قناة مائية بارزة.
             </vra:description>
-      <vra:display>Ḩārat Burj al-Mākāsir is one of the three traditional settlement quarters of Birkat al-Mawz oasis,
-                the others being Ḩārat as-Saybani and Ḩārat al-Wādī (or Ḩillat as Sūq). The name is derived from the prominent round-plan tower (burj) located on a rocky outcrop
-                that dominates the settlement quarter, rising above a cluster of small dwellings formed around its base.
-                Located at the southern foothills of Al Jabal al Akhḑar mountains, along with Saybani it defines the
-                northern edge of the oasis. A falaj (pl. aflāj) irrigation channel that extends eastwards from Ḩārat as-Saybani passes through the
-                settlement quarter and provides domestic water and irrigates the upper reaches of the date palm
-                plantations surrounding it. Another falaj channel cuts across north to south through the oasis near Ḩārat Burj al-Mākāsir as a
-                prominent raised aqueduct.</vra:display>
-      <vra:description source="Ministry of Heritage and Culture Sultanate of Oman, Birkat al-Mawz: Harat as-Saybani. Documentation and Heritage Management Plan, Masqaṭ: Mazoon Printing and Advertising L.L.C., 2014">
+      <vra:description source="Ministry of Heritage and Culture Sultanate of Oman, Birkat al-Mawz: Harat as-Saybani. Documentation and Heritage Management Plan, Masqaṭ: Mazoon Printing and Advertising L.L.C., 2014" xml:lang="en">
                Ḩārat Burj al-Mākāsir is one of the three traditional settlement quarters of Birkat al-Mawz oasis,
                 the others being Ḩārat as-Saybani and Ḩārat al-Wādī (or Ḩillat as Sūq). The name is derived from the prominent round-plan tower (burj) located on a rocky outcrop
                 that dominates the settlement quarter, rising above a cluster of small dwellings formed around its base.
@@ -44,104 +42,95 @@
                 prominent raised aqueduct.</vra:description>
     </vra:descriptionSet>
     <vra:locationSet>
-      <vra:display>بركة الموز (عُمان)</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;بركة الموز (عُمان)&lt;/div&gt;&lt;div lang="en"&gt;Birkat al-Mawz (Oman)&lt;/div&gt;</vra:display>
       <vra:location type="site">
         <vra:name type="geographic" vocab="GNS" refid="-786583">بركة الموز</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">سلطنة عمان</vra:name>
-        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
-        <vra:name type="geographic" vocab="VIAF" refid="117146937693413830395" href="http://viaf.org/viaf/117146937693413830395">Birkat al-Mawz</vra:name>
-        <vra:name type="geographic" refid="22.917301, 57.669828" vocab="GNS">Birkat al-Mawz</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373" xml:lang="en">Óman</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="117146937693413830395" href="http://viaf.org/viaf/117146937693413830395" xml:lang="en">Birkat al-Mawz</vra:name>
+        <vra:name type="geographic" refid="22.917301, 57.669828" vocab="GNS" xml:lang="en">Birkat al-Mawz</vra:name>
       </vra:location>
       <vra:location type="other">
         <vra:name type="geographic" refid="22.917301, 57.669828" vocab="GNS">بركة الموز</vra:name>
       </vra:location>
-      <vra:display>Birkat al-Mawz (Oman)</vra:display>
     </vra:locationSet>
     <vra:materialSet>
-      <vra:display>حجر؛ طوب لبن؛ إكساء صاروج</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;حجر؛ طوب لبن؛ إكساء صاروج&lt;/div&gt;&lt;div lang="en"&gt;stone; adobe bricks; sarūj render&lt;/div&gt;</vra:display>
       <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">حجر البناء</vra:material>
       <vra:material type="other" refid="300081138" vocab="AAT" href="http://vocab.getty.edu/page/aat/300081138">طوب (مادة)</vra:material>
       <vra:material type="other">صاروج</vra:material>
-      <vra:display>stone; adobe bricks; sarūj render</vra:display>
-      <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">building stone</vra:material>
-      <vra:material type="other" refid="300081138" vocab="AAT" href="http://vocab.getty.edu/page/aat/300081138">adobe (material)</vra:material>
-      <vra:material type="other" vocab="other">sarūj</vra:material>
+      <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700" xml:lang="en">building stone</vra:material>
+      <vra:material type="other" refid="300081138" vocab="AAT" href="http://vocab.getty.edu/page/aat/300081138" xml:lang="en">adobe (material)</vra:material>
+      <vra:material type="other" vocab="other" xml:lang="en">sarūj</vra:material>
     </vra:materialSet>
     <vra:relationSet>
-      <vra:display>من مستوطنة واحة بركة الموز، عُمان.</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;من مستوطنة واحة بركة الموز، عُمان.&lt;/div&gt;&lt;div lang="en"&gt;From Birkat al-Mawz oasis settlement, Oman.&lt;/div&gt;</vra:display>
       <vra:relation refid="w_001SET_BAM" type="partOf">مستوطنة واحة بركة الموز، عُمان.</vra:relation>
-      <vra:display>From Birkat al-Mawz oasis settlement, Oman.</vra:display>
-      <vra:relation refid="w_001SET_BAM" type="partOf">Birkat al-Mawz oasis settlement, Oman.</vra:relation>
+      <vra:relation refid="w_001SET_BAM" type="partOf" xml:lang="en">Birkat al-Mawz oasis settlement, Oman.</vra:relation>
     </vra:relationSet>
     <vra:stylePeriodSet>
-      <vra:display>عُماني شعبي</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;عُماني شعبي&lt;/div&gt;&lt;div lang="en"&gt;Omani vernacular&lt;/div&gt;</vra:display>
       <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</vra:stylePeriod>
       <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:stylePeriod>
-      <vra:display>Omani vernacular</vra:display>
-      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
-      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
+      <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483" xml:lang="en">vernacular architecture</vra:stylePeriod>
+      <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483" xml:lang="en">Omani</vra:stylePeriod>
     </vra:stylePeriodSet>
     <vra:subjectSet>
-      <vra:display>منطقة سكنية؛ برج؛ دفاعي؛ عمارة طينية</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;منطقة سكنية؛ برج؛ دفاعي؛ عمارة طينية&lt;/div&gt;&lt;div lang="en"&gt;residential district; burj; defensive; earthen architecture&lt;/div&gt;</vra:display>
       <vra:subject>
         <vra:term type="otherName" vocab="other">برج</vra:term>
         <vra:term type="descriptiveTopic" refid="300000742" vocab="AAT" href="http://vocab.getty.edu/page/aat/300000742">منطقة سكنية</vra:term>
         <vra:term type="descriptiveTopic" refid="300004862" vocab="AAT" href="http://vocab.getty.edu/page/aat/300004862">برج دفاعي</vra:term>
         <vra:term type="descriptiveTopic" refid="300379486" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379486">عمارة طينية</vra:term>
-        <vra:term type="otherName" vocab="other">burj</vra:term>
-        <vra:term type="descriptiveTopic" refid="300000742" vocab="AAT" href="http://vocab.getty.edu/page/aat/300000742">residential district</vra:term>
-        <vra:term type="descriptiveTopic" refid="300004862" vocab="AAT" href="http://vocab.getty.edu/page/aat/300004862">defensive tower</vra:term>
-        <vra:term type="descriptiveTopic" refid="300379486" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379486">earthen architecture</vra:term>
+        <vra:term type="otherName" vocab="other" xml:lang="en">burj</vra:term>
+        <vra:term type="descriptiveTopic" refid="300000742" vocab="AAT" href="http://vocab.getty.edu/page/aat/300000742" xml:lang="en">residential district</vra:term>
+        <vra:term type="descriptiveTopic" refid="300004862" vocab="AAT" href="http://vocab.getty.edu/page/aat/300004862" xml:lang="en">defensive tower</vra:term>
+        <vra:term type="descriptiveTopic" refid="300379486" vocab="AAT" href="http://vocab.getty.edu/page/aat/300379486" xml:lang="en">earthen architecture</vra:term>
       </vra:subject>
-      <vra:display>residential district; burj; defensive; earthen architecture</vra:display>
     </vra:subjectSet>
     <vra:techniqueSet>
-      <vra:display>جدار حجري جاف؛ منشأة طينية</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;جدار حجري جاف؛ منشأة طينية&lt;/div&gt;&lt;div lang="en"&gt;dry wall stone masonry; earth construction&lt;/div&gt;</vra:display>
       <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">البناء من حجر</vra:technique>
       <vra:technique refid="300070971" vocab="AAT" href="http://vocab.getty.edu/page/aat/300070971">جدران حجرية جافة بدون طينة</vra:technique>
       <vra:technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">منشأة طينية</vra:technique>
-      <vra:display>dry wall stone masonry; earth construction</vra:display>
-      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948">stonemasonry</vra:technique>
-      <vra:technique refid="300070971" vocab="AAT" href="http://vocab.getty.edu/page/aat/300070971">dry walls (masonry)</vra:technique>
-      <vra:technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382">earth construction</vra:technique>
+      <vra:technique refid="300386948" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386948" xml:lang="en">stonemasonry</vra:technique>
+      <vra:technique refid="300070971" vocab="AAT" href="http://vocab.getty.edu/page/aat/300070971" xml:lang="en">dry walls (masonry)</vra:technique>
+      <vra:technique refid="300404382" vocab="AAT" href="http://vocab.getty.edu/page/aat/300404382" xml:lang="en">earth construction</vra:technique>
     </vra:techniqueSet>
     <vra:titleSet>
-      <vra:display>حارة برج المكاسير في مستوطنة بركة الموز، عُمان.</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;حارة برج المكاسير في مستوطنة بركة الموز، عُمان.&lt;/div&gt;&lt;div lang="en"&gt;Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.&lt;/div&gt;</vra:display>
       <vra:title type="descriptive">حارة برج المكاسير في مستوطنة بركة الموز، عُمان.</vra:title>
       <vra:title type="translated">Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</vra:title>
-      <vra:display>Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</vra:display>
-      <vra:title type="descriptive">Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</vra:title>
-      <vra:title type="translated">حارة برج المكاسير في مستوطنة بركة الموز، عُمان</vra:title>
+      <vra:title type="descriptive" xml:lang="en">Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</vra:title>
+      <vra:title type="translated" xml:lang="en">حارة برج المكاسير في مستوطنة بركة الموز، عُمان</vra:title>
     </vra:titleSet>
     <vra:worktypeSet>
-      <vra:display>منطقة سكنية</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;منطقة سكنية&lt;/div&gt;&lt;div lang="en"&gt;residential district&lt;/div&gt;</vra:display>
       <vra:worktype refid="300000742" vocab="AAT" href="http://vocab.getty.edu/page/aat/300000742">مناطق سكنية</vra:worktype>
-      <vra:display>residential district</vra:display>
-      <vra:worktype refid="300000742" vocab="AAT" href="http://vocab.getty.edu/page/aat/300000742">residential districts</vra:worktype>
+      <vra:worktype refid="300000742" vocab="AAT" href="http://vocab.getty.edu/page/aat/300000742" xml:lang="en">residential districts</vra:worktype>
     </vra:worktypeSet>
   </vra:work>
   <vra:image id="i_00001ArBAM" xml:lang="ar">
     <vra:agentSet>
-      <vra:display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان&lt;/div&gt;&lt;div lang="en"&gt;Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman&lt;/div&gt;</vra:display>
       <vra:agent>
         <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
         <vra:culture>الإنكليزية</vra:culture>
         <vra:dates type="activity">
           <vra:earliestDate>2012</vra:earliestDate>
           <vra:latestDate>present</vra:latestDate>
-          <vra:earliestDate>1976</vra:earliestDate>
         </vra:dates>
         <vra:role>مؤلف</vra:role>
         <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</vra:role>
         <vra:attribution>جامعة ليفربول. كلية الهندسة المعمارية</vra:attribution>
-        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
-        <vra:culture>English</vra:culture>
-        <vra:role>creator</vra:role>
-        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">research centers(institutions)</vra:role>
-        <vra:attribution>University of Liverpool. School of Architecture</vra:attribution>
-        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</vra:name>
-        <vra:culture>Omani</vra:culture>
-        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</vra:role>
+        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441" xml:lang="en">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:culture xml:lang="en">English</vra:culture>
+        <vra:role xml:lang="en">creator</vra:role>
+        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398" xml:lang="en">research centers(institutions)</vra:role>
+        <vra:attribution xml:lang="en">University of Liverpool. School of Architecture</vra:attribution>
+        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770" xml:lang="en">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</vra:name>
+        <vra:culture xml:lang="en">Omani</vra:culture>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080" xml:lang="en">funding agencies</vra:role>
       </vra:agent>
       <vra:agent>
         <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</vra:name>
@@ -152,107 +141,92 @@
         </vra:dates>
         <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</vra:role>
       </vra:agent>
-      <vra:display>Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman</vra:display>
     </vra:agentSet>
     <vra:dateSet>
-      <vra:display>تم إنشاؤها 2011</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تم إنشاؤها 2011&lt;/div&gt;&lt;div lang="en"&gt;Created 2011&lt;/div&gt;</vra:display>
       <vra:date type="creation">
         <vra:earliestDate>2011</vra:earliestDate>
         <vra:latestDate>2011</vra:latestDate>
       </vra:date>
-      <vra:display>Created 2011</vra:display>
     </vra:dateSet>
     <vra:descriptionSet>
-      <vra:display>رسم لمخطط حارة برج المكاسر في مستوطنة بركة الموز، عُمان؛ أُنتجت خلال العمل الميداني التوثيقي من قبل أركيام.</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;رسم لمخطط حارة برج المكاسر في مستوطنة بركة الموز، عُمان؛ أُنتجت خلال العمل الميداني التوثيقي من قبل أركيام.&lt;/div&gt;&lt;div lang="en"&gt;Plan drawing of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman, produced during
+                documentation fieldwork by ArCHIAM.&lt;/div&gt;</vra:display>
       <vra:description>رسم لمخطط حارة برج المكاسر في مستوطنة بركة الموز، عُمان؛ أُنتجت خلال العمل الميداني التوثيقي من قبل أركيام.</vra:description>
-      <vra:display>Plan drawing of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman, produced during
-                documentation fieldwork by ArCHIAM.
-            </vra:display>
-      <vra:description>Plan drawing of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman, produced during
+      <vra:description xml:lang="en">Plan drawing of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman, produced during
                 documentation fieldwork by ArCHIAM.
             </vra:description>
     </vra:descriptionSet>
     <vra:locationSet>
-      <vra:display>تم إنشاؤها في بركة الموز (عُمان)</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تم إنشاؤها في بركة الموز (عُمان)&lt;/div&gt;&lt;div lang="en"&gt;Created in Birkat al-Mawz (Oman)&lt;/div&gt;</vra:display>
       <vra:location type="creation">
         <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">"&gt;سلطنة عمان</vra:name>
         <vra:name type="geographic" vocab="GNS" refid="-786583">بركة الموز</vra:name>
-        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
-        <vra:name type="geographic" vocab="VIAF" refid="117146937693413830395" href="http://viaf.org/viaf/117146937693413830395">Birkat al-Mawz</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373" xml:lang="en">Óman</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="117146937693413830395" href="http://viaf.org/viaf/117146937693413830395" xml:lang="en">Birkat al-Mawz</vra:name>
       </vra:location>
-      <vra:display>Created in Birkat al-Mawz (Oman)</vra:display>
     </vra:locationSet>
     <vra:materialSet>
-      <vra:display>حبر على ورق</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;حبر على ورق&lt;/div&gt;&lt;div lang="en"&gt;ink on paper&lt;/div&gt;</vra:display>
       <vra:material refid="300015012" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300015012">حبر</vra:material>
       <vra:material refid="300014109" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300014109">ورقة (مادة مصنوعة من ألياف)</vra:material>
-      <vra:display>ink on paper</vra:display>
-      <vra:material refid="300015012" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300015012">ink</vra:material>
-      <vra:material refid="300014109" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300014109">paper (fiber product)</vra:material>
+      <vra:material refid="300015012" type="medium" vocab="AAT" href="http://vocab.getty.edu/page/aat/300015012" xml:lang="en">ink</vra:material>
+      <vra:material refid="300014109" type="support" vocab="AAT" href="http://vocab.getty.edu/page/aat/300014109" xml:lang="en">paper (fiber product)</vra:material>
     </vra:materialSet>
     <vra:measurementsSet>
-      <vra:display>أبعادالورقة 31.34 (cm(W) x 22.35 cm(H؛ دقة الصورة المرقمنة 400 ppi</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;أبعادالورقة 31.34 (cm(W) x 22.35 cm(H؛ دقة الصورة المرقمنة 400 ppi&lt;/div&gt;&lt;div lang="en"&gt;Paper dimensions 31.34 cm(W) x 22.35 cm(H); Digitised image resolution 400 ppi&lt;/div&gt;</vra:display>
       <vra:measurements type="width" unit="cm">31.34</vra:measurements>
       <vra:measurements type="height" unit="cm">22.35</vra:measurements>
       <vra:measurements type="resolution" unit="ppi">400</vra:measurements>
-      <vra:display>Paper dimensions 31.34 cm(W) x 22.35 cm(H); Digitised image resolution 400 ppi</vra:display>
     </vra:measurementsSet>
     <vra:relationSet>
-      <vra:display>من مجموعة أركيام: بركة الموز. صورة لحارة برج المكاسير في مستوطنة بركة الموز، عُمان.</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;من مجموعة أركيام: بركة الموز. صورة لحارة برج المكاسير في مستوطنة بركة الموز، عُمان.&lt;/div&gt;&lt;div lang="en"&gt;From The ArCHIAM Collection: Birkat al-Mawz. Image of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.&lt;/div&gt;</vra:display>
       <vra:relation relids="w_002SET_BAM" type="imageOf">حارة برج المكاسير في مستوطنة بركة الموز، عُمان.</vra:relation>
       <vra:relation refid="c_00000ArBAM" type="partOf">مجموعة أركيام: بركة الموز</vra:relation>
-      <vra:display>From The ArCHIAM Collection: Birkat al-Mawz. Image of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</vra:display>
-      <vra:relation relids="w_002SET_BAM" type="imageOf">Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</vra:relation>
-      <vra:relation refid="c_00000ArBAM" type="partOf">The ArCHIAM Collection: Birkat al-Mawz.</vra:relation>
+      <vra:relation relids="w_002SET_BAM" type="imageOf" xml:lang="en">Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</vra:relation>
+      <vra:relation refid="c_00000ArBAM" type="partOf" xml:lang="en">The ArCHIAM Collection: Birkat al-Mawz.</vra:relation>
     </vra:relationSet>
     <vra:rightsSet>
-      <vra:display>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</vra:display>
-      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
-                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
-            </vra:notes>
+      <vra:display>&lt;div lang="ar"&gt;© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0&lt;/div&gt;&lt;div lang="en"&gt;©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0&lt;/div&gt;</vra:display>
+      <vra:notes>&lt;div lang="ar"&gt;معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG&lt;/div&gt;&lt;div lang="en"&gt;Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
+                and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG&lt;/div&gt;</vra:notes>
       <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
         <vra:rightsHolder>وزارة التراث والثقافة في سلطنة عُمان</vra:rightsHolder>
         <vra:text>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</vra:text>
-        <vra:rightsHolder>Ministry of Heritage and Culture Sultanate of Oman</vra:rightsHolder>
-        <vra:text>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:text>
+        <vra:rightsHolder xml:lang="en">Ministry of Heritage and Culture Sultanate of Oman</vra:rightsHolder>
+        <vra:text xml:lang="en">©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:text>
       </vra:rights>
-      <vra:display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:display>
-      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia
-                and the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG</vra:notes>
     </vra:rightsSet>
     <vra:sourceSet>
-      <vra:display>وزارة التراث القومي والثقافة في سلطنة عُمان، بركة الموز: حارة السيباني. مخطط التوثيق
-                    وإدارة التراث، مسقط: مزون للطباعة والنشر والإعلان (ش.م.م)، 2014.</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;وزارة التراث القومي والثقافة في سلطنة عُمان، بركة الموز: حارة السيباني. مخطط التوثيق
+                    وإدارة التراث، مسقط: مزون للطباعة والنشر والإعلان (ش.م.م)، 2014.&lt;/div&gt;&lt;div lang="en"&gt;Ministry of Heritage and Culture Sultanate of Oman, Birkat al-Mawz: Harat as-Saybani.
+                     Documentation and Heritage Management Plan, Masqaṭ: Mazoon Printing and Advertising L.L.C., 2014&lt;/div&gt;</vra:display>
       <vra:source>
         <vra:name type="book">وزارة التراث القومي والثقافة في سلطنة عُمان، بركة الموز: حارة السيباني. مخطط التوثيق
                     وإدارة التراث، مسقط: مزون للطباعة والنشر والإعلان (ش.م.م)، 2014.
                 </vra:name>
         <vra:refid type="ISBN">978-99969-0-303-8</vra:refid>
-        <vra:name type="book">Ministry of Heritage and Culture Sultanate of Oman, Birkat al-Mawz: Harat as-Saybani.
+        <vra:name type="book" xml:lang="en">Ministry of Heritage and Culture Sultanate of Oman, Birkat al-Mawz: Harat as-Saybani.
                     Documentation and Heritage Management Plan, Masqaṭ: Mazoon Printing and Advertising L.L.C., 2014</vra:name>
       </vra:source>
-      <vra:display>Ministry of Heritage and Culture Sultanate of Oman, Birkat al-Mawz: Harat as-Saybani.
-                     Documentation and Heritage Management Plan, Masqaṭ: Mazoon Printing and Advertising L.L.C., 2014</vra:display>
     </vra:sourceSet>
     <vra:techniqueSet>
-      <vra:display>رسم معماري باليد الحرة</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;رسم معماري باليد الحرة&lt;/div&gt;&lt;div lang="en"&gt;freehand architectural drawing&lt;/div&gt;</vra:display>
       <vra:technique refid="300054197" vocab="AAT" href="http://vocab.getty.edu/page/aat/300054197">رسم معماري (عملية)</vra:technique>
       <vra:technique refid="300053181" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053181">رسم باليد الحرة(تقنية)</vra:technique>
-      <vra:display>freehand architectural drawing</vra:display>
-      <vra:technique refid="300054197" vocab="AAT" href="http://vocab.getty.edu/page/aat/300054197">architectural drawing(process)</vra:technique>
-      <vra:technique refid="300053181" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053181">freehand drawing(technique)</vra:technique>
+      <vra:technique refid="300054197" vocab="AAT" href="http://vocab.getty.edu/page/aat/300054197" xml:lang="en">architectural drawing(process)</vra:technique>
+      <vra:technique refid="300053181" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053181" xml:lang="en">freehand drawing(technique)</vra:technique>
     </vra:techniqueSet>
     <vra:titleSet>
-      <vra:display>مخطط لحارة برج المكاسير في مستوطنة بركة الموز، عُمان.</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;مخطط لحارة برج المكاسير في مستوطنة بركة الموز، عُمان.&lt;/div&gt;&lt;div lang="en"&gt;Plan of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.&lt;/div&gt;</vra:display>
       <vra:title type="generalView">مخطط لحارة برج المكاسير في مستوطنة بركة الموز، عُمان.</vra:title>
       <vra:title type="generalView">Plan of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</vra:title>
-      <vra:display>Plan of Ḩārat Burj al-Mākāsir in Birkat al-Mawz settlement, Oman.</vra:display>
     </vra:titleSet>
     <vra:worktypeSet>
-      <vra:display>رسم معماري</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;رسم معماري&lt;/div&gt;&lt;div lang="en"&gt;architectural drawing&lt;/div&gt;</vra:display>
       <vra:worktype refid="300034787" vocab="AAT" href="http://vocab.getty.edu/page/aat/300034787">رسومات معمارية (أعمال بصرية)</vra:worktype>
-      <vra:display>architectural drawing</vra:display>
-      <vra:worktype refid="300034787" vocab="AAT" href="http://vocab.getty.edu/page/aat/300034787">architectural drawings (visual works)</vra:worktype>
+      <vra:worktype refid="300034787" vocab="AAT" href="http://vocab.getty.edu/page/aat/300034787" xml:lang="en">architectural drawings (visual works)</vra:worktype>
     </vra:worktypeSet>
   </vra:image>
 </vra:vra>

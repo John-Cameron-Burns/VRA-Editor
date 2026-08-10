@@ -1,153 +1,136 @@
 <?xml version='1.0' encoding='utf-8'?>
 <vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
-  <vra:collection id="c_00000ArMUD" xml:lang="en">
+  <vra:collection id="c_00000ArMUD" xml:lang="ar">
     <vra:agentSet>
-      <vra:display>Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان&lt;/div&gt;&lt;div lang="en"&gt;Created by ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb); funded by Ministry of Heritage and Culture Sultanate of Oman&lt;/div&gt;</vra:display>
       <vra:agent>
-        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
-        <vra:culture>English</vra:culture>
+        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسةالهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
+        <vra:culture>الإنكليزية</vra:culture>
         <vra:dates type="activity">
           <vra:earliestDate>2012</vra:earliestDate>
           <vra:latestDate>present</vra:latestDate>
-          <vra:earliestDate>1976</vra:earliestDate>
         </vra:dates>
-        <vra:role>creator</vra:role>
-        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">research centers(institutions)</vra:role>
-        <vra:attribution>University of Liverpool. School of Architecture</vra:attribution>
-        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسةالهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
-        <vra:culture>الإنكليزية</vra:culture>
         <vra:role>مؤلف</vra:role>
         <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398">مركز أبحاث (مؤسّسات)</vra:role>
         <vra:attribution>جامعة ليفربول. كلية الهندسة المعمارية</vra:attribution>
-        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</vra:name>
-        <vra:culture>عُماني</vra:culture>
-        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</vra:role>
+        <vra:name refid="315560441" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/315560441" xml:lang="en">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:culture xml:lang="en">English</vra:culture>
+        <vra:role xml:lang="en">creator</vra:role>
+        <vra:role refid="300343398" vocab="AAT" href="http://vocab.getty.edu/page/aat/300343398" xml:lang="en">research centers(institutions)</vra:role>
+        <vra:attribution xml:lang="en">University of Liverpool. School of Architecture</vra:attribution>
+        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770" xml:lang="en">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</vra:name>
+        <vra:culture xml:lang="en">Omani</vra:culture>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080" xml:lang="en">funding agencies</vra:role>
       </vra:agent>
       <vra:agent>
-        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">Oman. Wizārat al-Turāth al-Qawmī wa-al-Thaqāfah</vra:name>
-        <vra:culture>Omani</vra:culture>
+        <vra:name refid="134225770" type="corporate" vocab="VIAF" href="https://viaf.org/viaf/134225770">عمان. وزارة التراث القومي والثقافة</vra:name>
+        <vra:culture>عُماني</vra:culture>
         <vra:dates type="activity">
           <vra:earliestDate>1976</vra:earliestDate>
           <vra:latestDate>present</vra:latestDate>
         </vra:dates>
-        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">funding agencies</vra:role>
+        <vra:role refid="300150080" vocab="AAT" href="http://vocab.getty.edu/page/aat/300150080">جهات مموّلة</vra:role>
       </vra:agent>
-      <vra:display>تم إنشاؤها من قبل أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب)؛ بتمويل من وزارة التراث والثقافة في سلطنة عُمان</vra:display>
     </vra:agentSet>
     <vra:culturalContextSet>
-      <vra:culturalContext vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
       <vra:culturalContext vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:culturalContext>
+      <vra:culturalContext vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483" xml:lang="en">Omani</vra:culturalContext>
     </vra:culturalContextSet>
     <vra:dateSet>
-      <vra:display>Created 2013-2014</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;تم إنشاؤها 2013-2014&lt;/div&gt;&lt;div lang="en"&gt;Created 2013-2014&lt;/div&gt;</vra:display>
       <vra:date type="creation">
         <vra:earliestDate>2013</vra:earliestDate>
         <vra:latestDate>2014</vra:latestDate>
       </vra:date>
-      <vra:display>تم إنشاؤها 2013-2014</vra:display>
     </vra:dateSet>
     <vra:descriptionSet>
-      <vra:display>Institutional collection of the ArCHIAM Centre, consisting of audio and visual material on Mudayrib,
+      <vra:display>&lt;div lang="ar"&gt;تتألف المجموعة المؤسسيّة لمركز أركيام من مواد ووثائق سمعية وبصرية عن المضيرب، سلطنة عُمان.
+                تم إنتاج المادة كجزء من مشروع خطة إدارة الوثائق والتراث بتكليف من وزارة التراث القومي والثقافة في عُمان. تم إنشاء المجموعة بين عامي 2013 و 2014.&lt;/div&gt;&lt;div lang="en"&gt;Institutional collection of the ArCHIAM Centre, consisting of audio and visual material on Mudayrib,
                 Sultanate of Oman. The material was produced as part of a Documentation and Heritage Management Plan
-                project, commissioned by the Ministry of Heritage and Culture in Oman. The collection dates between 2013 and 2014.
-            </vra:display>
-      <vra:description>
+                project, commissioned by the Ministry of Heritage and Culture in Oman. The collection dates between 2013 and 2014.&lt;/div&gt;</vra:display>
+      <vra:description>تتألف المجموعة المؤسسيّة لمركز أركيام من مواد ووثائق سمعية وبصرية عن المضيرب، سلطنة عُمان.
+                تم إنتاج المادة كجزء من مشروع خطة إدارة الوثائق والتراث بتكليف من وزارة التراث القومي والثقافة في عُمان. تم إنشاء المجموعة بين عامي 2013 و 2014.
+            </vra:description>
+      <vra:description xml:lang="en">
                 Institutional collection of the ArCHIAM Centre, consisting of audio and visual material on Mudayrib,
                 Sultanate of Oman. The material was produced as part of a Documentation and Heritage Management Plan
                 project, commissioned by the Ministry of Heritage and Culture in Oman. The collection dates between 2013 and 2014.
             </vra:description>
-      <vra:display>تتألف المجموعة المؤسسيّة لمركز أركيام من مواد ووثائق سمعية وبصرية عن المضيرب، سلطنة عُمان.
-                تم إنتاج المادة كجزء من مشروع خطة إدارة الوثائق والتراث بتكليف من وزارة التراث القومي والثقافة في عُمان. تم إنشاء المجموعة بين عامي 2013 و 2014.
-            </vra:display>
-      <vra:description>تتألف المجموعة المؤسسيّة لمركز أركيام من مواد ووثائق سمعية وبصرية عن المضيرب، سلطنة عُمان.
-                تم إنتاج المادة كجزء من مشروع خطة إدارة الوثائق والتراث بتكليف من وزارة التراث القومي والثقافة في عُمان. تم إنشاء المجموعة بين عامي 2013 و 2014.
-            </vra:description>
     </vra:descriptionSet>
     <vra:locationSet>
-      <vra:display>ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb) (Liverpool, Great Britain); created in Mudayrib (Oman)</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب) (ليفربول، بريطانيا العظمى) تم إنشاؤها في المضيرب (عُمان)&lt;/div&gt;&lt;div lang="en"&gt;ArCHIAM (Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb) (Liverpool, Great Britain); created in Mudayrib (Oman)&lt;/div&gt;</vra:display>
       <vra:location type="repository">
-        <vra:name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
-        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">University of Liverpool. School of Architecture</vra:name>
         <vra:name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441">مركز لدراسةالهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب.</vra:name>
         <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928">جامعة ليفربول. كلية الهندسة المعمارية</vra:name>
+        <vra:name type="corporate" refid="315560441" vocab="VIAF" href="https://viaf.org/viaf/315560441" xml:lang="en">Centre for the Study of Architecture and Cultural Heritage of India, Arabia and the Maghreb</vra:name>
+        <vra:name type="corporate" vocab="VIAF" refid="143075928" href="http://viaf.org/143075928" xml:lang="en">University of Liverpool. School of Architecture</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="102153651688355781260" href="http://viaf.org/viaf/102153651688355781260" xml:lang="en">Mudayrib (Oman)</vra:name>
+        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373" xml:lang="en">Óman</vra:name>
+      </vra:location>
+      <vra:location type="creation">
         <vra:name type="geographic" refid="-786100" vocab="GNS">المضيرب</vra:name>
         <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">"&gt;سلطنة عمان</vra:name>
       </vra:location>
-      <vra:location type="creation">
-        <vra:name type="geographic" vocab="VIAF" refid="102153651688355781260" href="http://viaf.org/viaf/102153651688355781260">Mudayrib (Oman)</vra:name>
-        <vra:name type="geographic" vocab="VIAF" refid="137795373" href="http://viaf.org/viaf/137795373">Óman</vra:name>
-      </vra:location>
-      <vra:display>أركيام (مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية والمغرب) (ليفربول، بريطانيا العظمى) تم إنشاؤها في المضيرب (عُمان)</vra:display>
     </vra:locationSet>
     <vra:materialSet>
-      <vra:display>architectural drawings; digital photographs; videos</vra:display>
-      <vra:material type="medium" vocab="AAT" refid="300034787" href="http://vocab.getty.edu/page/aat/300034787">architectural drawings (visual works)</vra:material>
-      <vra:material type="medium" vocab="AAT" refid="300417379" href="http://vocab.getty.edu/page/aat/300417379">digital photographs</vra:material>
-      <vra:material type="support" vocab="AAT" refid="300054153" href="http://vocab.getty.edu/page/aat/300054153">video</vra:material>
-      <vra:display>رسومات معمارية؛ صور رقمية؛ فيديوهات</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;رسومات معمارية؛ صور رقمية؛ فيديوهات&lt;/div&gt;&lt;div lang="en"&gt;architectural drawings; digital photographs; videos&lt;/div&gt;</vra:display>
       <vra:material type="medium" vocab="AAT" refid="300034787" href="http://vocab.getty.edu/page/aat/300034787">رسومات معمارية</vra:material>
       <vra:material type="medium" vocab="AAT" refid="300417379" href="http://vocab.getty.edu/page/aat/300417379">صور رقمية</vra:material>
       <vra:material type="support" vocab="AAT" refid="300054153" href="http://vocab.getty.edu/page/aat/300054153">فيديو</vra:material>
+      <vra:material type="medium" vocab="AAT" refid="300034787" href="http://vocab.getty.edu/page/aat/300034787" xml:lang="en">architectural drawings (visual works)</vra:material>
+      <vra:material type="medium" vocab="AAT" refid="300417379" href="http://vocab.getty.edu/page/aat/300417379" xml:lang="en">digital photographs</vra:material>
+      <vra:material type="support" vocab="AAT" refid="300054153" href="http://vocab.getty.edu/page/aat/300054153" xml:lang="en">video</vra:material>
     </vra:materialSet>
     <vra:rightsSet>
-      <vra:display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:display>
-      <vra:notes>Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia and
-                the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG
-            </vra:notes>
+      <vra:display>&lt;div lang="ar"&gt;© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0&lt;/div&gt;&lt;div lang="en"&gt;©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0&lt;/div&gt;</vra:display>
+      <vra:notes>&lt;div lang="ar"&gt;معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
+                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG&lt;/div&gt;&lt;div lang="en"&gt;Contact information: Centre for the Study of Architecture and Cultural Heritage of India, Arabia and
+                the Maghreb, University of Liverpool, 19-23 Abercromby Square, Liverpool L69 7ZG&lt;/div&gt;</vra:notes>
       <vra:rights type="copyrighted" href="https://creativecommons.org/licenses/by/4.0">
-        <vra:rightsHolder>Ministry of Heritage and Culture Sultanate of Oman</vra:rightsHolder>
-        <vra:text>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:text>
         <vra:rightsHolder>وزارة التراث والثقافة في سلطنة عُمان</vra:rightsHolder>
         <vra:text>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</vra:text>
+        <vra:rightsHolder xml:lang="en">Ministry of Heritage and Culture Sultanate of Oman</vra:rightsHolder>
+        <vra:text xml:lang="en">©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:text>
       </vra:rights>
-      <vra:display>© وزارة التراث والثقافة في سلطنة عُمان. CC BY 4.0</vra:display>
-      <vra:notes>معلومات التواصل: مركز لدراسة الهندسة المعمارية والتراث الثقافي في الهند و شبه الجزيرة العربية
-                والمغرب، جامعة ليفربول، 19-23 ساحة ابركرومبي، ليفربول L69 7ZG
-            </vra:notes>
     </vra:rightsSet>
     <vra:stylePeriodSet>
-      <vra:display>Islamic Omani vernacular</vra:display>
-      <vra:stylePeriod vocab="AAT" refid="300068483" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
-      <vra:stylePeriod vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
-      <vra:stylePeriod vocab="AAT" refid="300380013" href="http://vocab.getty.edu/page/aat/300380013">Islamic (culture or style)</vra:stylePeriod>
-      <vra:display>عُماني شعبي إسلامي</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;عُماني شعبي إسلامي&lt;/div&gt;&lt;div lang="en"&gt;Islamic Omani vernacular&lt;/div&gt;</vra:display>
       <vra:stylePeriod vocab="AAT" refid="300068483" href="http://vocab.getty.edu/page/aat/300068483">عمارة شعبية</vra:stylePeriod>
       <vra:stylePeriod vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483">عُماني</vra:stylePeriod>
       <vra:stylePeriod vocab="AAT" refid="300380013" href="http://vocab.getty.edu/page/aat/300380013">إسلامي (ثقافة أو طراز)</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300068483" href="http://vocab.getty.edu/page/aat/300068483" xml:lang="en">vernacular architecture</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300386483" href="http://vocab.getty.edu/page/aat/300386483" xml:lang="en">Omani</vra:stylePeriod>
+      <vra:stylePeriod vocab="AAT" refid="300380013" href="http://vocab.getty.edu/page/aat/300380013" xml:lang="en">Islamic (culture or style)</vra:stylePeriod>
     </vra:stylePeriodSet>
     <vra:subjectSet>
-      <vra:display>architecture; settlements; landscapes; ethnography</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;عمارة؛ مستوطنات؛ مناظر طبيعية؛ أثنوغرافيا&lt;/div&gt;&lt;div lang="en"&gt;architecture; settlements; landscapes; ethnography&lt;/div&gt;</vra:display>
       <vra:subject>
-        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054156" href="http://vocab.getty.edu/page/aat/300054156">architecture (discipline)</vra:term>
-        <vra:term type="descriptiveTopic" vocab="AAT" refid="300008346" href="http://vocab.getty.edu/page/aat/300008346">Settlements and Landscapes (hierarchy name)</vra:term>
-        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054319" href="http://vocab.getty.edu/page/aat/300054319">ethnography</vra:term>
         <vra:term type="descriptiveTopic" vocab="AAT" refid="300054156" href="http://vocab.getty.edu/page/aat/300054156">عمارة (تخصّص)</vra:term>
         <vra:term type="descriptiveTopic" vocab="AAT" refid="300008346" href="http://vocab.getty.edu/page/aat/300008346">مستوطنات ومناظر طبيعية (اسم متسلسل)</vra:term>
         <vra:term type="descriptiveTopic" vocab="AAT" refid="300054319" href="http://vocab.getty.edu/page/aat/300054319">أثنوغرافيا</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054156" href="http://vocab.getty.edu/page/aat/300054156" xml:lang="en">architecture (discipline)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300008346" href="http://vocab.getty.edu/page/aat/300008346" xml:lang="en">Settlements and Landscapes (hierarchy name)</vra:term>
+        <vra:term type="descriptiveTopic" vocab="AAT" refid="300054319" href="http://vocab.getty.edu/page/aat/300054319" xml:lang="en">ethnography</vra:term>
       </vra:subject>
-      <vra:display>عمارة؛ مستوطنات؛ مناظر طبيعية؛ أثنوغرافيا</vra:display>
     </vra:subjectSet>
     <vra:techniqueSet>
-      <vra:display>architectural drawing; digital photography; video recording</vra:display>
-      <vra:technique vocab="AAT" refid="300054197" href="http://vocab.getty.edu/page/aat/300054197">architectural drawing (process)</vra:technique>
-      <vra:technique vocab="AAT" refid="300386812" href="http://vocab.getty.edu/page/aat/300386812">digital photography (digital camera)</vra:technique>
-      <vra:technique vocab="AAT" refid="300417974" href="http://vocab.getty.edu/page/aat/300417974">video recording (process)</vra:technique>
-      <vra:display>رسم معماري؛ تصوير رقمي؛ تسجيل فيديو</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;رسم معماري؛ تصوير رقمي؛ تسجيل فيديو&lt;/div&gt;&lt;div lang="en"&gt;architectural drawing; digital photography; video recording&lt;/div&gt;</vra:display>
       <vra:technique vocab="AAT" refid="300054197" href="http://vocab.getty.edu/page/aat/300054197">رسم معماري (عملية)</vra:technique>
       <vra:technique vocab="AAT" refid="300386812" href="http://vocab.getty.edu/page/aat/300386812">تصوير رقمي (كاميرا رقمية)</vra:technique>
       <vra:technique vocab="AAT" refid="300417974" href="http://vocab.getty.edu/page/aat/300417974">تسجيل فيديو (عملية)</vra:technique>
+      <vra:technique vocab="AAT" refid="300054197" href="http://vocab.getty.edu/page/aat/300054197" xml:lang="en">architectural drawing (process)</vra:technique>
+      <vra:technique vocab="AAT" refid="300386812" href="http://vocab.getty.edu/page/aat/300386812" xml:lang="en">digital photography (digital camera)</vra:technique>
+      <vra:technique vocab="AAT" refid="300417974" href="http://vocab.getty.edu/page/aat/300417974" xml:lang="en">video recording (process)</vra:technique>
     </vra:techniqueSet>
     <vra:titleSet>
-      <vra:display>The ArCHIAM Collection: Mudayrib.</vra:display>
-      <vra:title type="descriptive">The ArCHIAM Collection: Mudayrib</vra:title>
+      <vra:display>&lt;div lang="ar"&gt;مجموعة أركيام: المضيرب.&lt;/div&gt;&lt;div lang="en"&gt;The ArCHIAM Collection: Mudayrib.&lt;/div&gt;</vra:display>
       <vra:title type="descriptive">مجموعة أركيام: المضيرب.</vra:title>
-      <vra:display>مجموعة أركيام: المضيرب.</vra:display>
+      <vra:title type="descriptive">The ArCHIAM Collection: Mudayrib</vra:title>
     </vra:titleSet>
     <vra:worktypeSet>
-      <vra:display>documentation</vra:display>
-      <vra:worktype vocab="AAT" refid="300054638" href="http://vocab.getty.edu/page/aat/300054638">documentation (activity)</vra:worktype>
-      <vra:display>توثيق</vra:display>
+      <vra:display>&lt;div lang="ar"&gt;توثيق&lt;/div&gt;&lt;div lang="en"&gt;documentation&lt;/div&gt;</vra:display>
       <vra:worktype vocab="AAT" refid="300054638" href="http://vocab.getty.edu/page/aat/300054638">توثيق (نشاط)</vra:worktype>
+      <vra:worktype vocab="AAT" refid="300054638" href="http://vocab.getty.edu/page/aat/300054638" xml:lang="en">documentation (activity)</vra:worktype>
     </vra:worktypeSet>
   </vra:collection>
 </vra:vra>
