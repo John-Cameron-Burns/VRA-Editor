@@ -78,6 +78,7 @@ TAG_LABELS = {
 # Field-level labels in the generic element editor (vocab/refid/href are
 # the VRA Core attribute names; these are what a cataloguer sees instead).
 FIELD_LABELS = {
+    'lang': 'Language',
     'vocab': 'Linked to',
     'refid': 'Record ID',
     'href': 'Link',

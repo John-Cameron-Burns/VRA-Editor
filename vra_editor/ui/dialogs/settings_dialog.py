@@ -4,15 +4,22 @@ from typing import Optional
 
 from PySide6.QtWidgets import (
     QDialog, QWidget, QFormLayout, QVBoxLayout, QHBoxLayout,
-    QLineEdit, QCheckBox, QPushButton, QFileDialog,
+    QLineEdit, QCheckBox, QPushButton, QFileDialog, QLabel,
     QDialogButtonBox, QGroupBox, QMessageBox,
 )
 
+from ...app_data import BOOTSTRAP_DIR
 from ...config import (
     DEFAULT_CONFIG_PATH, LOCATION_KEYS, OPTION_TEXT_KEYS,
     to_bool,
 )
 from ...utils import strip_quotes
+
+# Not an archive workflow stage like the LOCATION_KEYS -- shown in its own
+# group in the UI -- but still just a path, saved under the same
+# [locations] section so app_data.get_app_data_dir() can read it back
+# with the same load_locations() call the archive folders use.
+APP_DATA_KEY = 'app_data'
 
 
 # noinspection PyUnresolvedReferences
@@ -35,6 +42,7 @@ class SettingsDialog(QDialog):
         self._option_edits: dict[str, QLineEdit] = {}
         self.fullname_edit: Optional[QLineEdit] = None
         self.auto_ingest_check: Optional[QCheckBox] = None
+        self.app_data_edit: Optional[QLineEdit] = None
 
         self._build_ui()
         self._load()
@@ -47,6 +55,7 @@ class SettingsDialog(QDialog):
         outer = QVBoxLayout(self)
 
         outer.addWidget(self._build_locations_group())
+        outer.addWidget(self._build_app_data_group())
         outer.addWidget(self._build_user_group())
         outer.addWidget(self._build_options_group())
 
@@ -75,6 +84,33 @@ class SettingsDialog(QDialog):
 
             self._location_edits[key] = edit
             form.addRow(f"{key}:", row)
+
+        return group
+
+    def _build_app_data_group(self) -> QGroupBox:
+        group = QGroupBox("Application Data")
+        form = QFormLayout(group)
+
+        row = QWidget()
+        row_layout = QHBoxLayout(row)
+        row_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.app_data_edit = QLineEdit()
+        self.app_data_edit.setPlaceholderText(f"(default: {BOOTSTRAP_DIR})")
+        browse_btn = QPushButton("Browse...")
+        browse_btn.clicked.connect(lambda: self._browse_for(self.app_data_edit))
+        row_layout.addWidget(self.app_data_edit)
+        row_layout.addWidget(browse_btn)
+
+        form.addRow("Clutter folder:", row)
+        note = QLabel(
+            "Where this app keeps its own files -- the edit/review version "
+            "history and the vocabulary-lookup cache -- separate from the "
+            "archive itself. Leave blank to use the default above."
+        )
+        note.setWordWrap(True)
+        note.setStyleSheet("color: #666;")
+        form.addRow(note)
 
         return group
 
@@ -117,6 +153,7 @@ class SettingsDialog(QDialog):
         locations = parser['locations'] if parser.has_section('locations') else {}
         for key, edit in self._location_edits.items():
             edit.setText(locations.get(key, ''))
+        self.app_data_edit.setText(locations.get(APP_DATA_KEY, ''))
 
         user = parser['user'] if parser.has_section('user') else {}
         self.fullname_edit.setText(strip_quotes(user.get('FullName', '')))
@@ -131,6 +168,14 @@ class SettingsDialog(QDialog):
         parser['locations'] = {
             key: edit.text().strip() for key, edit in self._location_edits.items()
         }
+        app_data_path = self.app_data_edit.text().strip()
+        if app_data_path:
+            # Omitted entirely when blank, not written as app_data= --
+            # get_app_data_dir() treats "not in the dict at all" as
+            # "use the default", but an empty string would resolve to
+            # Path('') instead.
+            parser['locations'][APP_DATA_KEY] = app_data_path
+
         for key, path in parser['locations'].items():
             if not path:
                 continue

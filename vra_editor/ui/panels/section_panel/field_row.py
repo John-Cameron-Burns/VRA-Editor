@@ -5,11 +5,13 @@ from vra_editor.core.friendly_labels import FIELD_LABELS, friendly_label
 from vra_editor.ui.dialogs.vocabulary_search_dialog import VocabularySearchDialog
 from vra_editor.ui.widgets.auto_grow_text_edit import AutoGrowTextEdit
 
-# The vocab/refid/href trio is what every current leaf actually exposes;
-# kept as a list (not three named fields) so adding another vraAttributes
-# member later (dataDate, source, rules, ...) is extending this list and
-# FIELD_LABELS, not redesigning the widget.
-_VOCAB_LINK_ATTRS = ('vocab', 'refid', 'href')
+# Every vraAttributes member currently exposed in this row; kept as a list
+# (not named fields) so adding another one later (dataDate, source, rules,
+# ...) is extending this list and FIELD_LABELS, not redesigning the widget.
+# lang is xml:lang -- VRA Core's real mechanism for multi-language content:
+# a second <title>/<description>/... element with a different lang, not
+# multiple languages crammed into one element's text.
+_VOCAB_LINK_ATTRS = ('lang', 'vocab', 'refid', 'href')
 
 
 class FieldRow(QWidget):
@@ -62,6 +64,9 @@ class FieldRow(QWidget):
             for attr_name in _VOCAB_LINK_ATTRS:
                 edit = QLineEdit(attributes.get(attr_name, ''))
                 edit.setPlaceholderText(FIELD_LABELS.get(attr_name, attr_name))
+                if attr_name == 'lang':
+                    edit.setFixedWidth(50)  # holds a short ISO 639 code, not a value like the others
+                    edit.setToolTip("Language of this text (ISO 639 code, e.g. en, fr, ar)")
                 edit.textChanged.connect(self._on_changed)
                 attr_row.addWidget(edit)
                 self._attr_inputs[attr_name] = edit
@@ -78,11 +83,13 @@ class FieldRow(QWidget):
         vocab = self._attr_inputs.get('vocab')
         refid = self._attr_inputs.get('refid')
         href = self._attr_inputs.get('href')
+        lang = self._attr_inputs.get('lang')
         self._doc_controller.update_element_data(
             self.text_input.toPlainText(),
             vocab.text() if vocab else '',
             refid.text() if refid else '',
             href.text() if href else '',
+            lang.text() if lang else '',
         )
 
     def _on_remove_clicked(self):

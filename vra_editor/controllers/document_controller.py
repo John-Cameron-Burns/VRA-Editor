@@ -65,13 +65,13 @@ class DocumentController(QObject):
         update_* methods below read from."""
         self._current_element = element
 
-    def update_element_data(self, text: str, vocab: str, refid: str, href: str):
+    def update_element_data(self, text: str, vocab: str, refid: str, href: str, lang: str = ''):
         """Generic write-back for any leaf element (title, name, role,
         technique, subject/term, ...) -- covers every basicString-derived
         tag uniformly rather than one method per tag."""
         if self._current_element is not None:
             self._snapshot_before_edit(self._current_element)
-            self.xml_doc.set_element_data(self._current_element, text, vocab, refid, href)
+            self.xml_doc.set_element_data(self._current_element, text, vocab, refid, href, lang)
         self._xml_text = self._rebuild_xml()
         self.xml_updated.emit(self._xml_text)
 

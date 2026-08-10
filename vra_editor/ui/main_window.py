@@ -1,8 +1,7 @@
 from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QKeySequence, QShortcut
-from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtGui import QKeySequence, QShortcut, QPixmap
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QPushButton, QLabel,
     QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy, QMessageBox, QInputDialog,
@@ -24,7 +23,7 @@ from vra_editor.ui.panels.xml_preview.code_editor import XmlPreviewPanel
 from vra_editor.utils import user_name
 
 IMAGES_DIR = Path(__file__).resolve().parent.parent / "images"
-LOGO_PATH = IMAGES_DIR / "idm_logo.svg"
+LOGO_PATH = IMAGES_DIR / "logo.png"
 
 # The one committing action per mode (Submit hands a record on for review;
 # Approve moves it into the reviewed archive) gets a distinct, deliberate
@@ -270,9 +269,22 @@ class MainWindow(QMainWindow):
         self._highlight_current_element()
 
     def _on_section_selected(self, node):
-        """A Set was chosen in the Simple view's section list."""
+        """A Set was chosen in the Simple view's section list. Re-fetches
+        a fresh node for the same tag rather than trusting the one the
+        signal carried: SectionListPanel's rows are only rebuilt on
+        document_loaded (structural changes), so a plain edit -- e.g.
+        adding a Display translation, which only emits xml_updated --
+        would otherwise leave the just-clicked row holding a node
+        snapshotted before that edit."""
         self._current_section_tag = node.data.get('tag')
-        self.section_form.show_section(node)
+        record_node = self._current_record_node()
+        if record_node is None:
+            return
+        match = next(
+            (c for c in record_node.children if c.data.get('tag') == self._current_section_tag),
+            None,
+        )
+        self.section_form.show_section(match if match is not None else node)
 
     def _on_add_section_requested(self, tag: str, sibling_order: list):
         """A Set the record doesn't have yet was chosen from the
@@ -351,8 +363,9 @@ class MainWindow(QMainWindow):
         top_layout.setContentsMargins(5, 5, 5, 5)
 
         if LOGO_PATH.exists():
-            logo = QSvgWidget(str(LOGO_PATH))
-            logo.setFixedSize(20, 30)  # matches the SVG's own ~2:3 aspect ratio
+            logo_pixmap = QPixmap(str(LOGO_PATH))
+            logo = QLabel()
+            logo.setPixmap(logo_pixmap.scaledToHeight(30, Qt.TransformationMode.SmoothTransformation))
             top_layout.addWidget(logo)
 
         self.mode_bar = ModeBar(self.VARIANTS)

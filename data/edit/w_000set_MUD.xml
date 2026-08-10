@@ -1,11 +1,11 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
   <vra:work id="w_000set_MUD" xml:lang="en">
     <vra:culturalContextSet>
       <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
     </vra:culturalContextSet>
     <vra:descriptionSet>
-      <vra:display>Mudayrib is located about 130 km south-east of Muscat in the Wilāyat of Al Qābil in Ash Shariqīyah North Governorate on the northern edges
+      <vra:display>&lt;div lang="en"&gt;Mudayrib is located about 130 km south-east of Muscat in the Wilāyat of Al Qābil in Ash Shariqīyah North Governorate on the northern edges
                 of Ash Shariqīyah desert (formerly, Wahiba Sands; Ramlat Āl Wahībah). It is located on the eastern banks of the Wādī al Mudayrib, which runs in a south-easterly direction
                 along the foothills of the Eastern Ḩajar mountains (Al-Ḥajar ash-Sharqī). Lying on the main inland route from the eastern port of Şūr to the interior of Oman,
                 Mudayrib has always benefited from Indian Ocean trade. Unlike many other oases of the region Mudayrib consists of a single settlement core rather than having a fragmentary setup.
@@ -18,8 +18,28 @@
                 topographical limitations which the surrounding hills posed on the expansion of the settlement and
                 partly due to the strong position of the Ḩirth tribes in the Ibrā’ and Al Qābil regions.
                 The core is disposed around a series of fortifications, such as the Ḩisn al Khanājīra, located at the centre of Mudayrib, immediately to the west of the sūq.
-                The settlement quarter is an excellent example of the traditional architectural development that reached impressive refinement and high levels of quality. </vra:display>
-      <vra:description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014">Al Muḑayrib is located about 130 km south-east of Masqaţ in the Wilāyat of al Qābil in ash Sharqīyah North Governorate on the northern edges of ash Sharqīyah desert (formerly, Wahiba Sands; Ramlat Āl Wahībah).
+                The settlement quarter is an excellent example of the traditional architectural development that reached impressive refinement and high levels of quality.&lt;/div&gt;&lt;div lang="fr"&gt;Mudayrib se situe à environ 130 km au sud-est de Mascate, dans le wilaya d'Al Qābil, au sein du gouvernorat d'Ash Shariqīyah Nord, à la lisière nord du désert d'Ash Shariqīyah (anciennement les sables de Wahiba ; Ramlat Āl Wahībah). Elle se trouve sur la rive orientale de l'oued al Mudayrib, qui coule vers le sud-est,
+
+au pied des monts Ḩajar orientaux (Al-Ḥajar ash-Sharqī). Située sur la principale voie intérieure reliant le port oriental de Şūr à l'intérieur des terres omanaises,
+
+Mudayrib a toujours bénéficié du commerce de l'océan Indien. Contrairement à de nombreuses autres oasis de la région, Mudayrib se compose d'un seul noyau urbain, et non d'une structure fragmentée.
+
+L'agglomération est nichée au cœur d'une couronne de collines ophiolitiques basses qui l'entourent de tous côtés, à l'exception du sud, où l'oasis s'étend en éventail. L'eau du système d'irrigation, Falaj al Mudayrib, est captée dans l'oued situé à environ 6 km au nord du village et se divise en quatre canaux principaux (sāqīyat) près du sūq.
+
+Ces canaux constituent la composante irriguée du réseau d'aflāj.
+
+Les collines environnantes sont surmontées de tours de guet qui surveillent la campagne environnante et les principaux accès au village.
+
+La plus grande colline, qui s'élève à l'est du village, abrite à son sommet le Ḩisn al Mudayrib, une enceinte fortifiée largement visible, utilisée en temps de conflit et sans fonction d'habitation.
+
+La forme relativement compacte et autosuffisante du village s'explique en partie par les
+
+contraintes topographiques que les collines environnantes imposaient à son expansion et
+
+en partie par la position dominante des tribus Ḩirth dans les régions d'Ibrā' et d'Al Qābil. Le cœur historique s'organise autour d'une série de fortifications, telles que le Ḩisn al Khanājīra, situé au centre de Mudayrib, immédiatement à l'ouest du souk.
+
+Le quartier d'habitation est un excellent exemple du développement architectural traditionnel qui a atteint un raffinement et une qualité remarquables.&lt;/div&gt;</vra:display>
+      <vra:description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Al-Mudayrib, Al-Qabil, Nottingham: Nottingham Trent University, 2014" xml:lang="en">Al Muḑayrib is located about 130 km south-east of Masqaţ in the Wilāyat of al Qābil in ash Sharqīyah North Governorate on the northern edges of ash Sharqīyah desert (formerly, Wahiba Sands; Ramlat Āl Wahībah).
                 Mudayrib is located about 130 km south-east of Muscat in the Wilāyat of Al Qābil in Ash Shariqīyah North Governorate on the northern edges
                 of Ash Shariqīyah desert (formerly, Wahiba Sands; Ramlat Āl Wahībah). It is located on the eastern banks of the Wādī al Mudayrib, which runs in a south-easterly direction
                 along the foothills of the Eastern Ḩajar mountains (Al-Ḥajar ash-Sharqī). Lying on the main inland route from the eastern port of Şūr to the interior of Oman,
@@ -34,7 +54,25 @@
                 partly due to the strong position of the Ḩirth tribes in the Ibrā’ and Al Qābil regions.
                 The core is disposed around a series of fortifications, such as the Ḩisn al Khanājīra, located at the centre of Mudayrib, immediately to the west of the sūq.
                 The settlement quarter is an excellent example of the traditional architectural development that reached impressive refinement and high levels of quality.</vra:description>
-    </vra:descriptionSet>
+    <vra:description xml:lang="fr">Al-Mudhaireb se situe à environ 130 km au sud-est de Mascate, dans le wilayat d'Al-Qabil, gouvernorat de Sharqiyah Nord, à la lisière nord du désert de Sharqiyah (anciennement les sables de Wahiba).
+
+La ville s'étend sur les rives de l'oued oriental, qui coule vers le sud-est le long des contreforts des monts Hajar orientaux.
+
+Située sur la principale voie de communication intérieure reliant le port oriental de Sur à l'intérieur des terres omanaises, Al-Mudhaireb a toujours profité du commerce avec l'océan Indien.
+
+Contrairement à de nombreuses autres oasis de la région, Al-Mudhaireb se compose d'un seul centre urbain et non de plusieurs hameaux.
+
+L'agglomération est nichée au cœur d'une ceinture de collines basses qui entourent le centre urbain de tous côtés, à l'exception du sud, où l'oasis est tournée vers l'extérieur.
+
+Le système d'irrigation, Falaj Al-Mudhaireb, est alimenté par un oued situé à environ 6 km au nord du village, où il se divise en quatre canaux principaux (saqiyas) près du marché, formant le cœur du réseau d'irrigation du falaj.
+
+Des tours de guet dominent les collines environnantes, surplombant la campagne et les principales entrées du village. La plus grande colline, en pente douce, marque la limite orientale du village. À son sommet se dresse le fort d'Al-Mudhaireb, une enceinte fortifiée utilisée en temps de conflit, aujourd'hui sans vocation résidentielle.
+
+L'un des facteurs ayant déterminé la forme compacte et autosuffisante du village est la topographie, imposée par les collines environnantes, qui a limité son expansion. Un autre facteur est la position dominante de la tribu Harith dans les régions d'Ibra et d'Al-Qabil.
+
+Le centre du village s'est développé autour d'une série de fortifications, comme le fort d'Al-Khanajrah, situé au cœur d'Al-Mudhaireb, directement à l'ouest du marché.
+
+Ce lotissement résidentiel constitue un excellent exemple de développement architectural traditionnel, réalisé avec un raffinement remarquable et une grande qualité.</vra:description></vra:descriptionSet>
     <vra:locationSet>
       <vra:display>Mudayrib (Oman)</vra:display>
       <vra:location type="site">
@@ -54,7 +92,6 @@
     </vra:materialSet>
     <vra:stylePeriodSet>
       <vra:display>Omani vernacular</vra:display>
-      <vra:stylePeriod />
       <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
       <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
     </vra:stylePeriodSet>
@@ -146,7 +183,7 @@
       <vra:display>From The ArCHIAM Collection: Mudayrib. Image of Mudayrib settlement, Oman.</vra:display>
       <vra:relation relids="w_001SET_MUD" type="imageOf">Mudayrib settlement, Oman.</vra:relation>
       <vra:relation refid="c_00000ArMUD" type="partOf">The ArCHIAM Collection: Mudayrib.</vra:relation>
-      <vra:relation />
+      <vra:relation/>
     </vra:relationSet>
     <vra:rightsSet>
       <vra:display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:display>
@@ -159,7 +196,7 @@
     </vra:rightsSet>
     <vra:techniqueSet>
       <vra:display>video interview</vra:display>
-      <vra:technique />
+      <vra:technique/>
       <vra:technique refid="300026392" vocab="AAT" href="http://vocab.getty.edu/page/aat/300026392">interviews</vra:technique>
       <vra:technique refid="300417974" vocab="AAT" href="http://vocab.getty.edu/page/aat/300417974">video recording (process)</vra:technique>
     </vra:techniqueSet>

@@ -11,6 +11,7 @@ from vra_editor.core.friendly_labels import friendly_label
 
 VRA_NS = "http://www.vraweb.org/vracore4.htm"
 NSMAP = {None: VRA_NS}
+XML_NS = "http://www.w3.org/XML/1998/namespace"  # the reserved xml: prefix, for xml:lang
 
 # Top-level record types build_tree looks for when walking the document.
 _RECORD_TAGS = ('work', 'image', 'collection')
@@ -147,6 +148,7 @@ class VraXmlParser:
                 'vocab': elem.get('vocab', ''),
                 'refid': elem.get('refid', ''),
                 'href': elem.get('href', ''),
+                'lang': elem.get(f'{{{XML_NS}}}lang', ''),
             },
             element=elem,
         )
@@ -306,10 +308,13 @@ class VraXmlParser:
     # name, role, technique, subject/term, and ~20 others)
     # ------------------------------------------------------------------
 
-    def set_element_data(self, elem, text: str, vocab: str = '', refid: str = '', href: str = ''):
+    def set_element_data(self, elem, text: str, vocab: str = '', refid: str = '', href: str = '',
+                          lang: str = ''):
         """elem is the leaf element itself. Clears an attribute entirely
         rather than writing it empty, so untouched fields don't start
-        appearing as vocab="" in the saved file."""
+        appearing as vocab="" in the saved file. lang is xml:lang --
+        namespace-qualified, unlike the other three, since it's the
+        reserved XML attribute rather than a VRA Core one."""
         elem.text = text
         for attr_name, value in (('vocab', vocab), ('refid', refid), ('href', href)):
             value = (value or '').strip()
@@ -317,3 +322,9 @@ class VraXmlParser:
                 elem.set(attr_name, value)
             elif attr_name in elem.attrib:
                 del elem.attrib[attr_name]
+        lang = (lang or '').strip()
+        lang_attr = f'{{{XML_NS}}}lang'
+        if lang:
+            elem.set(lang_attr, lang)
+        elif lang_attr in elem.attrib:
+            del elem.attrib[lang_attr]

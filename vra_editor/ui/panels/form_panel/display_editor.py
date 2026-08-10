@@ -114,10 +114,17 @@ class DisplayEditorPanel(QWidget):
         self._emit_changed()
 
     def get_translations(self) -> dict:
+        """Keyed on text alone, not text+lang: a blank language code is
+        a legitimate entry here, not an incomplete one -- it's how
+        get_display_translations() surfaces a legacy plain-text
+        <display> that predates this app's per-language convention (see
+        xml_parser.py). Requiring both would silently drop that entry,
+        and the archival text with it, the moment any row in this
+        editor changes."""
         result = {}
         for lang_edit, text_edit, _ in self._rows:
             lang = lang_edit.text().strip()
             text = text_edit.text().strip()
-            if lang and text:
+            if text:
                 result[lang] = text
         return result

@@ -1,7 +1,10 @@
 """Clients for the controlled-vocabulary authority services: VIAF (names),
-Getty AAT/TGN/ULAN (terms, places, names), and GNS -- NGA's GEOnet Names
+Getty AAT/TGN/ULAN (terms, places, names), GNS -- NGA's GEOnet Names
 Server (places outside the US; not to be confused with the unrelated
-Geonames.org gazetteer).
+Geonames.org gazetteer) -- and the Library of Congress's id.loc.gov
+Linked Data Service: LCSH (subject headings), LCNAF (names), LCGFT
+(genre/form terms), and LCTGM (the Thesaurus for Graphic Materials,
+LC's own controlled vocabulary for describing visual material).
 
 Each search_* function returns a list of AuthorityResult with a common
 shape, so the vocabulary search dialog doesn't need to know the
@@ -14,9 +17,11 @@ import ssl
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 import certifi
+
+from . import vocab_cache
 
 USER_AGENT = "VRA-Editor/1.0 (VRA Core 4 metadata editor)"
 
@@ -27,7 +32,7 @@ USER_AGENT = "VRA-Editor/1.0 (VRA Core 4 metadata editor)"
 # on an unpredictable subset of installs.
 _SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 
-VOCABULARIES = ("VIAF", "AAT", "TGN", "ULAN", "GNS")
+VOCABULARIES = ("VIAF", "AAT", "TGN", "ULAN", "GNS", "LCSH", "LCNAF", "LCGFT", "LCTGM")
 
 # Spelled out for the vocabulary picker -- the bare acronym means
 # little to a cataloguer who hasn't used that specific authority before.
@@ -37,9 +42,22 @@ VOCABULARY_LABELS = {
     "TGN": "TGN — Getty Thesaurus of Geographic Names (places)",
     "ULAN": "ULAN — Getty Union List of Artist Names (people)",
     "GNS": "GNS — NGA GEOnet Names Server (places outside the US)",
+    "LCSH": "LCSH — Library of Congress Subject Headings (terms)",
+    "LCNAF": "LCNAF — Library of Congress Name Authority File (names)",
+    "LCGFT": "LCGFT — LC Genre/Form Terms (what a work is, not what it's about)",
+    "LCTGM": "LCTGM — LC Thesaurus for Graphic Materials (visual/photographic subjects)",
 }
 
 _GETTY_TYPES = {"AAT": "/aat", "TGN": "/tgn", "ULAN": "/ulan"}
+
+# id.loc.gov's Linked Data Service: every vocabulary there shares the same
+# suggest2 endpoint shape, just under a different path.
+_LOC_DIRECTORIES = {
+    "LCSH": "authorities/subjects",
+    "LCNAF": "authorities/names",
+    "LCGFT": "authorities/genreForms",
+    "LCTGM": "vocabulary/graphicMaterials",
+}
 
 # NGA's public ArcGIS REST query endpoint for GNS -- keyless, no
 # registration needed. Layer 0 ("GeoNames") is the point feature layer;
@@ -139,13 +157,63 @@ def search_gns(query: str, timeout: float = 10.0) -> list:
     return out
 
 
+def search_loc(query: str, vocab: str, timeout: float = 10.0) -> list:
+    """Library of Congress Linked Data Service (id.loc.gov). One suggest2
+    endpoint shape shared across all of LC's vocabularies -- only the
+    path (`_LOC_DIRECTORIES[vocab]`) differs. No key required. `token`
+    is LC's own stable ID (e.g. "sh85096661" for LCSH's "Painting"),
+    used as refid the same way this app uses Getty's numeric IDs."""
+    directory = _LOC_DIRECTORIES[vocab]
+    url = f"https://id.loc.gov/{directory}/suggest2/?" + urllib.parse.urlencode({"q": query, "count": 25})
+    payload = _get_json(url, {"User-Agent": USER_AGENT, "Accept": "application/json"}, timeout)
+
+    out = []
+    for hit in payload.get("hits", []):
+        out.append(AuthorityResult(
+            label=hit.get("aLabel") or hit.get("suggestLabel") or "",
+            vocab=vocab,
+            refid=hit.get("token", ""),
+            href=hit.get("uri", ""),
+        ))
+    return out
+
+
 def search(vocab: str, query: str) -> list:
-    """Dispatches to the right backend for `vocab`. Raises
-    AuthorityLookupError on network/API failure or misconfiguration."""
+    """Dispatches to the right backend for `vocab` -- but checks the
+    local cache (vocab_cache.py) first.
+
+    If this exact (vocab, query) has already gone to the network
+    before, its result set is replayed faithfully from what was
+    recorded then -- no network call, and no risk of silently dropping
+    an entry the fuzzy local index wouldn't otherwise match.
+
+    Otherwise, entries already indexed from a *different* past search
+    are checked first (search_local's fuzzy label match) and returned
+    ahead of anything freshly fetched -- so a related query still
+    surfaces an entry already in use for that concept, encouraging the
+    same authority entry to get reused rather than a fresh-but-
+    different alternative winning each time. Only truly new entries
+    (not already indexed) get appended after those. Raises
+    AuthorityLookupError on network/API failure or misconfiguration; a
+    fully-local answer can't fail this way."""
+    if vocab_cache.already_fetched(vocab, query):
+        return [AuthorityResult(**hit) for hit in vocab_cache.get_exact(vocab, query)]
+
+    local_hits = vocab_cache.search_local(vocab, query)
+    local_refids = {hit["refid"] for hit in local_hits}
+
     if vocab == "VIAF":
-        return search_viaf(query)
-    if vocab in _GETTY_TYPES:
-        return search_getty(query, vocab)
-    if vocab == "GNS":
-        return search_gns(query)
-    raise AuthorityLookupError(f"Unknown vocabulary: {vocab}")
+        fresh = search_viaf(query)
+    elif vocab in _GETTY_TYPES:
+        fresh = search_getty(query, vocab)
+    elif vocab == "GNS":
+        fresh = search_gns(query)
+    elif vocab in _LOC_DIRECTORIES:
+        fresh = search_loc(query, vocab)
+    else:
+        raise AuthorityLookupError(f"Unknown vocabulary: {vocab}")
+
+    vocab_cache.record_fetch(vocab, query, [asdict(r) for r in fresh])
+
+    new_only = [r for r in fresh if r.refid not in local_refids]
+    return [AuthorityResult(**hit) for hit in local_hits] + new_only
