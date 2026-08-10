@@ -1,0 +1,104 @@
+"""Reading dimensions/EXIF from an image file and writing IPTC back into
+one. Pure functions, no Qt/UI dependency -- vra_editor.ui code calls these,
+not the other way around, matching this app's core/ui layering.
+
+Two libraries, for two different jobs:
+  - Pillow: pixel dimensions, DPI, and decoding for the preview pane. Used
+    for preview specifically because Qt's own bundled TIFF plugin can't
+    open JPEG-compressed TIFFs (confirmed against this project's own real
+    sample file) -- QPixmap(path) silently fails where Pillow succeeds.
+  - pyexiv2 (libexiv2): EXIF GPS/timestamp reading and IPTC writing.
+    Pillow's own EXIF support doesn't cover GPS IFD parsing or IPTC at
+    all, and unlike lighter pure-Python IPTC writers (iptcinfo3, JPEG
+    only), pyexiv2 handles TIFF too.
+"""
+
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
+
+import pyexiv2
+from PIL import Image
+from PySide6.QtGui import QImage
+
+_GPS_IFD_TAG = 0x8825
+_EXIF_IFD_TAG = 0x8769
+_DATETIME_ORIGINAL_TAG = 36867  # lives in the Exif sub-IFD, not the main one
+_DATETIME_TAG = 306  # lives in the main IFD directly
+
+
+@dataclass(frozen=True)
+class ImageInfo:
+    width: int
+    height: int
+    dpi: Optional[float]  # None if the file doesn't declare one
+    gps_lat: Optional[float]  # decimal degrees, None if no GPS EXIF
+    gps_lon: Optional[float]
+    date: Optional[str]  # ISO "YYYY-MM-DD", None if no capture timestamp
+
+
+def _dms_to_decimal(dms, ref: str) -> float:
+    """EXIF GPS coordinates are (degrees, minutes, seconds) as IFDRationals;
+    ref is 'N'/'S'/'E'/'W' -- south and west are negative."""
+    degrees, minutes, seconds = (float(v) for v in dms)
+    decimal = degrees + minutes / 60 + seconds / 3600
+    return -decimal if ref in ('S', 'W') else decimal
+
+
+def _read_gps(exif) -> tuple[Optional[float], Optional[float]]:
+    gps_ifd = exif.get_ifd(_GPS_IFD_TAG)
+    if not gps_ifd:
+        return None, None
+    lat = gps_ifd.get(2)  # GPSLatitude
+    lat_ref = gps_ifd.get(1)  # GPSLatitudeRef
+    lon = gps_ifd.get(4)  # GPSLongitude
+    lon_ref = gps_ifd.get(3)  # GPSLongitudeRef
+    if not (lat and lat_ref and lon and lon_ref):
+        return None, None
+    return _dms_to_decimal(lat, lat_ref), _dms_to_decimal(lon, lon_ref)
+
+
+def _read_date(exif) -> Optional[str]:
+    exif_ifd = exif.get_ifd(_EXIF_IFD_TAG)
+    raw = (exif_ifd.get(_DATETIME_ORIGINAL_TAG) if exif_ifd else None) or exif.get(_DATETIME_TAG)
+    if not raw:
+        return None
+    try:
+        return datetime.strptime(raw, '%Y:%m:%d %H:%M:%S').date().isoformat()
+    except ValueError:
+        return None
+
+
+def read_image_info(path) -> ImageInfo:
+    with Image.open(path) as im:
+        width, height = im.size
+        dpi_info = im.info.get('dpi')
+        dpi = float(dpi_info[0]) if dpi_info else None
+        exif = im.getexif()
+        gps_lat, gps_lon = _read_gps(exif)
+        date = _read_date(exif)
+    return ImageInfo(width=width, height=height, dpi=dpi, gps_lat=gps_lat, gps_lon=gps_lon, date=date)
+
+
+def load_preview_image(path) -> QImage:
+    """Decodes via Pillow and hands Qt raw pixel bytes, rather than
+    QPixmap(path)/QImage(path) -- Qt's own bundled TIFF plugin can't open
+    JPEG-compressed TIFFs, which real archival scans commonly are."""
+    with Image.open(path) as im:
+        rgb = im.convert('RGB')
+        data = rgb.tobytes('raw', 'RGB')
+        qimage = QImage(data, rgb.width, rgb.height, rgb.width * 3, QImage.Format.Format_RGB888)
+        return qimage.copy()  # detach from `data`, which goes out of scope on return
+
+
+def write_iptc(path, iptc_fields: dict) -> None:
+    """iptc_fields is {Iptc.Application2.* key: value}, already built by
+    the caller (DocumentController, which knows the VRA-to-IPTC field
+    mapping) -- this function has no VRA-specific knowledge, just writes
+    whatever it's given."""
+    img = pyexiv2.Image(str(path))
+    try:
+        img.modify_iptc(iptc_fields)
+    finally:
+        img.close()
