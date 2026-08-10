@@ -108,17 +108,18 @@ class VraXmlParser:
         self._append_children(node, record_elem, child_specs)
         return node
 
-    def _build_node(self, elem, is_leaf: bool, has_vocab: bool, type_name: Optional[str]) -> VraTreeNode:
+    def _build_node(self, elem, is_leaf: bool, has_vocab: bool, type_name: Optional[str],
+                     type_choices: tuple = ()) -> VraTreeNode:
         tag = self._localname(elem)
 
         if is_leaf:
-            return self._build_leaf_node(elem, tag, has_vocab)
+            return self._build_leaf_node(elem, tag, has_vocab, type_choices)
 
         child_specs = vra_structure.children_of_type(type_name)
         node = VraTreeNode(
             label=friendly_label(tag),
             node_type='set' if tag.endswith('Set') else 'container',
-            data={'tag': tag},
+            data={'tag': tag, 'type': elem.get('type', ''), 'type_choices': type_choices},
             element=elem,
             child_specs=tuple(child_specs),
         )
@@ -153,9 +154,11 @@ class VraXmlParser:
             spec = specs_by_tag.get(child_tag)
             if spec is None:
                 continue  # not part of this element's schema-declared children -- nothing to show/edit
-            node.children.append(self._build_node(child_elem, spec.is_leaf, spec.has_vocab, spec.type_name))
+            node.children.append(self._build_node(
+                child_elem, spec.is_leaf, spec.has_vocab, spec.type_name, spec.type_choices,
+            ))
 
-    def _build_leaf_node(self, elem, tag: str, has_vocab: bool) -> VraTreeNode:
+    def _build_leaf_node(self, elem, tag: str, has_vocab: bool, type_choices: tuple = ()) -> VraTreeNode:
         text = (elem.text or '').strip()
         label = friendly_label(tag)
         return VraTreeNode(
@@ -169,6 +172,8 @@ class VraXmlParser:
                 'refid': elem.get('refid', ''),
                 'href': elem.get('href', ''),
                 'lang': elem.get(f'{{{XML_NS}}}lang', ''),
+                'type': elem.get('type', ''),
+                'type_choices': type_choices,
             },
             element=elem,
         )
@@ -329,14 +334,18 @@ class VraXmlParser:
     # ------------------------------------------------------------------
 
     def set_element_data(self, elem, text: str, vocab: str = '', refid: str = '', href: str = '',
-                          lang: str = ''):
+                          lang: str = '', type_value: str = ''):
         """elem is the leaf element itself. Clears an attribute entirely
         rather than writing it empty, so untouched fields don't start
         appearing as vocab="" in the saved file. lang is xml:lang --
         namespace-qualified, unlike the other three, since it's the
-        reserved XML attribute rather than a VRA Core one."""
+        reserved XML attribute rather than a VRA Core one. type_value is
+        "type" -- unlike vocab/refid/href it's a controlled-vocabulary
+        attribute (see vra_structure.ChildSpec.type_choices) on some
+        elements and unrestricted on others, but written back the same
+        way either way."""
         elem.text = text
-        for attr_name, value in (('vocab', vocab), ('refid', refid), ('href', href)):
+        for attr_name, value in (('vocab', vocab), ('refid', refid), ('href', href), ('type', type_value)):
             value = (value or '').strip()
             if value:
                 elem.set(attr_name, value)
@@ -348,3 +357,15 @@ class VraXmlParser:
             elem.set(lang_attr, lang)
         elif lang_attr in elem.attrib:
             del elem.attrib[lang_attr]
+
+    def set_element_type(self, elem, type_value: str):
+        """Sets/clears just the "type" attribute -- for container
+        elements (date, location, rights, stateEdition, agent's own
+        "dates") that carry a controlled-vocabulary type of their own
+        but, being containers rather than leaves, don't go through
+        set_element_data's full text+attributes write."""
+        type_value = (type_value or '').strip()
+        if type_value:
+            elem.set('type', type_value)
+        elif 'type' in elem.attrib:
+            del elem.attrib['type']

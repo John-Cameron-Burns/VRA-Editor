@@ -74,9 +74,14 @@ class SectionListPanel(BackgroundImageWidget):
                 item = QListWidgetItem(f"{friendly_label(tag)}{suffix}")
                 # Bold + full contrast: this section has content, matching
                 # the tree view's own convention of bolding Set-level nodes.
+                # Foreground set explicitly (not left to the OS palette) --
+                # the list's background is forced to near-white above, and
+                # in dark mode the palette's default text color is white too,
+                # which would make these invisible against it.
                 font = item.font()
                 font.setBold(True)
                 item.setFont(font)
+                item.setForeground(QBrush(QColor("#1a1a1a")))
                 item.setData(_NODE_ROLE, node)
             else:
                 item = QListWidgetItem(f"+ Add {friendly_label(tag)}")

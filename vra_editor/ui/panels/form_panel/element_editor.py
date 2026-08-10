@@ -1,7 +1,7 @@
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QPushButton
+from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QPushButton, QComboBox
 
-from vra_editor.core.friendly_labels import FIELD_LABELS, friendly_label
+from vra_editor.core.friendly_labels import FIELD_LABELS, friendly_label, friendly_enum_value
 from vra_editor.ui.dialogs.vocabulary_search_dialog import VocabularySearchDialog
 from vra_editor.ui.widgets.auto_grow_text_edit import AutoGrowTextEdit
 
@@ -15,12 +15,12 @@ class ElementEditorPanel(QWidget):
     fields from a VIAF/AAT/TGN/ULAN/GNS lookup.
     """
 
-    element_changed = Signal(str, str, str, str, str)  # text, vocab, refid, href, lang
+    element_changed = Signal(str, str, str, str, str, str)  # text, vocab, refid, href, lang, type
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._loading = False
-        self._original = ('', '', '', '', '')  # (text, vocab, refid, href, lang) as loaded, for Cancel
+        self._original = ('', '', '', '', '', '')  # (text, vocab, refid, href, lang, type) as loaded, for Cancel
 
         layout = QFormLayout(self)
 
@@ -30,6 +30,11 @@ class ElementEditorPanel(QWidget):
         self.text_input = AutoGrowTextEdit(min_height=80, max_height=400)
         self.text_input.textChanged.connect(self._on_field_changed)
         layout.addRow("Text:", self.text_input)
+
+        self.type_label = QLabel("Type:")
+        self.type_combo = QComboBox()
+        self.type_combo.currentIndexChanged.connect(self._on_field_changed)
+        layout.addRow(self.type_label, self.type_combo)
 
         self.lang_label = QLabel(f"{FIELD_LABELS['lang']}:")
         self.lang_input = QLineEdit()
@@ -79,10 +84,11 @@ class ElementEditorPanel(QWidget):
         self.element_changed.emit(
             self.text_input.toPlainText(), self.vocab_input.text(),
             self.refid_input.text(), self.href_input.text(), self.lang_input.text(),
+            self.type_combo.currentData() or '',
         )
 
     def set_element_data(self, tag: str, text: str, has_vocab: bool, vocab: str, refid: str, href: str,
-                          lang: str = ''):
+                          lang: str = '', type_choices: tuple = (), type_value: str = ''):
         self._loading = True
         self.tag_label.setText(f"<b>{friendly_label(tag)}</b>")
         self.text_input.setPlainText(text)
@@ -90,18 +96,33 @@ class ElementEditorPanel(QWidget):
         self.refid_input.setText(refid)
         self.href_input.setText(href)
         self.lang_input.setText(lang)
+
+        # Rebuilt every time, not just shown/hidden -- unlike vocab/refid/
+        # href/lang, which fields exist doesn't change, but which *values*
+        # are valid for "type" does, per the specific tag being edited.
+        self.type_combo.clear()
+        self.type_combo.addItem('', '')
+        for value in type_choices:
+            self.type_combo.addItem(friendly_enum_value(value), value)
+        idx = self.type_combo.findData(type_value)
+        self.type_combo.setCurrentIndex(idx if idx >= 0 else 0)
+        self.type_label.setVisible(bool(type_choices))
+        self.type_combo.setVisible(bool(type_choices))
+
         for widget in self._extra_attr_widgets:
             widget.setVisible(has_vocab)
         self._loading = False
-        self._original = (text, vocab, refid, href, lang)
+        self._original = (text, vocab, refid, href, lang, type_value)
 
     def _on_cancel_clicked(self):
-        text, vocab, refid, href, lang = self._original
+        text, vocab, refid, href, lang, type_value = self._original
         self.text_input.setPlainText(text)
         self.vocab_input.setText(vocab)
         self.refid_input.setText(refid)
         self.href_input.setText(href)
         self.lang_input.setText(lang)
+        idx = self.type_combo.findData(type_value)
+        self.type_combo.setCurrentIndex(idx if idx >= 0 else 0)
 
     def _on_search_clicked(self):
         dlg = VocabularySearchDialog(initial_query=self.text_input.toPlainText(), parent=self)

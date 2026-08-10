@@ -9,6 +9,8 @@ it; putting it in ui/ would make core/ depend on ui/, backwards from
 the rest of the app's layering.
 """
 
+import re
+
 # Record types (work/image/collection) and Set-level section headers.
 TAG_LABELS = {
     'work': 'Work',
@@ -98,3 +100,24 @@ def friendly_label(tag: str) -> str:
     """Returns the display name for `tag`, or `tag` itself if there's no
     mapping -- never blank, never a crash, just less friendly."""
     return TAG_LABELS.get(tag, tag)
+
+
+_ENUM_TOKEN_RE = re.compile(r'[A-Z]+(?![a-z])|[A-Z][a-z]*|[a-z0-9]+')
+
+
+def friendly_enum_value(value: str) -> str:
+    """Turns a strict-schema controlled-vocabulary value (relation type,
+    title type, ...) like "formerlyLargerContextFor" into "Formerly
+    larger context for" -- generic camelCase-to-words, not a per-value
+    mapping, since these enumerations run to dozens of values across 18
+    different attributes (see vra_structure.ChildSpec.type_choices).
+    A run of capitals (an acronym like "ISBN"/"URL") is left as-is
+    rather than lowercased."""
+    if not value:
+        return value
+    tokens = _ENUM_TOKEN_RE.findall(value)
+    if not tokens:
+        return value
+    words = [tok if (tok.isupper() and len(tok) > 1) else tok.lower() for tok in tokens]
+    words[0] = words[0][:1].upper() + words[0][1:]
+    return ' '.join(words)

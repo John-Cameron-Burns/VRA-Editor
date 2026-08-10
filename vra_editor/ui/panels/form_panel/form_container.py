@@ -15,7 +15,7 @@ BACKGROUND_IMAGE_PATH = IMAGES_DIR / "background-1.jpg"
 class FormContainerPanel(QWidget):
     """Panel container displaying the active form based on selection."""
 
-    element_data_changed = Signal(str, str, str, str, str)  # text, vocab, refid, href, lang
+    element_data_changed = Signal(str, str, str, str, str, str)  # text, vocab, refid, href, lang, type
     display_data_changed = Signal(dict)
 
     def __init__(self, parent=None):
@@ -55,7 +55,7 @@ class FormContainerPanel(QWidget):
             self.element_editor.set_element_data(
                 data.get("tag", ""), data.get("text", ""), data.get("has_vocab", False),
                 data.get("vocab", ""), data.get("refid", ""), data.get("href", ""),
-                data.get("lang", ""),
+                data.get("lang", ""), data.get("type_choices", ()), data.get("type", ""),
             )
             self.layout.setCurrentWidget(self.element_editor)
         elif node_type == "display":

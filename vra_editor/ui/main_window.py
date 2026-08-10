@@ -16,6 +16,7 @@ from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
 from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
 from vra_editor.ui.error_messages import friendly_validation_error
 from vra_editor.ui.panels.form_panel.form_container import FormContainerPanel
+from vra_editor.ui.panels.media_preview_panel import MediaPreviewPanel
 from vra_editor.ui.panels.review_notes_panel import ReviewNotesPanel
 from vra_editor.ui.panels.section_panel.section_form import SectionFormPanel
 from vra_editor.ui.panels.section_panel.section_list import SectionListPanel
@@ -163,14 +164,16 @@ class MainWindow(QMainWindow):
     # edge as secondary, view-toggle-style actions.
     BUTTON_ORDER = [
         'Create', 'Open', 'Save', 'Submit', 'Approve',
-        'Home', 'Review', 'Import', 'Undo', 'Review Notes', 'Cancel', 'Reject', 'Settings', 'Autofill',
-        'Advanced View', 'Show XML', 'About',
+        'Home', 'Review', 'Import', 'Undo', 'Review Notes', 'Media Preview', 'Cancel', 'Reject',
+        'Settings', 'Autofill', 'Advanced View', 'Show XML', 'About',
     ]
 
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Submit', 'Cancel', 'About'],
-        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Reject', 'Cancel', 'About'],
+        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Media Preview', 'Advanced View',
+                              'Submit', 'Cancel', 'About'],
+        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Media Preview', 'Advanced View',
+                                'Reject', 'Cancel', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'About'],
     )
 
@@ -184,6 +187,7 @@ class MainWindow(QMainWindow):
         'Undo': "Revert the last change (Ctrl+Z).",
         'Show XML': "Show or hide the raw XML for this record.",
         'Review Notes': "Show or hide notes a reviewer has left for the editor.",
+        'Media Preview': "Show or hide the linked media file's preview and IPTC tools.",
         'Advanced View': "Switch to the structure tree and single-element editor.",
         'Submit': "Send this record for review. Requires it to be schema-valid.",
         'Approve': "Move this record into the reviewed archive.",
@@ -249,14 +253,17 @@ class MainWindow(QMainWindow):
         splitter = QSplitter(Qt.Horizontal)
         self.xml_preview_panel = XmlPreviewPanel()
         self.review_notes_panel = ReviewNotesPanel(self.doc_controller)
+        self.media_preview_panel = MediaPreviewPanel(self.doc_controller)
         splitter.addWidget(self.nav_stack)
         splitter.addWidget(self.form_stack)
         splitter.addWidget(self.review_notes_panel)
+        splitter.addWidget(self.media_preview_panel)
         splitter.addWidget(self.xml_preview_panel)
-        splitter.setSizes([250, 425, 250, 425])
+        splitter.setSizes([250, 425, 250, 250, 425])
         self._splitter = splitter
         self.xml_preview_panel.setVisible(False)  # hidden by default; toggled via the "Show XML" button
         self.review_notes_panel.setVisible(False)  # toggled via "Review Notes"; auto-shown if there's unresolved work
+        self.media_preview_panel.setVisible(False)  # toggled via "Media Preview"
 
         self.status_bar = StatusBar()
         self.status_bar.set_user(user_name())  # fetched once; doesn't change
@@ -362,6 +369,7 @@ class MainWindow(QMainWindow):
         self.tree_panel.load_document(self.doc_controller.xml_doc)
         self._refresh_navigation()
         self.review_notes_panel.refresh()
+        self.media_preview_panel.refresh()
 
     def _on_file_loaded(self, _path: str):
         """Surfaced automatically, not just available behind the
@@ -455,6 +463,10 @@ class MainWindow(QMainWindow):
         review_notes_button.setCheckable(True)
         review_notes_button.toggled.connect(self._on_toggle_review_notes)
 
+        media_preview_button = self.mode_bar.buttons['Media Preview']
+        media_preview_button.setCheckable(True)
+        media_preview_button.toggled.connect(self._on_toggle_media_preview)
+
         advanced_button = self.mode_bar.buttons['Advanced View']
         advanced_button.setCheckable(True)
         advanced_button.toggled.connect(self._on_toggle_advanced)
@@ -489,6 +501,11 @@ class MainWindow(QMainWindow):
         self.review_notes_panel.setVisible(checked)
         if checked:
             self.review_notes_panel.refresh()
+
+    def _on_toggle_media_preview(self, checked: bool):
+        self.media_preview_panel.setVisible(checked)
+        if checked:
+            self.media_preview_panel.refresh()
 
     def _on_toggle_advanced(self, checked: bool):
         self.nav_stack.setCurrentIndex(1 if checked else 0)

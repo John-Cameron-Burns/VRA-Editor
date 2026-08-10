@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QComboBox
 
-from vra_editor.core.friendly_labels import FIELD_LABELS, friendly_label
+from vra_editor.core.friendly_labels import FIELD_LABELS, friendly_label, friendly_enum_value
 from vra_editor.ui.dialogs.vocabulary_search_dialog import VocabularySearchDialog
 from vra_editor.ui.widgets.auto_grow_text_edit import AutoGrowTextEdit
 
@@ -44,6 +44,20 @@ class FieldRow(QWidget):
         label = QLabel(friendly_label(tag))
         label.setMinimumWidth(110)
         main_row.addWidget(label)
+
+        self.type_combo = None
+        type_choices = attributes.get('type_choices') or ()
+        if type_choices:
+            self.type_combo = QComboBox()
+            self.type_combo.addItem('', '')  # "type" is optional per the schema
+            for value in type_choices:
+                self.type_combo.addItem(friendly_enum_value(value), value)
+            current_type = attributes.get('type', '')
+            idx = self.type_combo.findData(current_type)
+            self.type_combo.setCurrentIndex(idx if idx >= 0 else 0)
+            self.type_combo.setToolTip(f"What kind of {friendly_label(tag).lower()} this is.")
+            self.type_combo.currentIndexChanged.connect(self._on_changed)
+            main_row.addWidget(self.type_combo)
 
         self.text_input = AutoGrowTextEdit(min_height=46, max_height=240)
         self.text_input.setPlainText(text)
@@ -94,6 +108,7 @@ class FieldRow(QWidget):
             refid.text() if refid else '',
             href.text() if href else '',
             lang.text() if lang else '',
+            self.type_combo.currentData() if self.type_combo else '',
         )
 
     def _on_remove_clicked(self):

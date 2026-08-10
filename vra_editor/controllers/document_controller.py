@@ -1,4 +1,5 @@
 import datetime
+import shutil
 from pathlib import Path
 from typing import Optional
 
@@ -6,12 +7,19 @@ from PySide6.QtCore import QObject, Signal
 from lxml import etree
 
 from vra_editor.config import load_locations
-from vra_editor.core import review_notes
+from vra_editor.core import media_metadata, review_notes, vra_structure
 from vra_editor.core.schema_validator import SchemaValidator
-from vra_editor.core.xml_parser import VraXmlParser
+from vra_editor.core.xml_parser import VRA_NS, VraXmlParser
 from vra_editor.utils import user_name
 
-DEFAULT_XSD_PATH = Path(__file__).resolve().parent.parent / "resources" / "vra_core4.xsd"
+RESOURCES_DIR = Path(__file__).resolve().parent.parent / "resources"
+# vra_core4.xsd is explicitly the *unrestricted* variant ("all attributes are
+# uncontrolled", per its own header) -- every sample record's own
+# xsi:schemaLocation declares conformance to the *strict* schema instead,
+# which redefines vra_core4_strict.xsd's controlled-vocabulary attributes
+# (title type, relation type, ...) as real enumerations. Validating against
+# the unrestricted one let invalid attribute values silently pass.
+DEFAULT_XSD_PATH = RESOURCES_DIR / "vra_core4_strict.xsd"
 
 
 class DocumentController(QObject):
@@ -82,13 +90,26 @@ class DocumentController(QObject):
         update_* methods below read from."""
         self._current_element = element
 
-    def update_element_data(self, text: str, vocab: str, refid: str, href: str, lang: str = ''):
+    def update_element_data(self, text: str, vocab: str, refid: str, href: str, lang: str = '',
+                             type_value: str = ''):
         """Generic write-back for any leaf element (title, name, role,
         technique, subject/term, ...) -- covers every basicString-derived
         tag uniformly rather than one method per tag."""
         if self._current_element is not None:
             self._snapshot_before_edit(self._current_element)
-            self.xml_doc.set_element_data(self._current_element, text, vocab, refid, href, lang)
+            self.xml_doc.set_element_data(self._current_element, text, vocab, refid, href, lang, type_value)
+        self._xml_text = self._rebuild_xml()
+        self.xml_updated.emit(self._xml_text)
+
+    def update_element_type(self, element, type_value: str):
+        """Sets a container element's own "type" attribute (date,
+        location, rights, stateEdition, agent's "dates") -- these don't
+        go through update_element_data since they're containers, not
+        leaves with text of their own to write alongside it."""
+        if element is None:
+            return
+        self._snapshot_before_edit(element)
+        self.xml_doc.set_element_type(element, type_value)
         self._xml_text = self._rebuild_xml()
         self.xml_updated.emit(self._xml_text)
 
@@ -122,6 +143,202 @@ class DocumentController(QObject):
             self.xml_doc.set_display_translations(self._current_element, translations)
         self._xml_text = self._rebuild_xml()
         self.xml_updated.emit(self._xml_text)
+
+    # ------------------------------------------------------------------
+    # Media linking -- picks up a raw image/media file, moves it into the
+    # configured 'media' folder, and auto-populates whatever the file
+    # itself can tell us (see core/media_metadata.py for the actual
+    # dimension/EXIF/IPTC work; this class just orchestrates writing the
+    # results into the document).
+    # ------------------------------------------------------------------
+
+    # AAT unit terms for the auto-populated pixel/dpi measurements, in the
+    # vocab/refid/href form used throughout this archive's own sample data.
+    _AAT_PIXELS = {
+        'vocab': 'AAT', 'refid': '300266190',
+        'href': 'http://vocab.getty.edu/page/aat/300266190',
+    }
+    _AAT_DPI = {
+        'vocab': 'AAT', 'refid': '300410385',
+        'href': 'http://vocab.getty.edu/page/aat/300410385',
+    }
+
+    def link_media_file(self, image_path) -> Optional[Path]:
+        """Moves image_path into the 'media' location, then adds
+        measurements (dimensions + DPI, always), a location and/or a
+        creation date (only when the file's EXIF actually has GPS/a
+        timestamp), and a relation entry recording which file this
+        record is linked to. One undo snapshot for the whole cascade --
+        the public per-field methods (insert_child, update_element_data,
+        ...) each snapshot independently, so this works directly against
+        xml_doc instead, the same way create_new_record/_move_to_location
+        already bypass those wrappers. Returns the file's final path in
+        media/, or None if there's no document loaded or no 'media'
+        location configured.
+        """
+        if self.xml_doc.xml_root is None or self._current_file is None:
+            return None
+        media_dir = load_locations().get('media')
+        if media_dir is None:
+            return None
+
+        records = self.xml_doc.build_tree()
+        if not records:
+            return None
+        record_node = records[0]
+        record_elem = record_node.element
+        record_specs = record_node.child_specs
+
+        media_dir.mkdir(parents=True, exist_ok=True)
+        image_path = Path(image_path)
+        dest_path = (media_dir / image_path.name).resolve()
+        shutil.move(str(image_path), str(dest_path))
+
+        info = media_metadata.read_image_info(dest_path)
+
+        self._snapshot_before_structural_change()
+
+        measurements_set = self._ensure_set(record_elem, record_specs, 'measurementsSet')
+        measurements_type = self._type_name_of(record_specs, 'measurementsSet')
+        pixel_attrs = {'type': 'width', 'unit': 'px', **self._AAT_PIXELS}
+        self._add_set_item(measurements_set, measurements_type, 'measurements',
+                            str(info.width), pixel_attrs)
+        pixel_attrs = {'type': 'height', 'unit': 'px', **self._AAT_PIXELS}
+        self._add_set_item(measurements_set, measurements_type, 'measurements',
+                            str(info.height), pixel_attrs)
+        if info.dpi is not None:
+            dpi_attrs = {'type': 'resolution', 'unit': 'dpi', **self._AAT_DPI}
+            self._add_set_item(measurements_set, measurements_type, 'measurements',
+                                str(int(info.dpi)), dpi_attrs)
+
+        if info.gps_lat is not None and info.gps_lon is not None:
+            location_set = self._ensure_set(record_elem, record_specs, 'locationSet')
+            location_type = self._type_name_of(record_specs, 'locationSet')
+            location_elem = self._add_set_item(location_set, location_type, 'location',
+                                                attrs={'type': 'creation'})
+            # Raw EXIF coordinates aren't a verified gazetteer lookup, so
+            # deliberately no vocab= here -- unlike this archive's usual
+            # vocab="GNS" convention for actual GNS-confirmed places.
+            self._add_set_item(location_elem, 'locationType', 'name',
+                                f'{info.gps_lat:.6f}, {info.gps_lon:.6f}', {'type': 'geographic'})
+
+        if info.date is not None:
+            date_set = self._ensure_set(record_elem, record_specs, 'dateSet')
+            date_type = self._type_name_of(record_specs, 'dateSet')
+            date_elem = self._add_set_item(date_set, date_type, 'date', attrs={'type': 'creation'})
+            self._add_set_item(date_elem, 'dateType', 'earliestDate', info.date)
+            self._add_set_item(date_elem, 'dateType', 'latestDate', info.date)
+
+        relation_set = self._ensure_set(record_elem, record_specs, 'relationSet')
+        relation_type = self._type_name_of(record_specs, 'relationSet')
+        self._add_set_item(relation_set, relation_type, 'relation',
+                            dest_path.name, {'type': 'imageIs'})
+
+        self._xml_text = self._rebuild_xml()
+        self.xml_updated.emit(self._xml_text)
+        self.document_loaded.emit(self.xml_doc)
+        return dest_path
+
+    @staticmethod
+    def _type_name_of(specs, tag: str) -> Optional[str]:
+        return next((s.type_name for s in specs if s.tag == tag), None)
+
+    def _ensure_set(self, record_elem, record_specs, set_tag: str):
+        """The existing <set_tag> under record_elem, or a freshly
+        created empty one at its schema-correct position."""
+        existing = record_elem.find(f'{{{VRA_NS}}}{set_tag}')
+        if existing is not None:
+            return existing
+        sibling_order = [s.tag for s in record_specs]
+        return self.xml_doc.add_child(record_elem, set_tag, sibling_order)
+
+    def _add_set_item(self, parent_elem, parent_type_name: Optional[str], tag: str,
+                       text: str = '', attrs: Optional[dict] = None):
+        """Adds <tag> as a new child of parent_elem at its schema-correct
+        position (parent_type_name is parent_elem's own complexType, used
+        to look up its schema-declared child order), optionally with text
+        and attributes."""
+        sibling_order = [s.tag for s in vra_structure.children_of_type(parent_type_name)]
+        new_elem = self.xml_doc.add_child(parent_elem, tag, sibling_order)
+        if text:
+            new_elem.text = text
+        for key, value in (attrs or {}).items():
+            new_elem.set(key, value)
+        return new_elem
+
+    def find_linked_media_path(self) -> Optional[Path]:
+        """Resolves the media file linked via a type="imageIs" relation
+        entry (see link_media_file) against the 'media' location. None
+        if there's no such relation, the file's missing, or no 'media'
+        location is configured."""
+        if self.xml_doc.xml_root is None:
+            return None
+        media_dir = load_locations().get('media')
+        if media_dir is None:
+            return None
+        for relation in self.xml_doc.xml_root.iter(f'{{{VRA_NS}}}relation'):
+            if relation.get('type') == 'imageIs' and (relation.text or '').strip():
+                candidate = media_dir / relation.text.strip()
+                if candidate.exists():
+                    return candidate
+        return None
+
+    def build_iptc_fields(self) -> dict:
+        """The {Iptc.Application2.*: value} dict for inject_iptc, built
+        from this record's own data per the approved mapping: Title ->
+        ObjectName, Description -> Caption, People -> By-line, Rights ->
+        Copyright, Subjects -> Keywords, creation Date -> DateCreated."""
+        root = self.xml_doc.xml_root
+        if root is None:
+            return {}
+        fields = {}
+
+        title = self._first_text(root, 'title')
+        if title:
+            fields['Iptc.Application2.ObjectName'] = title
+
+        description = self._first_text(root, 'description')
+        if description:
+            fields['Iptc.Application2.Caption'] = description
+
+        names = self._all_sub_text(root, 'agent', 'name')
+        if names:
+            fields['Iptc.Application2.Byline'] = names
+
+        rights = self._first_text(root, 'rights')
+        if rights:
+            fields['Iptc.Application2.Copyright'] = rights
+
+        subjects = self._all_sub_text(root, 'subject', 'term')
+        if subjects:
+            fields['Iptc.Application2.Keywords'] = subjects
+
+        for date_elem in root.iter(f'{{{VRA_NS}}}date'):
+            if date_elem.get('type') == 'creation':
+                earliest = date_elem.find(f'{{{VRA_NS}}}earliestDate')
+                if earliest is not None and (earliest.text or '').strip():
+                    fields['Iptc.Application2.DateCreated'] = earliest.text.strip()
+                break
+
+        return fields
+
+    @staticmethod
+    def _first_text(root, tag: str) -> str:
+        elem = root.find(f'.//{{{VRA_NS}}}{tag}')
+        return (elem.text or '').strip() if elem is not None else ''
+
+    @staticmethod
+    def _all_sub_text(root, item_tag: str, sub_tag: str) -> list:
+        results = []
+        for item in root.iter(f'{{{VRA_NS}}}{item_tag}'):
+            sub = item.find(f'{{{VRA_NS}}}{sub_tag}')
+            text = (sub.text or '').strip() if sub is not None else ''
+            if text:
+                results.append(text)
+        return results
+
+    def inject_iptc(self, path, fields: dict) -> None:
+        media_metadata.write_iptc(path, fields)
 
     # ------------------------------------------------------------------
     # Review notes -- a reviewer's todo list for the editor, stored as an

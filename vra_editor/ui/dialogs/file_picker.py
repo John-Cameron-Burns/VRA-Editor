@@ -42,6 +42,14 @@ def extract_title(path: Path) -> str:
     return titles[0].text.strip()
 
 
+def _human_size(num_bytes: int) -> str:
+    size = float(num_bytes)
+    for unit in ('B', 'KB', 'MB', 'GB'):
+        if size < 1024 or unit == 'GB':
+            return f"{size:.0f} {unit}" if unit == 'B' else f"{size:.1f} {unit}"
+        size /= 1024
+
+
 class VraFilePickerDialog(QDialog):
     """Modal file picker restricted to a single folder, listing each
     record's parsed VRA title next to its filename.
@@ -52,13 +60,15 @@ class VraFilePickerDialog(QDialog):
             path = dlg.selected_path
     """
 
-    def __init__(self, directory: Path, title: str = "Select record", parent=None):
+    def __init__(self, directory: Path, title: str = "Select record", parent=None,
+                 file_filter: str | list[str] = "*.xml"):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setModal(True)
         self.resize(560, 420)
 
         self.directory = directory
+        self.file_filters = [file_filter] if isinstance(file_filter, str) else list(file_filter)
         self.selected_path: Path | None = None
 
         layout = QVBoxLayout(self)
@@ -66,8 +76,12 @@ class VraFilePickerDialog(QDialog):
         self.info_label = QLabel(f"Folder: {directory}")
         layout.addWidget(self.info_label)
 
+        # The second column parses each file as VRA XML for a title preview
+        # -- meaningless (and wasted work) for a non-XML filter, e.g. picking
+        # an image file, so it becomes a plain file-size column instead.
+        is_xml = self.file_filters == ['*.xml']
         self.table = QTableWidget(0, 2)
-        self.table.setHorizontalHeaderLabels(['File', 'Title'])
+        self.table.setHorizontalHeaderLabels(['File', 'Title'] if is_xml else ['File', 'Size'])
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -90,16 +104,24 @@ class VraFilePickerDialog(QDialog):
             self.info_label.setText(f"Folder not found: {self.directory}")
             return
 
-        xml_files = sorted(self.directory.glob('*.xml'))
-        self.table.setRowCount(len(xml_files))
-        for row, path in enumerate(xml_files):
+        is_xml = self.file_filters == ['*.xml']
+        seen = set()
+        files = []
+        for pattern in self.file_filters:
+            for path in self.directory.glob(pattern):
+                if path not in seen:
+                    seen.add(path)
+                    files.append(path)
+        files.sort()
+        self.table.setRowCount(len(files))
+        for row, path in enumerate(files):
             file_item = QTableWidgetItem(path.name)
             file_item.setData(Qt.UserRole, str(path))
-            title_item = QTableWidgetItem(extract_title(path))
+            second_item = QTableWidgetItem(extract_title(path) if is_xml else _human_size(path.stat().st_size))
             self.table.setItem(row, 0, file_item)
-            self.table.setItem(row, 1, title_item)
+            self.table.setItem(row, 1, second_item)
 
-        if xml_files:
+        if files:
             self.table.selectRow(0)
 
     def _accept_selection(self, *_ignored):

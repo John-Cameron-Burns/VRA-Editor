@@ -16,6 +16,7 @@ from typing import Optional
 from lxml import etree
 
 XSD_PATH = Path(__file__).resolve().parent.parent / "resources" / "vra_core4.xsd"
+STRICT_XSD_PATH = Path(__file__).resolve().parent.parent / "resources" / "vra_core4_strict.xsd"
 _XSD_NS = "http://www.w3.org/2001/XMLSchema"
 
 
@@ -33,6 +34,10 @@ class ChildSpec:
     type_name: Optional[str]  # lets callers recurse via children_of_type() even for
     # locally-declared tags (e.g. "dates", "display") that
     # aren't in the schema's global element table
+    type_choices: tuple = ()  # allowed values for this element's own "type" attribute,
+    # per the strict schema's controlled-vocabulary enumerations
+    # (e.g. relation's type: partOf, depicts, ...); empty if
+    # "type" isn't attested or isn't enumerated for this element
 
 
 @dataclass(frozen=True)
@@ -95,6 +100,38 @@ def _is_leaf_type(complex_types, type_name):
     return ct.find(_q("simpleContent")) is not None
 
 
+@lru_cache(maxsize=1)
+def _strict_enum_values() -> dict:
+    """{simple_type_name: tuple(allowed values)} for every controlled-
+    vocabulary attribute type the strict schema defines (relationTypeType,
+    titleTypeType, ...) -- parsed from its xsd:redefine block, which is
+    where these live rather than as direct schema-root children."""
+    tree = etree.parse(str(STRICT_XSD_PATH))
+    redefine = tree.getroot().find(_q("redefine"))
+    if redefine is None:
+        return {}
+    result = {}
+    for st in redefine.findall(_q("simpleType")):
+        name = st.get("name")
+        values = tuple(e.get("value") for e in st.iter(_q("enumeration")))
+        if name and values:
+            result[name] = values
+    return result
+
+
+def _type_attr_choices(complex_types, type_name) -> tuple:
+    """The enumerated values for type_name's own "type" attribute, if it
+    has one and the strict schema constrains it (e.g. relationType.type
+    -> relationTypeType's enumeration). () otherwise."""
+    ct = complex_types.get(type_name)
+    if ct is None:
+        return ()
+    for attr in ct.iter(_q("attribute")):
+        if attr.get("name") == "type":
+            return _strict_enum_values().get(attr.get("type"), ())
+    return ()
+
+
 def _resolve_element_type(top_elements, tag, explicit_type):
     if explicit_type:
         return explicit_type
@@ -133,9 +170,11 @@ def _collect_children(complex_types, top_elements, type_name):
             max_o = None if max_raw == "unbounded" else int(max_raw)
             is_leaf = _is_leaf_type(complex_types, el_type)
             has_vocab = _has_vocab_attrs(complex_types, el_type) if is_leaf else False
+            type_choices = _type_attr_choices(complex_types, el_type) if el_type else ()
             children.append(ChildSpec(
                 tag=tag, is_leaf=is_leaf, has_vocab=has_vocab,
                 min_occurs=min_o, max_occurs=max_o, type_name=el_type,
+                type_choices=type_choices,
             ))
     return children
 

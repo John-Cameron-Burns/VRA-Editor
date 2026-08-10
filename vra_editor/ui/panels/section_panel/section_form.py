@@ -1,10 +1,15 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QGroupBox, QStackedLayout,
+    QComboBox, QMessageBox,
 )
 
-from vra_editor.core.friendly_labels import friendly_label
+from vra_editor.config import load_locations
+from vra_editor.core.friendly_labels import friendly_label, friendly_enum_value
+from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
 from vra_editor.ui.panels.form_panel.display_editor import DisplayEditorPanel
 from vra_editor.ui.panels.section_panel.field_row import FieldRow
+
+_MEDIA_FILE_FILTERS = ['*.tif', '*.tiff', '*.jpg', '*.jpeg', '*.png']
 
 
 class SectionFormPanel(QWidget):
@@ -44,6 +49,16 @@ class SectionFormPanel(QWidget):
         )
         self.remove_section_button.clicked.connect(self._on_remove_section_clicked)
         header_row.addWidget(self.remove_section_button)
+
+        self.link_media_button = QPushButton("+ Link Media File")
+        self.link_media_button.setToolTip(
+            "Pick an image file from the ingest folder. It's moved into the "
+            "media folder, and its dimensions/resolution (and GPS/capture "
+            "date, if the file has them) are filled in automatically, along "
+            "with a relation entry linking this record to it."
+        )
+        self.link_media_button.clicked.connect(self._on_link_media_clicked)
+        header_row.addWidget(self.link_media_button)
         outer.addLayout(header_row)
 
         self.display_editor = DisplayEditorPanel()
@@ -80,6 +95,7 @@ class SectionFormPanel(QWidget):
         freshly re-fetched node for the same Set."""
         self._current_node = node
         self.header.setText(f"<h2>{friendly_label(node.data.get('tag', ''))}</h2>")
+        self.link_media_button.setVisible(node.data.get('tag') == 'relationSet')
         self._rebuild_cards()
         self.layout.setCurrentWidget(self.content)
 
@@ -163,8 +179,40 @@ class SectionFormPanel(QWidget):
         remove_row.addWidget(remove_button)
         outer.addLayout(remove_row)
 
+        type_row = self._build_type_row(item_node)
+        if type_row is not None:
+            outer.addLayout(type_row)
+
         self._render_container_fields(item_node, outer)
         return box
+
+    def _build_type_row(self, item_node):
+        """A "Type: [dropdown]" row for a container item's own
+        controlled-vocabulary "type" attribute (date, location, rights,
+        stateEdition, agent's own "dates") -- these are containers, not
+        leaves, so unlike a leaf's type (see FieldRow) they don't have
+        anywhere else to be edited. None if this item has no type
+        attribute, or the strict schema doesn't constrain it."""
+        type_choices = item_node.data.get('type_choices') or ()
+        if not type_choices:
+            return None
+
+        row = QHBoxLayout()
+        row.addWidget(QLabel("Type:"))
+        combo = QComboBox()
+        combo.addItem('', '')  # "type" is optional per the schema
+        for value in type_choices:
+            combo.addItem(friendly_enum_value(value), value)
+        current_type = item_node.data.get('type', '')
+        idx = combo.findData(current_type)
+        combo.setCurrentIndex(idx if idx >= 0 else 0)
+        combo.currentIndexChanged.connect(
+            lambda _index, c=combo, elem=item_node.element:
+            self._doc_controller.update_element_type(elem, c.currentData())
+        )
+        row.addWidget(combo)
+        row.addStretch()
+        return row
 
     def _render_container_fields(self, item_node, layout):
         """Adds one FieldRow per existing leaf sub-field, or a nested
@@ -187,6 +235,9 @@ class SectionFormPanel(QWidget):
                 sub_tag = child.data.get('tag', '')
                 sub_box = QGroupBox(friendly_label(sub_tag))
                 sub_layout = QVBoxLayout(sub_box)
+                sub_type_row = self._build_type_row(child)
+                if sub_type_row is not None:
+                    sub_layout.addLayout(sub_type_row)
                 self._render_container_fields(child, sub_layout)
                 layout.addWidget(sub_box)
 
@@ -221,6 +272,22 @@ class SectionFormPanel(QWidget):
         if self._current_node is None:
             return
         self._doc_controller.remove_element(self._current_node.element)
+
+    def _on_link_media_clicked(self):
+        ingest_dir = load_locations().get('ingest')
+        if ingest_dir is None:
+            QMessageBox.warning(self, "Missing location", "No 'ingest' folder is configured in vra-config.ini.")
+            return
+        if load_locations().get('media') is None:
+            QMessageBox.warning(self, "Missing location", "No 'media' folder is configured in vra-config.ini.")
+            return
+
+        dlg = VraFilePickerDialog(
+            directory=ingest_dir, title="Select Media File", parent=self, file_filter=_MEDIA_FILE_FILTERS,
+        )
+        if not dlg.exec() or dlg.selected_path is None:
+            return
+        self._doc_controller.link_media_file(dlg.selected_path)
 
     def _on_add_clicked(self):
         if self._current_node is None or self._add_spec is None:

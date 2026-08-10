@@ -8,7 +8,7 @@ from .utils import strip_quotes
 DEFAULT_CONFIG_PATH = CONFIG_PATH
 _LEGACY_CONFIG_PATH = Path("~/vra-config.ini").expanduser()  # pre-app_data.py location
 
-LOCATION_KEYS = ['edit', 'ingest', 'pending', 'rejected', 'reviewed', 'released']
+LOCATION_KEYS = ['edit', 'ingest', 'media', 'pending', 'rejected', 'reviewed', 'released']
 OPTION_TEXT_KEYS = ['image_pattern', 'collection_pattern', 'work_pattern']
 
 
