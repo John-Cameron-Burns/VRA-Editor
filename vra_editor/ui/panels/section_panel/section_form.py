@@ -34,8 +34,17 @@ class SectionFormPanel(QWidget):
         self.content = QWidget()
         outer = QVBoxLayout(self.content)
 
+        header_row = QHBoxLayout()
         self.header = QLabel()
-        outer.addWidget(self.header)
+        header_row.addWidget(self.header, stretch=1)
+        self.remove_section_button = QPushButton("Remove this section")
+        self.remove_section_button.setToolTip(
+            "Removes this whole section, including everything in it. "
+            "Undo (Ctrl+Z) brings it back."
+        )
+        self.remove_section_button.clicked.connect(self._on_remove_section_clicked)
+        header_row.addWidget(self.remove_section_button)
+        outer.addLayout(header_row)
 
         self.display_editor = DisplayEditorPanel()
         self.display_editor.display_changed.connect(self._on_display_changed)
@@ -202,6 +211,11 @@ class SectionFormPanel(QWidget):
             row.addWidget(button)
         row.addStretch()
         layout.addLayout(row)
+
+    def _on_remove_section_clicked(self):
+        if self._current_node is None:
+            return
+        self._doc_controller.remove_element(self._current_node.element)
 
     def _on_add_clicked(self):
         if self._current_node is None or self._add_spec is None:

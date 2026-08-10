@@ -43,8 +43,11 @@ def friendly_validation_error(raw_message: str) -> str:
         # something more substantive is also a valid next item, lead
         # with that instead -- it's almost always the real gap.
         substantive = [o for o in options if o not in ('Display', 'Notes')]
-        lead = substantive[0] if substantive else (options[0] if options else 'a required item')
-        return f'"{parent}" is missing its {lead}. Add one, or remove "{parent}" if it\'s not needed.'
+        lead = substantive[0] if substantive else (options[0] if options else 'an item')
+        return (
+            f'The "{parent}" section needs at least one {lead} entry before this can be saved. '
+            f'Add one, or open "{parent}" and click "Remove this section" if you don\'t need it here.'
+        )
 
     match = _NOT_EXPECTED_RE.search(cleaned)
     if match:

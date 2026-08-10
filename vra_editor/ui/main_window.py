@@ -62,17 +62,25 @@ class ModeBar(QWidget):
     instances across multiple layouts.
     """
 
-    def __init__(self, variants: dict[str, list[str]], parent=None):
+    def __init__(self, variants: dict[str, list[str]], order: list[str] | None = None, parent=None):
         super().__init__(parent)
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        # Preserve first-seen order across all variants.
-        ordered_names = []
-        for names in variants.values():
-            for name in names:
-                if name not in ordered_names:
-                    ordered_names.append(name)
+        all_names = {name for names in variants.values() for name in names}
+        if order is not None:
+            ordered_names = [name for name in order if name in all_names]
+            # Defensive: a name present in variants but missing from order
+            # still gets a button (just tacked on the end), so adding a
+            # new mode-bar button elsewhere can't silently vanish here.
+            ordered_names += [name for name in all_names if name not in ordered_names]
+        else:
+            # Preserve first-seen order across all variants.
+            ordered_names = []
+            for names in variants.values():
+                for name in names:
+                    if name not in ordered_names:
+                        ordered_names.append(name)
 
         self.buttons: dict[str, QPushButton] = {
             name: QPushButton(name) for name in ordered_names
@@ -142,6 +150,19 @@ class MainWindow(QMainWindow):
     # other widgets (not just buttons) need to change with mode --
     # see register_mode_widget / apply_mode below.
     BASE_BUTTONS = ['Home', 'Open', 'Create', 'Review', 'Import']
+
+    # Left-to-right position on the mode bar, independent of which mode a
+    # button belongs to (visibility is still driven by VARIANTS below).
+    # Create/Open/Save/Submit anchor the left edge as the core edit
+    # workflow; Approve rides in Submit's slot since the two are never
+    # visible at once. Advanced View/Show XML/About anchor the right
+    # edge as secondary, view-toggle-style actions.
+    BUTTON_ORDER = [
+        'Create', 'Open', 'Save', 'Submit', 'Approve',
+        'Home', 'Review', 'Import', 'Undo', 'Review Notes', 'Cancel', 'Reject', 'Settings', 'Autofill',
+        'Advanced View', 'Show XML', 'About',
+    ]
+
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'About'],
         edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Submit', 'Cancel', 'About'],
@@ -384,7 +405,7 @@ class MainWindow(QMainWindow):
             logo.setPixmap(logo_pixmap.scaledToHeight(30, Qt.TransformationMode.SmoothTransformation))
             top_layout.addWidget(logo)
 
-        self.mode_bar = ModeBar(self.VARIANTS)
+        self.mode_bar = ModeBar(self.VARIANTS, order=self.BUTTON_ORDER)
         top_layout.addWidget(self.mode_bar)
 
         # Register buttons in the shared mode-widget registry too, so
@@ -541,7 +562,12 @@ class MainWindow(QMainWindow):
         self.form_panel.show_editor('', {})
 
     def _on_submit(self):
-        ...
+        ok, result = self.doc_controller.submit_file()
+        if not ok:
+            self._show_validation_error(result)
+            return
+        self.status_bar.set_file(f"{result} (submitted)")
+        self._prompt_and_commit(result)
 
     def _on_cancel(self):
         self.apply_mode('initial')
@@ -555,7 +581,12 @@ class MainWindow(QMainWindow):
         self._prompt_and_commit(result)
 
     def _on_reject(self):
-        ...
+        ok, result = self.doc_controller.reject_file()
+        if not ok:
+            QMessageBox.warning(self, "Reject failed", result)
+            return
+        self.status_bar.set_file(f"{result} (rejected)")
+        self._prompt_and_commit(result)
 
     def _prompt_and_commit(self, path: str):
         """Asks the user for a commit comment and, if they give one,

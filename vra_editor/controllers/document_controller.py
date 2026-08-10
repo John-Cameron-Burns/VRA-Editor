@@ -234,28 +234,40 @@ class DocumentController(QObject):
             f.write(xml_bytes)
         return True, f"Saved to {self._current_file}"
 
-    def approve_file(self) -> tuple[bool, str]:
-        """Moves the current record from 'pending' into 'reviewed':
-        writes out whatever's currently in memory (any edits made
-        during review included) to the reviewed location, then removes
-        the original file. No schema validation here -- that only
-        happens on Save. Returns (success, message) -- message is the
-        new file path on success, or an error on failure."""
+    def _move_to_location(self, location_key: str, validate: bool) -> tuple[bool, str]:
+        """Shared shape for submit/approve/reject: writes the current
+        in-memory document (any edits made along the way included) to
+        location_key's configured folder under the same filename, then
+        removes it from wherever it was. Returns (success, message) --
+        the validation error or a missing-location message on failure,
+        or the new path on success.
+
+        validate gates whether this transition requires a schema-valid
+        document first. Submit does -- it's the actual gate keeping
+        invalid records out of the review queue. Approve/Reject don't:
+        by then the document was already validated at Submit time, and
+        a reviewer needs to be able to reject something broken without
+        first having to fix it themselves.
+        """
         if self.xml_doc.xml_root is None or self._current_file is None:
             return False, "No document loaded."
-
-        reviewed_dir = load_locations().get('reviewed')
-        if reviewed_dir is None:
-            return False, "No 'reviewed' folder configured in vra-config.ini."
-        reviewed_dir.mkdir(parents=True, exist_ok=True)
-
-        src_path = Path(self._current_file).resolve()
-        dest_path = (reviewed_dir / src_path.name).resolve()
 
         xml_bytes = etree.tostring(
             self.xml_doc.xml_root, pretty_print=True,
             xml_declaration=True, encoding='UTF-8',
         )
+        if validate:
+            valid, message = self._validator.validate(xml_bytes)
+            if not valid:
+                return False, message
+
+        dest_dir = load_locations().get(location_key)
+        if dest_dir is None:
+            return False, f"No '{location_key}' folder configured in vra-config.ini."
+        dest_dir.mkdir(parents=True, exist_ok=True)
+
+        src_path = Path(self._current_file).resolve()
+        dest_path = (dest_dir / src_path.name).resolve()
         with open(dest_path, 'wb') as f:
             f.write(xml_bytes)
 
@@ -265,6 +277,19 @@ class DocumentController(QObject):
         self._current_file = str(dest_path)
         self.file_loaded.emit(self._current_file)
         return True, str(dest_path)
+
+    def submit_file(self) -> tuple[bool, str]:
+        """Moves the current record from 'edit' into 'pending', for review."""
+        return self._move_to_location('pending', validate=True)
+
+    def approve_file(self) -> tuple[bool, str]:
+        """Moves the current record from 'pending' into 'reviewed'."""
+        return self._move_to_location('reviewed', validate=False)
+
+    def reject_file(self) -> tuple[bool, str]:
+        """Moves the current record from 'pending' into 'rejected', for
+        the editor to revisit."""
+        return self._move_to_location('rejected', validate=False)
 
     def _rebuild_xml(self) -> str:
         if self.xml_doc.xml_root is None:

@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
   <vra:work id="w_0000001SIN" xml:lang="en">
     <vra:culturalContextSet>
@@ -24,8 +24,7 @@
                  Made of mud brick and stone, the buildings of as-Sawāfah present remarkable architectural and decorative features.
                  These include generous arcades of pointed arches on round masonry columns, masonry lattice balustrades separating the courtyard from the shaded porticoes
                  and high-quality workmanship of mouldings in sarūj, a traditional hydraulic render made of calcined clay and lime.</vra:display>
-      <vra:description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Harat Al-Barashid and Harat as-Sawafah, Sinaw, Nottingham: Nottingham Trent University, 2014">
-                 The fortified settlement of Ḩārat as-Sawāfah forms, along with the neighbouring quarter of al-Barāshid to the south,
+      <vra:description source="Bandyopadhyay, Soumyen et al, Documentation and Heritage Management and Development Plan: Harat Al-Barashid and Harat as-Sawafah, Sinaw, Nottingham: Nottingham Trent University, 2014" xml:lang="en">The fortified settlement of Ḩārat as-Sawāfah forms, along with the neighbouring quarter of al-Barāshid to the south,
                  the eastern edge of the Sināw oasis, in the Ash Sharqīyah North Governorate. Sawāfah developed along Falaj al Mushaq with an extended north-south orientation with the palm groves
                  to the west of the falaj channel. Originally enclosed within a continuous defensive wall with gates on the north, south and west walls, more openings have emerged to allow shortcuts to
                  the agricultural fields from the new settlement developments beyond. The settlement presents two highly dilapidated gates on the downhill side,
@@ -36,8 +35,7 @@
                  the storage of produce and agricultural implements, sheltering of animal, as well as social activities would take place.
                  Made of mud brick and stone, the buildings of as-Sawāfah present remarkable architectural and decorative features.
                  These include generous arcades of pointed arches on round masonry columns, masonry lattice balustrades separating the courtyard from the shaded porticoes
-                 and high-quality workmanship of mouldings in sarūj, a traditional hydraulic render made of calcined clay and lime.
-             </vra:description>
+                 and high-quality workmanship of mouldings in sarūj, a traditional hydraulic render made of calcined clay and lime.</vra:description>
     </vra:descriptionSet>
     <vra:locationSet>
       <vra:display>Ḩārat as-Sawāfah, Sināw (Ash Sharqīyah North Governorate, Oman)</vra:display>
@@ -57,7 +55,7 @@
       <vra:material type="other" refid="300011700" vocab="AAT" href="http://vocab.getty.edu/page/aat/300011700">building stone</vra:material>
       <vra:material type="other" vocab="other">sarūj</vra:material>
     </vra:materialSet>
-    <vra:stylePeriodSet>
+    <vra:measurementsSet><vra:measurements vocab="AAT" refid="300056216" href="http://vocab.getty.edu/aat/300056216">opacity</vra:measurements></vra:measurementsSet><vra:stylePeriodSet>
       <vra:display>Islamic Omani vernacular</vra:display>
       <vra:stylePeriod refid="300380013" vocab="AAT" href="http://vocab.getty.edu/page/aat/300380013">Islamic (culture or style)</vra:stylePeriod>
       <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
@@ -158,7 +156,7 @@
     </vra:sourceSet>
     <vra:techniqueSet>
       <vra:display>aerial photogrammetry 3-D virtual model</vra:display>
-      <vra:technique />
+      <vra:technique/>
       <vra:technique refid="300053581" vocab="AAT" href="http://vocab.getty.edu/page/aat/300053581">aerial photogrammetry</vra:technique>
       <vra:technique refid="300010331" vocab="AAT" href="http://vocab.getty.edu/page/aat/300010331">three-dimensional</vra:technique>
       <vra:technique refid="300411661" vocab="AAT" href="http://vocab.getty.edu/page/aat/300411661">virtual models</vra:technique>
