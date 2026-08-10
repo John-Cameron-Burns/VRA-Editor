@@ -14,6 +14,7 @@ from vra_editor.core.commit_to_git import add_file_to_repo
 from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
 from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
 from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
+from vra_editor.ui.error_messages import friendly_validation_error
 from vra_editor.ui.panels.form_panel.form_container import FormContainerPanel
 from vra_editor.ui.panels.tree_panel.tree_widget import VraTreePanel
 from vra_editor.ui.panels.xml_preview.code_editor import XmlPreviewPanel
@@ -21,6 +22,31 @@ from vra_editor.utils import user_name
 
 IMAGES_DIR = Path(__file__).resolve().parent.parent / "images"
 LOGO_PATH = IMAGES_DIR / "idm_logo.svg"
+
+# The one committing action per mode (Submit hands a record on for review;
+# Approve moves it into the reviewed archive) gets a distinct, deliberate
+# style so it doesn't carry the same visual weight as Save/Undo/Cancel --
+# actions a scholar can try and back out of freely.
+PRIMARY_BUTTON_STYLE = """
+QPushButton {
+    background-color: #2E7D5B;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 16px;
+}
+QPushButton:hover {
+    background-color: #266449;
+}
+QPushButton:pressed {
+    background-color: #1F5239;
+}
+QPushButton:disabled {
+    background-color: #A9C3B7;
+    color: #EDEDEA;
+}
+"""
 
 
 class ModeBar(QWidget):
@@ -114,8 +140,8 @@ class MainWindow(QMainWindow):
     BASE_BUTTONS = ['Home', 'Open', 'Create', 'Review', 'Import']
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Undo', 'Submit', 'Cancel', 'About'],
-        review=BASE_BUTTONS + ['Approve', 'Undo', 'Reject', 'Cancel', 'About'],
+        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Submit', 'Cancel', 'About'],
+        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Reject', 'Cancel', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'About'],
     )
 
@@ -157,6 +183,8 @@ class MainWindow(QMainWindow):
         splitter.addWidget(self.form_panel)
         splitter.addWidget(self.xml_preview_panel)
         splitter.setSizes([250, 425, 425])
+        self._splitter = splitter
+        self.xml_preview_panel.setVisible(False)  # hidden by default; toggled via the "Show XML" button
 
         self.status_bar = StatusBar()
         self.status_bar.set_user(user_name())  # fetched once; doesn't change
@@ -245,6 +273,16 @@ class MainWindow(QMainWindow):
         for name, btn in self.mode_bar.buttons.items():
             self.register_mode_widget(name, btn)
 
+        for name in ('Submit', 'Approve'):
+            self.mode_bar.buttons[name].setStyleSheet(PRIMARY_BUTTON_STYLE)
+
+        # A toggle, not an action -- checkable so its pressed state shows
+        # whether the XML pane is currently open, and its label always
+        # names the click's effect rather than a fixed state.
+        show_xml_button = self.mode_bar.buttons['Show XML']
+        show_xml_button.setCheckable(True)
+        show_xml_button.toggled.connect(self._on_toggle_xml)
+
         self._connect_button_signals()
 
         return top_bar
@@ -266,6 +304,10 @@ class MainWindow(QMainWindow):
         buttons['Reject'].clicked.connect(self._on_reject)
         buttons['Autofill'].clicked.connect(self._on_autofill)
         buttons['Import'].clicked.connect(self._on_import)
+
+    def _on_toggle_xml(self, checked: bool):
+        self.xml_preview_panel.setVisible(checked)
+        self.mode_bar.buttons['Show XML'].setText('Hide XML' if checked else 'Show XML')
 
     # ------------------------------------------------------------------
     # Mode handling
@@ -336,10 +378,18 @@ class MainWindow(QMainWindow):
     def _on_save(self):
         ok, message = self.doc_controller.save_file()
         if not ok:
-            QMessageBox.warning(self, "Schema validation failed", message)
+            self._show_validation_error(message)
             return
         self.status_bar.set_file(message)
         self._prompt_and_commit(self.doc_controller.current_file)
+
+    def _show_validation_error(self, raw_message: str):
+        box = QMessageBox(
+            QMessageBox.Icon.Warning, "This record isn't ready to save yet",
+            friendly_validation_error(raw_message), parent=self,
+        )
+        box.setDetailedText(raw_message)
+        box.exec()
 
     def _on_undo(self):
         if not self.doc_controller.undo():

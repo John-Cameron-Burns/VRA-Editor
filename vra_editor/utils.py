@@ -41,18 +41,18 @@ else:
 
 def user_name() -> Optional[str]:
     """
-    Retrieves the current user's name. The function attempts to determine the user's
-    full name by evaluating  system credentials or configuration file and defaults to the
-    username if a full name is not found.
+    Retrieves the current user's full name for display, checking OS
+    account info first, then vra-config.ini's [user] FullName, and
+    falling back to the computer login name if neither has one.
 
-    :return: The user's name, either as only the username or as a combination of
-        username and full name if available.
+    :return: The user's full name, or their login name if no full name
+        is available.
     :rtype: str
     """
     uname = getpass.getuser()
     full_name = get_full_name()
     if full_name and full_name != uname:
-        return f'{uname}({full_name})'
+        return full_name
 
     from .config import load_config  # deferred: config.py imports strip_quotes from this module
     parser = load_config()

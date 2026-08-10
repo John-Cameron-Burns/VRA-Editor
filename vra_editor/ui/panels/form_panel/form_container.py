@@ -4,6 +4,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtWidgets import QWidget, QStackedLayout, QLabel
 
+from vra_editor.core.friendly_labels import friendly_label
 from vra_editor.ui.panels.form_panel.display_editor import DisplayEditorPanel
 from vra_editor.ui.panels.form_panel.element_editor import ElementEditorPanel
 
@@ -60,10 +61,10 @@ class FormContainerPanel(QWidget):
             self.display_editor.set_display_data(data.get("translations", {}))
             self.layout.setCurrentWidget(self.display_editor)
         elif node_type in ("record", "set", "container"):
-            tag = data.get("tag", node_type)
+            label = friendly_label(data.get("tag", node_type))
             self.container_info.setText(
-                f"<b>{tag}</b><br><br>Right-click this item in the tree to add or "
-                f"remove its sub-elements."
+                f"<b>{label}</b><br><br>Right-click “{label}” in the list on "
+                f"the left to add or remove items here."
             )
             self.layout.setCurrentWidget(self.container_info)
         else:

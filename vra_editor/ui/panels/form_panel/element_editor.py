@@ -1,6 +1,7 @@
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QPushButton, QTextEdit
 
+from vra_editor.core.friendly_labels import FIELD_LABELS, friendly_label
 from vra_editor.ui.dialogs.vocabulary_search_dialog import VocabularySearchDialog
 
 
@@ -30,17 +31,17 @@ class ElementEditorPanel(QWidget):
         self.text_input.textChanged.connect(self._on_field_changed)
         layout.addRow("Text:", self.text_input)
 
-        self.vocab_label = QLabel("Vocabulary:")
+        self.vocab_label = QLabel(f"{FIELD_LABELS['vocab']}:")
         self.vocab_input = QLineEdit()
         self.vocab_input.textChanged.connect(self._on_field_changed)
         layout.addRow(self.vocab_label, self.vocab_input)
 
-        self.refid_label = QLabel("Ref ID:")
+        self.refid_label = QLabel(f"{FIELD_LABELS['refid']}:")
         self.refid_input = QLineEdit()
         self.refid_input.textChanged.connect(self._on_field_changed)
         layout.addRow(self.refid_label, self.refid_input)
 
-        self.href_label = QLabel("URL:")
+        self.href_label = QLabel(f"{FIELD_LABELS['href']}:")
         self.href_input = QLineEdit()
         self.href_input.textChanged.connect(self._on_field_changed)
         layout.addRow(self.href_label, self.href_input)
@@ -71,7 +72,7 @@ class ElementEditorPanel(QWidget):
 
     def set_element_data(self, tag: str, text: str, has_vocab: bool, vocab: str, refid: str, href: str):
         self._loading = True
-        self.tag_label.setText(f"<b>{tag}</b>")
+        self.tag_label.setText(f"<b>{friendly_label(tag)}</b>")
         self.text_input.setPlainText(text)
         self.vocab_input.setText(vocab)
         self.refid_input.setText(refid)

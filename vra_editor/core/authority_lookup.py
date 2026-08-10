@@ -29,6 +29,16 @@ _SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 
 VOCABULARIES = ("VIAF", "AAT", "TGN", "ULAN", "GNS")
 
+# Spelled out for the vocabulary picker -- the bare acronym means
+# little to a cataloguer who hasn't used that specific authority before.
+VOCABULARY_LABELS = {
+    "VIAF": "VIAF — Virtual International Authority File (names)",
+    "AAT": "AAT — Getty Art & Architecture Thesaurus (terms)",
+    "TGN": "TGN — Getty Thesaurus of Geographic Names (places)",
+    "ULAN": "ULAN — Getty Union List of Artist Names (people)",
+    "GNS": "GNS — NGA GEOnet Names Server (places outside the US)",
+}
+
 _GETTY_TYPES = {"AAT": "/aat", "TGN": "/tgn", "ULAN": "/ulan"}
 
 # NGA's public ArcGIS REST query endpoint for GNS -- keyless, no

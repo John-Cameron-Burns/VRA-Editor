@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
 )
 
 from vra_editor.core.authority_lookup import (
-    VOCABULARIES, AuthorityResult, AuthorityLookupError, search,
+    VOCABULARIES, VOCABULARY_LABELS, AuthorityResult, AuthorityLookupError, search,
 )
 
 
@@ -35,6 +35,7 @@ class VocabularySearchDialog(QDialog):
         search_row = QHBoxLayout()
         self.vocab_combo = QComboBox()
         self.vocab_combo.addItems(VOCABULARIES)
+        self.vocab_combo.currentTextChanged.connect(self._on_vocab_changed)
         search_row.addWidget(self.vocab_combo)
 
         self.query_input = QLineEdit(initial_query)
@@ -45,6 +46,11 @@ class VocabularySearchDialog(QDialog):
         self.search_button.clicked.connect(self._on_search)
         search_row.addWidget(self.search_button)
         layout.addLayout(search_row)
+
+        self.vocab_description = QLabel(VOCABULARY_LABELS.get(self.vocab_combo.currentText(), ""))
+        self.vocab_description.setWordWrap(True)
+        self.vocab_description.setStyleSheet("color: #666;")
+        layout.addWidget(self.vocab_description)
 
         self.status_label = QLabel("")
         self.status_label.setWordWrap(True)
@@ -61,6 +67,9 @@ class VocabularySearchDialog(QDialog):
 
         if initial_query:
             self._on_search()
+
+    def _on_vocab_changed(self, vocab: str):
+        self.vocab_description.setText(VOCABULARY_LABELS.get(vocab, ""))
 
     def _on_search(self):
         vocab = self.vocab_combo.currentText()

@@ -7,6 +7,7 @@ from lxml import etree
 
 from vra_editor.core import vra_structure
 from vra_editor.core.display_i18n import DisplayTranslations, get_display, set_display
+from vra_editor.core.friendly_labels import friendly_label
 
 VRA_NS = "http://www.vraweb.org/vracore4.htm"
 NSMAP = {None: VRA_NS}
@@ -77,7 +78,7 @@ class VraXmlParser:
         record_id = record_elem.get('id', '')
         child_specs = vra_structure.allowed_children(record_type)
         node = VraTreeNode(
-            label=f"{record_type.capitalize()} (id: {record_id})",
+            label=f"{friendly_label(record_type)} (id: {record_id})",
             node_type='record',
             data={'tag': record_type},
             element=record_elem,
@@ -94,7 +95,7 @@ class VraXmlParser:
 
         child_specs = vra_structure.children_of_type(type_name)
         node = VraTreeNode(
-            label=tag,
+            label=friendly_label(tag),
             node_type='set' if tag.endswith('Set') else 'container',
             data={'tag': tag},
             element=elem,
@@ -129,8 +130,9 @@ class VraXmlParser:
 
     def _build_leaf_node(self, elem, tag: str, has_vocab: bool) -> VraTreeNode:
         text = (elem.text or '').strip()
+        label = friendly_label(tag)
         return VraTreeNode(
-            label=f"{tag}: {text}" if text else tag,
+            label=f"{label}: {text}" if text else label,
             node_type='leaf',
             data={
                 'tag': tag,
