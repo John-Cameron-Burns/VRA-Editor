@@ -6,6 +6,7 @@ from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QPushButton, QLabel,
     QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy, QMessageBox, QInputDialog,
+    QStackedWidget,
 )
 
 from vra_editor.config import load_locations
@@ -16,6 +17,8 @@ from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
 from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
 from vra_editor.ui.error_messages import friendly_validation_error
 from vra_editor.ui.panels.form_panel.form_container import FormContainerPanel
+from vra_editor.ui.panels.section_panel.section_form import SectionFormPanel
+from vra_editor.ui.panels.section_panel.section_list import SectionListPanel
 from vra_editor.ui.panels.tree_panel.tree_widget import VraTreePanel
 from vra_editor.ui.panels.xml_preview.code_editor import XmlPreviewPanel
 from vra_editor.utils import user_name
@@ -140,8 +143,8 @@ class MainWindow(QMainWindow):
     BASE_BUTTONS = ['Home', 'Open', 'Create', 'Review', 'Import']
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Submit', 'Cancel', 'About'],
-        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Reject', 'Cancel', 'About'],
+        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Advanced View', 'Submit', 'Cancel', 'About'],
+        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Advanced View', 'Reject', 'Cancel', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'About'],
     )
 
@@ -153,10 +156,13 @@ class MainWindow(QMainWindow):
         self.doc_controller = DocumentController()
 
         self.mode_bar: ModeBar | None = None
-        self.tree_panel = None  # Shows the elements tree
-        self.form_panel = None
+        self.tree_panel = None  # Advanced-view: the elements tree
+        self.form_panel = None  # Advanced-view: single-element form
+        self.section_list = None  # Simple-view (default): section list
+        self.section_form = None  # Simple-view (default): section form
         self.xml_preview_panel = None  # Shows the current XML
         self.status_bar: StatusBar | None = None
+        self._current_section_tag: str | None = None  # which Set the Simple view is showing
 
         # Registry of any widget (not just mode-bar buttons) that should
         # be shown/hidden per mode. Populate via register_mode_widget().
@@ -175,12 +181,26 @@ class MainWindow(QMainWindow):
     def initialise_layout(self):
         top_bar = self._build_top_bar()
 
-        splitter = QSplitter(Qt.Horizontal)
+        # Simple view (default) and Advanced view (tree + single-element
+        # form) are two alternate presentations of the same document,
+        # swapped together by the "Advanced View" toggle -- see
+        # _on_toggle_advanced. Both drive the same DocumentController.
+        self.section_list = SectionListPanel()
         self.tree_panel = VraTreePanel()
+        self.nav_stack = QStackedWidget()
+        self.nav_stack.addWidget(self.section_list)  # index 0: Simple
+        self.nav_stack.addWidget(self.tree_panel)    # index 1: Advanced
+
+        self.section_form = SectionFormPanel(self.doc_controller)
         self.form_panel = FormContainerPanel()
+        self.form_stack = QStackedWidget()
+        self.form_stack.addWidget(self.section_form)  # index 0: Simple
+        self.form_stack.addWidget(self.form_panel)    # index 1: Advanced
+
+        splitter = QSplitter(Qt.Horizontal)
         self.xml_preview_panel = XmlPreviewPanel()
-        splitter.addWidget(self.tree_panel)
-        splitter.addWidget(self.form_panel)
+        splitter.addWidget(self.nav_stack)
+        splitter.addWidget(self.form_stack)
         splitter.addWidget(self.xml_preview_panel)
         splitter.setSizes([250, 425, 425])
         self._splitter = splitter
@@ -198,12 +218,23 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.status_bar)
         self.setCentralWidget(central)
 
+        # Advanced view (unchanged from before the Simple view existed).
         self.tree_panel.element_selected.connect(self._on_element_selected)
         self.tree_panel.add_child_requested.connect(self._on_add_child_requested)
         self.tree_panel.remove_requested.connect(self._on_remove_requested)
-        self.doc_controller.document_loaded.connect(self.tree_panel.load_document)
         self.form_panel.element_data_changed.connect(self.doc_controller.update_element_data)
         self.form_panel.display_data_changed.connect(self.doc_controller.update_display_data)
+
+        # Simple view -- SectionFormPanel/FieldRow call doc_controller
+        # directly (see field_row.py), so only navigation needs wiring.
+        self.section_list.section_selected.connect(self._on_section_selected)
+        self.section_list.add_section_requested.connect(self._on_add_section_requested)
+
+        # document_loaded fires on load and on any insert/remove (a
+        # structural change); both views' data comes from a fresh
+        # build_tree() walk each time, since the old VraTreeNode objects
+        # don't survive a rebuild.
+        self.doc_controller.document_loaded.connect(self._on_document_loaded)
         self.doc_controller.xml_updated.connect(self._on_xml_updated)
 
         # Status bar updates as a side effect of other actions: connect
@@ -218,10 +249,12 @@ class MainWindow(QMainWindow):
         # )
 
         self.xml_preview_panel.update_xml_text(self.doc_controller.get_initial_xml())
+        self._refresh_navigation()  # show the "no record open" placeholder
 
     def _on_element_selected(self, node_type: str, data: dict, element):
-        """Tree selection changed: track which lxml element subsequent
-        form edits should write into, then show the matching editor."""
+        """Tree selection changed (Advanced view): track which lxml
+        element subsequent form edits should write into, then show the
+        matching editor."""
         self.doc_controller.set_current_element(element)
         self.form_panel.show_editor(node_type, data)
         self._highlight_current_element()
@@ -234,6 +267,59 @@ class MainWindow(QMainWindow):
         self.doc_controller.remove_element(element)
         self.form_panel.show_editor('', {})
         self._highlight_current_element()
+
+    def _on_section_selected(self, node):
+        """A Set was chosen in the Simple view's section list."""
+        self._current_section_tag = node.data.get('tag')
+        self.section_form.show_section(node)
+
+    def _on_add_section_requested(self, tag: str, sibling_order: list):
+        """A Set the record doesn't have yet was chosen from the
+        greyed-out "+ Add" rows in the section list."""
+        record_node = self._current_record_node()
+        if record_node is None:
+            return
+        self._current_section_tag = tag  # set before insert_child: document_loaded fires from inside it
+        self.doc_controller.insert_child(record_node.element, tag, sibling_order)
+
+    def _current_record_node(self):
+        if self.doc_controller.xml_doc.xml_root is None:
+            return None
+        records = self.doc_controller.xml_doc.build_tree()
+        return records[0] if records else None
+
+    def _on_document_loaded(self, *_ignored):
+        """Fires on file load and on any insert/remove. Both views read
+        from a fresh build_tree() walk -- the previous call's
+        VraTreeNode objects don't survive a structural change, only the
+        underlying lxml elements do."""
+        self.tree_panel.load_document(self.doc_controller.xml_doc)
+        self._refresh_navigation()
+
+    def _refresh_navigation(self):
+        """Re-syncs the Simple view (both the section list and whichever
+        section was showing) with the document's current state. Called
+        after every document_loaded, and when the Advanced-view toggle
+        flips, since plain field edits only emit xml_updated -- the
+        pane that was hidden during such an edit would otherwise show
+        stale data the moment it becomes visible again."""
+        record_node = self._current_record_node()
+        self.section_list.load_record(record_node)
+
+        if record_node is None:
+            self.section_form.show_no_document()
+            return
+
+        if self._current_section_tag is not None:
+            match = next(
+                (c for c in record_node.children if c.data.get('tag') == self._current_section_tag),
+                None,
+            )
+            if match is not None:
+                self.section_form.show_section(match)
+                return
+
+        self.section_form.clear()
 
     def _on_xml_updated(self, xml_text: str):
         """The preview text got replaced (any edit, insert, or remove) --
@@ -283,6 +369,10 @@ class MainWindow(QMainWindow):
         show_xml_button.setCheckable(True)
         show_xml_button.toggled.connect(self._on_toggle_xml)
 
+        advanced_button = self.mode_bar.buttons['Advanced View']
+        advanced_button.setCheckable(True)
+        advanced_button.toggled.connect(self._on_toggle_advanced)
+
         self._connect_button_signals()
 
         return top_bar
@@ -308,6 +398,17 @@ class MainWindow(QMainWindow):
     def _on_toggle_xml(self, checked: bool):
         self.xml_preview_panel.setVisible(checked)
         self.mode_bar.buttons['Show XML'].setText('Hide XML' if checked else 'Show XML')
+
+    def _on_toggle_advanced(self, checked: bool):
+        self.nav_stack.setCurrentIndex(1 if checked else 0)
+        self.form_stack.setCurrentIndex(1 if checked else 0)
+        self.mode_bar.buttons['Advanced View'].setText('Simple View' if checked else 'Advanced View')
+        # Plain field edits only emit xml_updated, not document_loaded,
+        # so whichever pane was hidden during one would otherwise show
+        # stale data the moment it becomes visible again.
+        self._refresh_navigation()
+        if checked:
+            self.tree_panel.load_document(self.doc_controller.xml_doc)
 
     # ------------------------------------------------------------------
     # Mode handling
