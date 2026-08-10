@@ -6,3 +6,21 @@ __pycache__/
 # PyInstaller build output (see packaging/VRA_Editor.spec)
 /build/
 /dist/
+
+# Real media files dropped into the working folders during use (personal
+# photos, scans, ...) -- not sample data, never meant to be tracked.
+# Uppercase variants included explicitly since git's case-sensitivity for
+# ignore patterns follows core.ignorecase, which isn't true on every platform.
+/data/ingest/**/*.tif
+/data/ingest/**/*.TIF
+/data/ingest/**/*.tiff
+/data/ingest/**/*.TIFF
+/data/ingest/**/*.jpg
+/data/ingest/**/*.JPG
+/data/ingest/**/*.jpeg
+/data/ingest/**/*.JPEG
+/data/ingest/**/*.png
+/data/ingest/**/*.PNG
+/data/ingest/**/*.pxm
+/data/ingest/**/*.PXM
+/data/media/
