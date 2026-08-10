@@ -57,6 +57,20 @@ class DocumentController(QObject):
         self.document_loaded.emit(self.xml_doc)  # tree panel rebuilds itself from this
         self.xml_updated.emit(self._xml_text)
 
+    def create_new_record(self, record_type: str, record_id: str, dest_path):
+        """Starts a brand-new, empty record of the given type. Not
+        written to disk yet -- that happens on the first Save/Submit,
+        same as any other edit -- dest_path is just where it will land."""
+        xml_string = self.xml_doc.new_document(record_type, record_id)
+        self._current_file = str(dest_path)
+        self._current_element = None
+        self._xml_text = xml_string or ""
+        self._undo_stack.clear()
+        self._undo_snapshot_element = None
+        self.file_loaded.emit(self._current_file)
+        self.document_loaded.emit(self.xml_doc)
+        self.xml_updated.emit(self._xml_text)
+
     def set_archive(self, archive_name: str):
         self._current_archive = archive_name
         self.archive_changed.emit(archive_name)

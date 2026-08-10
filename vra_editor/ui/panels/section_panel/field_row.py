@@ -72,6 +72,10 @@ class FieldRow(QWidget):
                 self._attr_inputs[attr_name] = edit
 
             search_button = QPushButton("Search authority...")
+            search_button.setToolTip(
+                "Look this term up in a controlled vocabulary (VIAF, Getty, GNS, "
+                "Library of Congress) and fill in Linked to/Record ID/Link from the result."
+            )
             search_button.clicked.connect(self._on_search_clicked)
             attr_row.addWidget(search_button)
             outer.addLayout(attr_row)

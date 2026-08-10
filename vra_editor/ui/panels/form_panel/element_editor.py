@@ -53,6 +53,10 @@ class ElementEditorPanel(QWidget):
         layout.addRow(self.href_label, self.href_input)
 
         self.search_button = QPushButton("Search authority vocabulary...")
+        self.search_button.setToolTip(
+            "Look this term up in a controlled vocabulary (VIAF, Getty, GNS, "
+            "Library of Congress) and fill in Text/Linked to/Record ID/Link from the result."
+        )
         self.search_button.clicked.connect(self._on_search_clicked)
         layout.addRow(self.search_button)
 

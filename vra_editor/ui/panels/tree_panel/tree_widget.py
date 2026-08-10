@@ -1,8 +1,9 @@
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont, QKeySequence, QShortcut
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTreeWidget, QTreeWidgetItem, QMenu
+from PySide6.QtWidgets import QVBoxLayout, QTreeWidget, QTreeWidgetItem, QMenu
 
 from vra_editor.core.xml_parser import VraXmlParser, VraTreeNode
+from vra_editor.ui.widgets.background_image_widget import BackgroundImageWidget
 
 _NODE_TYPE_ROLE = 100
 _NODE_DATA_ROLE = 101
@@ -10,20 +11,27 @@ _NODE_ELEMENT_ROLE = 102
 _NODE_CHILD_SPECS_ROLE = 103
 
 
-class VraTreePanel(QWidget):
+class VraTreePanel(BackgroundImageWidget):
     """Left Panel: XML Hierarchy Tree."""
 
     element_selected = Signal(str, dict, object)  # node_type, data, lxml element
     add_child_requested = Signal(object, str, list)  # parent element, tag, sibling schema order
     remove_requested = Signal(object)  # lxml element to remove
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, image_path=None, parent=None):
+        super().__init__(image_path, parent)
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(10, 8, 8, 8)
 
         self.tree = QTreeWidget()
         self.tree.setHeaderLabel("VRA Core 4 Structure")
+        # Translucent rather than the tree view's usual opaque white, so
+        # the panel's background image reads as a faint texture behind
+        # it instead of being completely hidden -- still light enough
+        # that item text stays fully legible.
+        self.tree.setStyleSheet(
+            "QTreeWidget { background-color: rgba(255, 255, 255, 217); border: 1px solid #ccc; }"
+        )
         layout.addWidget(self.tree)
 
         self.tree.itemClicked.connect(self._on_item_clicked)

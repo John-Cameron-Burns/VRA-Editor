@@ -1,8 +1,9 @@
 from PySide6.QtGui import QBrush, QColor, QFont
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QLabel
+from PySide6.QtWidgets import QVBoxLayout, QListWidget, QListWidgetItem, QLabel
 from PySide6.QtCore import Signal
 
 from vra_editor.core.friendly_labels import friendly_label
+from vra_editor.ui.widgets.background_image_widget import BackgroundImageWidget
 
 # Cataloguing relevance, not the XSD's roughly-alphabetical declaration
 # order -- what a cataloguer wants to see/fill in first (what is it,
@@ -20,7 +21,7 @@ _ADD_TAG_ROLE = 101
 _SIBLING_ORDER_ROLE = 102
 
 
-class SectionListPanel(QWidget):
+class SectionListPanel(BackgroundImageWidget):
     """Left-hand navigation for the sectioned form: one row per Set
     present in the record (Titles, People, Dates, ...), plus a greyed
     "+ Add" row for any Set type this record doesn't have yet."""
@@ -28,16 +29,23 @@ class SectionListPanel(QWidget):
     section_selected = Signal(object)  # VraTreeNode for the chosen Set
     add_section_requested = Signal(str, list)  # tag, sibling_order
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, image_path=None, parent=None):
+        super().__init__(image_path, parent)
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(10, 8, 8, 8)
 
         header = QLabel("<b>Sections</b>")
         layout.addWidget(header)
 
         self.list_widget = QListWidget()
         self.list_widget.itemClicked.connect(self._on_item_clicked)
+        # Translucent rather than the item view's usual opaque white, so
+        # the panel's background image reads as a faint texture behind
+        # the list instead of being completely hidden by it -- still
+        # light enough that item text stays fully legible.
+        self.list_widget.setStyleSheet(
+            "QListWidget { background-color: rgba(255, 255, 255, 217); border: 1px solid #ccc; }"
+        )
         layout.addWidget(self.list_widget)
 
     def load_record(self, record_node):

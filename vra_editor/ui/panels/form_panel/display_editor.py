@@ -29,6 +29,7 @@ class DisplayEditorPanel(QWidget):
 
         button_row = QHBoxLayout()
         add_btn = QPushButton("+ Add language")
+        add_btn.setToolTip("Add another language version of this text.")
         add_btn.clicked.connect(lambda: self._add_row('', '', emit_changed=True))
         button_row.addWidget(add_btn)
         button_row.addStretch()
@@ -57,6 +58,7 @@ class DisplayEditorPanel(QWidget):
 
         remove_btn = QPushButton("✕")
         remove_btn.setFixedWidth(24)
+        remove_btn.setToolTip("Remove this language.")
 
         row_layout.addWidget(lang_edit)
         row_layout.addWidget(text_edit)

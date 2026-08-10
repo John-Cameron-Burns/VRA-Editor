@@ -1,8 +1,10 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea,
-    QCheckBox, QLineEdit,
+    QCheckBox,
 )
+
+from vra_editor.ui.widgets.auto_grow_text_edit import AutoGrowTextEdit
 
 
 class ReviewNotesPanel(QWidget):
@@ -29,20 +31,27 @@ class ReviewNotesPanel(QWidget):
 
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
+        # A plain QWidget defaults to the app's own grey chrome background
+        # (the Window palette role), not white like the Sections list (a
+        # QListWidget, white by default) -- left alone, an empty notes
+        # list is a big grey blank box with only a small white input
+        # strip at the bottom, easy to mistake for a disabled panel.
+        self.scroll.setStyleSheet("QScrollArea { background-color: white; border: 1px solid #ccc; }")
         self.rows_container = QWidget()
+        self.rows_container.setStyleSheet("background-color: white;")
         self.rows_layout = QVBoxLayout(self.rows_container)
         self.rows_layout.addStretch()
         self.scroll.setWidget(self.rows_container)
         outer.addWidget(self.scroll, stretch=1)
 
         add_row = QHBoxLayout()
-        self.new_note_input = QLineEdit()
+        self.new_note_input = AutoGrowTextEdit(min_height=60, max_height=160)
         self.new_note_input.setPlaceholderText("Add a note for the editor...")
-        self.new_note_input.returnPressed.connect(self._on_add_clicked)
         add_row.addWidget(self.new_note_input, stretch=1)
         add_button = QPushButton("Add")
+        add_button.setToolTip("Add this note for the editor to see.")
         add_button.clicked.connect(self._on_add_clicked)
-        add_row.addWidget(add_button)
+        add_row.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignTop)
         outer.addLayout(add_row)
 
     def refresh(self):
@@ -91,7 +100,7 @@ class ReviewNotesPanel(QWidget):
         return row
 
     def _on_add_clicked(self):
-        text = self.new_note_input.text().strip()
+        text = self.new_note_input.toPlainText().strip()
         if not text:
             return
         self._doc_controller.add_review_note(text)

@@ -1,8 +1,16 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <vra:vra xmlns:vra="http://www.vraweb.org/vracore4.htm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vraweb.org/vracore4.htm http://www.loc.gov/standards/vracore/vra-strict.xsd">
-  <vra:work id="w_000set_MUD" xml:lang="en">
+  <!--VRA-EDITOR-REVIEW-NOTES
+[
+  {
+    "text": "try again",
+    "author": "john burns",
+    "date": "2026-08-10",
+    "resolved": false
+  }
+]--><vra:work id="w_000set_MUD" xml:lang="en">
     <vra:culturalContextSet>
-      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:culturalContext>
+      <vra:culturalContext refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483" xml:lang="en">Omani</vra:culturalContext>
     </vra:culturalContextSet>
     <vra:descriptionSet>
       <vra:display>Mudayrib is located about 130 km south-east of Muscat in the Wilāyat of Al Qābil in Ash Shariqīyah North Governorate on the northern edges
@@ -36,7 +44,7 @@
                 The settlement quarter is an excellent example of the traditional architectural development that reached impressive refinement and high levels of quality.</vra:description>
     </vra:descriptionSet>
     <vra:locationSet>
-      <vra:display>Mudayrib (Oman)</vra:display>
+      <vra:display>&lt;div lang="en"&gt;Mudayrib (Oman)&lt;/div&gt;</vra:display>
       <vra:location type="site">
         <vra:name type="geographic" vocab="VIAF" refid="102153651688355781260" href="http://viaf.org/viaf/102153651688355781260">Mudayrib (Oman)</vra:name>
         <vra:name type="geographic" refid="136118942" vocab="VIAF" href="http://viaf.org/viaf/136118942">Sharqīyah (Oman)</vra:name>
@@ -54,7 +62,7 @@
     </vra:materialSet>
     <vra:stylePeriodSet>
       <vra:display>Omani vernacular</vra:display>
-      <vra:stylePeriod />
+      <vra:stylePeriod/>
       <vra:stylePeriod refid="300068483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300068483">vernacular architecture</vra:stylePeriod>
       <vra:stylePeriod refid="300386483" vocab="AAT" href="http://vocab.getty.edu/page/aat/300386483">Omani</vra:stylePeriod>
     </vra:stylePeriodSet>
@@ -146,7 +154,7 @@
       <vra:display>From The ArCHIAM Collection: Mudayrib. Image of Mudayrib settlement, Oman.</vra:display>
       <vra:relation relids="w_001SET_MUD" type="imageOf">Mudayrib settlement, Oman.</vra:relation>
       <vra:relation refid="c_00000ArMUD" type="partOf">The ArCHIAM Collection: Mudayrib.</vra:relation>
-      <vra:relation />
+      <vra:relation/>
     </vra:relationSet>
     <vra:rightsSet>
       <vra:display>©Ministry of Heritage and Culture Sultanate of Oman. CC BY 4.0</vra:display>
@@ -159,7 +167,7 @@
     </vra:rightsSet>
     <vra:techniqueSet>
       <vra:display>video interview</vra:display>
-      <vra:technique />
+      <vra:technique/>
       <vra:technique refid="300026392" vocab="AAT" href="http://vocab.getty.edu/page/aat/300026392">interviews</vra:technique>
       <vra:technique refid="300417974" vocab="AAT" href="http://vocab.getty.edu/page/aat/300417974">video recording (process)</vra:technique>
     </vra:techniqueSet>

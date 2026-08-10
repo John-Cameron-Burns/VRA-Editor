@@ -77,6 +77,7 @@ class SettingsDialog(QDialog):
 
             edit = QLineEdit()
             browse_btn = QPushButton("Browse...")
+            browse_btn.setToolTip(f"Choose the folder for '{key}'.")
             browse_btn.clicked.connect(lambda _checked, e=edit: self._browse_for(e))
 
             row_layout.addWidget(edit)
@@ -98,6 +99,7 @@ class SettingsDialog(QDialog):
         self.app_data_edit = QLineEdit()
         self.app_data_edit.setPlaceholderText(f"(default: {BOOTSTRAP_DIR})")
         browse_btn = QPushButton("Browse...")
+        browse_btn.setToolTip("Choose where this app stores its own files.")
         browse_btn.clicked.connect(lambda: self._browse_for(self.app_data_edit))
         row_layout.addWidget(self.app_data_edit)
         row_layout.addWidget(browse_btn)
@@ -126,6 +128,10 @@ class SettingsDialog(QDialog):
         form = QFormLayout(group)
 
         self.auto_ingest_check = QCheckBox()
+        self.auto_ingest_check.setToolTip(
+            "Automatically merge newly-arrived source files into the edit "
+            "folder, without waiting for Import to be clicked."
+        )
         form.addRow("Auto ingest:", self.auto_ingest_check)
 
         for key in OPTION_TEXT_KEYS:

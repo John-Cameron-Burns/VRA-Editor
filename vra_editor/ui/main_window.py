@@ -20,6 +20,7 @@ from vra_editor.ui.panels.review_notes_panel import ReviewNotesPanel
 from vra_editor.ui.panels.section_panel.section_form import SectionFormPanel
 from vra_editor.ui.panels.section_panel.section_list import SectionListPanel
 from vra_editor.ui.panels.tree_panel.tree_widget import VraTreePanel
+from vra_editor.ui.widgets.background_image_widget import random_background_image
 from vra_editor.ui.panels.xml_preview.code_editor import XmlPreviewPanel
 from vra_editor.utils import user_name
 
@@ -62,7 +63,8 @@ class ModeBar(QWidget):
     instances across multiple layouts.
     """
 
-    def __init__(self, variants: dict[str, list[str]], order: list[str] | None = None, parent=None):
+    def __init__(self, variants: dict[str, list[str]], order: list[str] | None = None,
+                 tooltips: dict[str, str] | None = None, parent=None):
         super().__init__(parent)
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -85,7 +87,9 @@ class ModeBar(QWidget):
         self.buttons: dict[str, QPushButton] = {
             name: QPushButton(name) for name in ordered_names
         }
-        for btn in self.buttons.values():
+        for name, btn in self.buttons.items():
+            if tooltips and name in tooltips:
+                btn.setToolTip(tooltips[name])
             layout.addWidget(btn)
         layout.addStretch()
 
@@ -170,6 +174,26 @@ class MainWindow(QMainWindow):
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'About'],
     )
 
+    BUTTON_TOOLTIPS = {
+        'Home': "Return to the start screen.",
+        'Open': "Open an existing record from the edit folder.",
+        'Create': "Start a new, blank record.",
+        'Review': "Open a record that's waiting in the review queue.",
+        'Import': "Merge newly-arrived source files into the edit folder.",
+        'Save': "Save this record without changing its review status.",
+        'Undo': "Revert the last change (Ctrl+Z).",
+        'Show XML': "Show or hide the raw XML for this record.",
+        'Review Notes': "Show or hide notes a reviewer has left for the editor.",
+        'Advanced View': "Switch to the structure tree and single-element editor.",
+        'Submit': "Send this record for review. Requires it to be schema-valid.",
+        'Approve': "Move this record into the reviewed archive.",
+        'Reject': "Send this record back to the editor for revision.",
+        'Cancel': "Discard changes and return to the start screen.",
+        'Settings': "Configure archive folders, application data, and preferences.",
+        'Autofill': "Fill in settings fields with their default values.",
+        'About': "Show version and license information.",
+    }
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("VRA Core 4 XML Editor")
@@ -207,8 +231,11 @@ class MainWindow(QMainWindow):
         # form) are two alternate presentations of the same document,
         # swapped together by the "Advanced View" toggle -- see
         # _on_toggle_advanced. Both drive the same DocumentController.
-        self.section_list = SectionListPanel()
-        self.tree_panel = VraTreePanel()
+        # Chosen once per session, not per panel, so toggling Advanced
+        # View doesn't swap the picture out from under you.
+        nav_background = random_background_image()
+        self.section_list = SectionListPanel(image_path=nav_background)
+        self.tree_panel = VraTreePanel(image_path=nav_background)
         self.nav_stack = QStackedWidget()
         self.nav_stack.addWidget(self.section_list)  # index 0: Simple
         self.nav_stack.addWidget(self.tree_panel)    # index 1: Advanced
@@ -405,7 +432,7 @@ class MainWindow(QMainWindow):
             logo.setPixmap(logo_pixmap.scaledToHeight(30, Qt.TransformationMode.SmoothTransformation))
             top_layout.addWidget(logo)
 
-        self.mode_bar = ModeBar(self.VARIANTS, order=self.BUTTON_ORDER)
+        self.mode_bar = ModeBar(self.VARIANTS, order=self.BUTTON_ORDER, tooltips=self.BUTTON_TOOLTIPS)
         top_layout.addWidget(self.mode_bar)
 
         # Register buttons in the shared mode-widget registry too, so
@@ -502,6 +529,33 @@ class MainWindow(QMainWindow):
         self.apply_mode('edit')
 
     def _on_create(self):
+        record_type, ok = QInputDialog.getItem(
+            self, "Create Record", "Record type:", ('work', 'image', 'collection'), 0, False,
+        )
+        if not ok:
+            return
+
+        record_id, ok = QInputDialog.getText(self, "Create Record", "Record ID:")
+        record_id = record_id.strip()
+        if not ok or not record_id:
+            return
+        if any(sep in record_id for sep in ('/', '\\')):
+            QMessageBox.warning(self, "Invalid ID", "Record ID can't contain '/' or '\\'.")
+            return
+
+        locations = load_locations()
+        edit_dir = locations.get('edit')
+        if edit_dir is None:
+            QMessageBox.warning(self, "Missing location", "No 'edit' folder is configured in vra-config.ini.")
+            return
+
+        dest_path = (edit_dir / f"{record_id}.xml").resolve()
+        if dest_path.exists():
+            QMessageBox.warning(self, "Record already exists", f"{dest_path} already exists.")
+            return
+
+        edit_dir.mkdir(parents=True, exist_ok=True)
+        self.doc_controller.create_new_record(record_type, record_id, dest_path)
         self.apply_mode('edit')
 
     def _on_review(self):

@@ -127,7 +127,9 @@ class SectionFormPanel(QWidget):
         addable = [spec for spec in node.child_specs if spec.tag not in ('display', 'notes')]
         if addable:
             self._add_spec = addable[0]
-            self.add_button.setText(f"+ Add {friendly_label(self._add_spec.tag)}")
+            label = friendly_label(self._add_spec.tag)
+            self.add_button.setText(f"+ Add {label}")
+            self.add_button.setToolTip(f"Add another {label} to this section.")
             self.add_button.setEnabled(True)
         else:
             self._add_spec = None
@@ -154,6 +156,7 @@ class SectionFormPanel(QWidget):
         remove_row = QHBoxLayout()
         remove_row.addStretch()
         remove_button = QPushButton(f"Remove this {friendly_label(tag)}")
+        remove_button.setToolTip(f"Remove this {friendly_label(tag)} entirely. Undo (Ctrl+Z) brings it back.")
         remove_button.clicked.connect(
             lambda _checked=False, elem=item_node.element: self._doc_controller.remove_element(elem)
         )
@@ -201,9 +204,11 @@ class SectionFormPanel(QWidget):
         if not addable_specs:
             return
 
+        parent_label = friendly_label(item_node.data.get('tag', ''))
         row = QHBoxLayout()
         for spec in addable_specs:
             button = QPushButton(f"+ {friendly_label(spec.tag)}")
+            button.setToolTip(f"Add a {friendly_label(spec.tag)} to this {parent_label}.")
             button.clicked.connect(
                 lambda _checked=False, elem=item_node.element, tag=spec.tag, order=sibling_order:
                 self._doc_controller.insert_child(elem, tag, order)

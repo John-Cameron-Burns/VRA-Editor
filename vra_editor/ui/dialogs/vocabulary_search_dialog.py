@@ -43,6 +43,7 @@ class VocabularySearchDialog(QDialog):
         search_row.addWidget(self.query_input, stretch=1)
 
         self.search_button = QPushButton("Search")
+        self.search_button.setToolTip("Search the selected vocabulary for this term.")
         self.search_button.clicked.connect(self._on_search)
         search_row.addWidget(self.search_button)
         layout.addLayout(search_row)

@@ -12,6 +12,7 @@ from vra_editor.core.friendly_labels import friendly_label
 VRA_NS = "http://www.vraweb.org/vracore4.htm"
 NSMAP = {None: VRA_NS}
 XML_NS = "http://www.w3.org/XML/1998/namespace"  # the reserved xml: prefix, for xml:lang
+XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
 
 # Top-level record types build_tree looks for when walking the document.
 _RECORD_TAGS = ('work', 'image', 'collection')
@@ -49,6 +50,25 @@ class VraXmlParser:
             return etree.tostring(self.xml_root, pretty_print=True).decode('utf-8')
         except Exception as e:
             print(e)
+
+    def new_document(self, record_type: str, record_id: str, lang: str = 'en') -> str:
+        """Builds a fresh, minimal record of the given type (work/image/
+        collection) and makes it the loaded document, as if just parsed
+        from a file -- every Set is optional per the schema (recordType's
+        own sequence is all minOccurs="0"), so an empty record like this
+        is already schema-valid; the user fills it in via "+ Add" from
+        there. Returns the pretty-printed XML text, matching load()."""
+        root = etree.Element(f'{{{VRA_NS}}}vra', nsmap={'vra': VRA_NS, 'xsi': XSI_NS})
+        root.set(f'{{{XSI_NS}}}schemaLocation', f'{VRA_NS} http://www.loc.gov/standards/vracore/vra-strict.xsd')
+
+        record = etree.SubElement(root, f'{{{VRA_NS}}}{record_type}')
+        record.set('id', record_id)
+        record.set(f'{{{XML_NS}}}lang', lang)
+
+        self.xml_root = root
+        self.xml_etree = etree.ElementTree(root)
+        self.file_name = None
+        return etree.tostring(root, pretty_print=True).decode('utf-8')
 
     # ------------------------------------------------------------------
     # Tree building -- generic, schema-driven walk of whatever's actually
