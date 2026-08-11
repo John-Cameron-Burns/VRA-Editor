@@ -12,6 +12,7 @@ from vra_editor.config import load_locations
 from vra_editor.controllers.document_controller import DocumentController
 from vra_editor.core.commit_to_git import add_file_to_repo
 from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
+from vra_editor.ui.dialogs.help_dialog import HelpDialog
 from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
 from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
 from vra_editor.ui.error_messages import friendly_validation_error
@@ -296,7 +297,7 @@ class MainWindow(QMainWindow):
         'Home', 'Open', 'Create', 'Review', 'Import',
         'Save', 'Undo', 'Submit', 'Approve', 'Reject', 'Cancel',
         'Show XML', 'Review Notes', 'Advanced View',
-        'Settings', 'Autofill', 'About',
+        'Settings', 'Autofill', 'Help', 'About',
     ]
 
     # Which visual cluster each button belongs to -- see ModeBar's
@@ -307,16 +308,16 @@ class MainWindow(QMainWindow):
         'Save': 'action', 'Undo': 'action', 'Submit': 'action', 'Approve': 'action',
         'Reject': 'action', 'Cancel': 'action',
         'Show XML': 'view', 'Review Notes': 'view', 'Advanced View': 'view',
-        'Settings': 'admin', 'Autofill': 'admin', 'About': 'admin',
+        'Settings': 'admin', 'Autofill': 'admin', 'Help': 'admin', 'About': 'admin',
     }
 
     VARIANTS = dict(
-        initial=BASE_BUTTONS + ['Settings', 'About'],
+        initial=BASE_BUTTONS + ['Settings', 'Help', 'About'],
         edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View',
-                              'Submit', 'Cancel', 'About'],
+                              'Submit', 'Cancel', 'Help', 'About'],
         review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View',
-                                'Reject', 'Cancel', 'About'],
-        settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'About'],
+                                'Reject', 'Cancel', 'Help', 'About'],
+        settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'Help', 'About'],
     )
 
     BUTTON_TOOLTIPS = {
@@ -336,6 +337,7 @@ class MainWindow(QMainWindow):
         'Cancel': "Discard changes and return to the start screen.",
         'Settings': "Configure archive folders, application data, and preferences.",
         'Autofill': "Fill in settings fields with their default values.",
+        'Help': "Open the user manual.",
         'About': "Show version and license information.",
     }
 
@@ -354,6 +356,7 @@ class MainWindow(QMainWindow):
         self.xml_preview_panel = None  # Shows the current XML
         self.status_bar: StatusBar | None = None
         self._current_section_tag: str | None = None  # which Set the Simple view is showing
+        self._help_dialog: HelpDialog | None = None  # created lazily, reused across clicks
 
         # Registry of any widget (not just mode-bar buttons) that should
         # be shown/hidden per mode. Populate via register_mode_widget().
@@ -607,7 +610,7 @@ class MainWindow(QMainWindow):
         for name in ('Submit', 'Approve'):
             self.mode_bar.buttons[name].setStyleSheet(PRIMARY_BUTTON_STYLE)
         self.mode_bar.buttons['Reject'].setStyleSheet(REJECT_BUTTON_STYLE)
-        for name in ('Show XML', 'Review Notes', 'Advanced View', 'Settings', 'Autofill', 'About'):
+        for name in ('Show XML', 'Review Notes', 'Advanced View', 'Settings', 'Autofill', 'Help', 'About'):
             self.mode_bar.buttons[name].setStyleSheet(SECONDARY_BUTTON_STYLE)
 
         # A toggle, not an action -- checkable so its pressed state shows
@@ -637,6 +640,7 @@ class MainWindow(QMainWindow):
         buttons['Create'].clicked.connect(self._on_create)
         buttons['Review'].clicked.connect(self._on_review)
         buttons['Settings'].clicked.connect(self._on_settings)
+        buttons['Help'].clicked.connect(self._on_help)
         buttons['About'].clicked.connect(self._on_about)
         buttons['Save'].clicked.connect(self._on_save)
         buttons['Undo'].clicked.connect(self._on_undo)
@@ -798,6 +802,17 @@ class MainWindow(QMainWindow):
         dlg.exec()  # modal -- blocks until the user Saves or Cancels
         # dlg.exec() returning doesn't itself change app mode; Settings
         # remains an overlay on whatever mode was active before it opened.
+
+    def _on_help(self):
+        # Lazily created, then reused -- non-modal, so it can stay open
+        # on the side while the user works through whatever it's
+        # explaining, rather than reopening (and losing scroll position/
+        # find text) on every click.
+        if self._help_dialog is None:
+            self._help_dialog = HelpDialog(self)
+        self._help_dialog.show()
+        self._help_dialog.raise_()
+        self._help_dialog.activateWindow()
 
     def _on_about(self):
         QMessageBox.about(
