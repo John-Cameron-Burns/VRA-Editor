@@ -7,6 +7,10 @@ __pycache__/
 /build/
 /dist/
 
+# Personal IDE config -- not part of the app, and not the same between
+# any two contributors' machines.
+/.idea/
+
 # Real media files dropped into the working folders during use (personal
 # photos, scans, ...) -- not sample data, never meant to be tracked.
 # Uppercase variants included explicitly since git's case-sensitivity for
