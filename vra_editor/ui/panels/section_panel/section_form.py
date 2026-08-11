@@ -1,16 +1,11 @@
-from pathlib import Path
-
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QGroupBox, QStackedLayout,
-    QComboBox, QMessageBox, QFileDialog, QInputDialog,
+    QComboBox,
 )
 
-from vra_editor.config import load_locations
 from vra_editor.core.friendly_labels import friendly_label, friendly_enum_value
 from vra_editor.ui.panels.form_panel.display_editor import DisplayEditorPanel
 from vra_editor.ui.panels.section_panel.field_row import FieldRow
-
-_MEDIA_FILE_NAME_FILTER = "Images (*.tif *.tiff *.jpg *.jpeg *.png);;All Files (*)"
 
 
 class SectionFormPanel(QWidget):
@@ -50,18 +45,6 @@ class SectionFormPanel(QWidget):
         )
         self.remove_section_button.clicked.connect(self._on_remove_section_clicked)
         header_row.addWidget(self.remove_section_button)
-
-        self.link_media_button = QPushButton("+ Link Media File")
-        self.link_media_button.setToolTip(
-            "Pick an image file from anywhere on disk (with the option to "
-            "rename it as it comes in). It's copied into the media folder -- "
-            "the original is left where it was -- and its dimensions/"
-            "resolution (and GPS/capture date, if the file has them) are "
-            "filled in automatically, along with a relation entry linking "
-            "this record to it."
-        )
-        self.link_media_button.clicked.connect(self._on_link_media_clicked)
-        header_row.addWidget(self.link_media_button)
         outer.addLayout(header_row)
 
         self.display_editor = DisplayEditorPanel()
@@ -98,7 +81,6 @@ class SectionFormPanel(QWidget):
         freshly re-fetched node for the same Set."""
         self._current_node = node
         self.header.setText(f"<h2>{friendly_label(node.data.get('tag', ''))}</h2>")
-        self.link_media_button.setVisible(node.data.get('tag') == 'relationSet')
         self._rebuild_cards()
         self.layout.setCurrentWidget(self.content)
 
@@ -281,44 +263,6 @@ class SectionFormPanel(QWidget):
         if self._current_node is None:
             return
         self._doc_controller.remove_element(self._current_node.element)
-
-    def _on_link_media_clicked(self):
-        media_dir = load_locations().get('media')
-        if media_dir is None:
-            QMessageBox.warning(self, "Missing location", "No 'media' folder is configured in vra-config.ini.")
-            return
-
-        # Unrestricted -- the source file can be anywhere on disk, not just
-        # the ingest folder, which is only used as a starting point if it
-        # exists (a cataloguer usually does have new files sitting there).
-        ingest_dir = load_locations().get('ingest')
-        start_dir = str(ingest_dir) if ingest_dir and ingest_dir.exists() else str(Path.home())
-        path_str, _ = QFileDialog.getOpenFileName(
-            self, "Select Media File", start_dir, _MEDIA_FILE_NAME_FILTER,
-        )
-        if not path_str:
-            return
-        source_path = Path(path_str)
-
-        new_name, ok = QInputDialog.getText(
-            self, "Save into media folder as", "Filename:", text=source_path.name,
-        )
-        if not ok:
-            return
-        new_name = new_name.strip()
-        if not new_name:
-            return
-        if any(sep in new_name for sep in ('/', '\\')):
-            QMessageBox.warning(self, "Invalid name", "The filename can't contain '/' or '\\'.")
-            return
-        if (media_dir / new_name).exists():
-            QMessageBox.warning(
-                self, "File already exists",
-                f'"{new_name}" already exists in the media folder. Pick a different name and try again.',
-            )
-            return
-
-        self._doc_controller.link_media_file(source_path, dest_name=new_name)
 
     def _on_add_clicked(self):
         if self._current_node is None or self._add_spec is None:

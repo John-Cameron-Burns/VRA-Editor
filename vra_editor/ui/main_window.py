@@ -15,9 +15,9 @@ from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
 from vra_editor.ui.dialogs.audit_dialog import AuditDialog
 from vra_editor.ui.dialogs.help_dialog import HelpDialog
 from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
+from vra_editor.ui.dialogs.media_sync_dialog import MediaSyncDialog
 from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
 from vra_editor.ui.error_messages import friendly_validation_error
-from vra_editor.ui.panels.center_pane import CenterPane
 from vra_editor.ui.panels.form_panel.form_container import FormContainerPanel
 from vra_editor.ui.panels.review_notes_panel import ReviewNotesPanel
 from vra_editor.ui.panels.section_panel.section_form import SectionFormPanel
@@ -297,7 +297,7 @@ class MainWindow(QMainWindow):
     BUTTON_ORDER = [
         'Home', 'Open', 'Create', 'Review', 'Import',
         'Save', 'Undo', 'Submit', 'Approve', 'Reject', 'Cancel',
-        'Show XML', 'Review Notes', 'Advanced View',
+        'Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
         'Settings', 'Autofill', 'Audits', 'Help', 'About',
     ]
 
@@ -308,15 +308,15 @@ class MainWindow(QMainWindow):
         'Home': 'nav', 'Open': 'nav', 'Create': 'nav', 'Review': 'nav', 'Import': 'nav',
         'Save': 'action', 'Undo': 'action', 'Submit': 'action', 'Approve': 'action',
         'Reject': 'action', 'Cancel': 'action',
-        'Show XML': 'view', 'Review Notes': 'view', 'Advanced View': 'view',
+        'Show XML': 'view', 'Review Notes': 'view', 'Advanced View': 'view', 'Sync Media': 'view',
         'Settings': 'admin', 'Autofill': 'admin', 'Audits': 'admin', 'Help': 'admin', 'About': 'admin',
     }
 
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'Audits', 'Help', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View',
+        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
                               'Submit', 'Cancel', 'Audits', 'Help', 'About'],
-        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View',
+        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
                                 'Reject', 'Cancel', 'Audits', 'Help', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'Audits', 'Help', 'About'],
     )
@@ -332,6 +332,7 @@ class MainWindow(QMainWindow):
         'Show XML': "Show or hide the raw XML for this record.",
         'Review Notes': "Show or hide notes a reviewer has left for the editor.",
         'Advanced View': "Switch to the structure tree and single-element editor.",
+        'Sync Media': "Compare this record against an image file and fill in gaps on either side.",
         'Submit': "Send this record for review. Requires it to be schema-valid.",
         'Approve': "Move this record into the reviewed archive.",
         'Reject': "Send this record back to the editor for revision.",
@@ -399,13 +400,8 @@ class MainWindow(QMainWindow):
         splitter = QSplitter(Qt.Horizontal)
         self.xml_preview_panel = XmlPreviewPanel()
         self.review_notes_panel = ReviewNotesPanel(self.doc_controller)
-        # Wraps form_stack together with the linked-media preview band,
-        # so the preview persists across the Simple/Advanced toggle --
-        # see CenterPane. Its own "Thumbnail" button (not a top-bar
-        # toggle) collapses/restores it.
-        self.center_pane = CenterPane(self.doc_controller, self.form_stack)
         splitter.addWidget(self.nav_stack)
-        splitter.addWidget(self.center_pane)
+        splitter.addWidget(self.form_stack)
         splitter.addWidget(self.review_notes_panel)
         splitter.addWidget(self.xml_preview_panel)
         splitter.setSizes([250, 425, 250, 425])
@@ -520,7 +516,6 @@ class MainWindow(QMainWindow):
         self.tree_panel.load_document(self.doc_controller.xml_doc)
         self._refresh_navigation()
         self.review_notes_panel.refresh()
-        self.center_pane.refresh()
 
     def _on_file_loaded(self, path: str):
         """Surfaced automatically, not just available behind the
@@ -528,17 +523,10 @@ class MainWindow(QMainWindow):
         can't miss it. Deliberately tied to file_loaded rather than
         document_loaded -- the latter also fires on every insert/remove,
         which would reopen the panel right after the user closes it if
-        they then add or delete a Set.
-
-        Also where the media band's relevance and collapse state reset
-        -- file_loaded (unlike document_loaded) only fires on a genuine
-        load/create/clear/move, never on a plain edit, so collapsing it
-        to a thumbnail while editing doesn't keep getting undone by
-        every add/remove Set (see CenterPane.set_media_relevant)."""
+        they then add or delete a Set."""
         if self.review_notes_panel.has_unresolved_notes():
             self.mode_bar.buttons['Review Notes'].setChecked(True)
         self.mode_strip.set_context(self.mode_bar.current_mode, path)
-        self.center_pane.set_media_relevant(self.doc_controller.current_record_type == 'image')
 
     def _refresh_navigation(self):
         """Re-syncs the Simple view (both the section list and whichever
@@ -612,7 +600,8 @@ class MainWindow(QMainWindow):
         for name in ('Submit', 'Approve'):
             self.mode_bar.buttons[name].setStyleSheet(PRIMARY_BUTTON_STYLE)
         self.mode_bar.buttons['Reject'].setStyleSheet(REJECT_BUTTON_STYLE)
-        for name in ('Show XML', 'Review Notes', 'Advanced View', 'Settings', 'Autofill', 'Audits', 'Help', 'About'):
+        for name in ('Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
+                     'Settings', 'Autofill', 'Audits', 'Help', 'About'):
             self.mode_bar.buttons[name].setStyleSheet(SECONDARY_BUTTON_STYLE)
 
         # A toggle, not an action -- checkable so its pressed state shows
@@ -653,6 +642,7 @@ class MainWindow(QMainWindow):
         buttons['Reject'].clicked.connect(self._on_reject)
         buttons['Autofill'].clicked.connect(self._on_autofill)
         buttons['Import'].clicked.connect(self._on_import)
+        buttons['Sync Media'].clicked.connect(self._on_sync_media)
 
     def _on_toggle_xml(self, checked: bool):
         self.xml_preview_panel.setVisible(checked)
@@ -687,6 +677,15 @@ class MainWindow(QMainWindow):
         visible_names = set(self.VARIANTS[mode])
         for name, widget in self.mode_widgets.items():
             widget.setVisible(name in visible_names)
+        # Sync Media additionally needs the open record to actually be an
+        # image -- a Collection or Work can never have a file to sync
+        # against. Recomputed here (rather than from a separate
+        # file_loaded-driven channel) since apply_mode's sweep above would
+        # otherwise re-show it on every mode transition regardless of
+        # record type.
+        self.mode_bar.buttons['Sync Media'].setVisible(
+            'Sync Media' in visible_names and self.doc_controller.current_record_type == 'image'
+        )
         self.mode_bar.update_dividers(visible_names)
         self.mode_bar.current_mode = mode
         self.status_bar.set_mode(mode)
@@ -926,4 +925,8 @@ class MainWindow(QMainWindow):
             return
 
         dlg = ImportProgressDialog(ingest_dir, edit_dir, parent=self)
+        dlg.exec()
+
+    def _on_sync_media(self):
+        dlg = MediaSyncDialog(self.doc_controller, parent=self)
         dlg.exec()

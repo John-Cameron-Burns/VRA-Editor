@@ -211,11 +211,14 @@ class DocumentController(QObject):
         self.xml_updated.emit(self._xml_text)
 
     # ------------------------------------------------------------------
-    # Media linking -- picks up a raw image/media file, moves it into the
-    # configured 'media' folder, and auto-populates whatever the file
-    # itself can tell us (see core/media_metadata.py for the actual
-    # dimension/EXIF/IPTC work; this class just orchestrates writing the
-    # results into the document).
+    # Media sync -- compares the open record against an image file the
+    # cataloguer picks (there's no XML-stored link to a file; VRA Core's
+    # relation element is for record-to-record links, each end with its
+    # own id, not a pointer to a raw file with none, so the file is
+    # located fresh each time from MediaSyncDialog) and fills gaps in
+    # either direction. See core/media_metadata.py for the actual
+    # dimension/EXIF/IPTC work; this class just classifies each field and
+    # orchestrates writing the chosen results into the document or file.
     # ------------------------------------------------------------------
 
     # AAT unit terms for the auto-populated pixel/dpi measurements, in the
@@ -229,108 +232,163 @@ class DocumentController(QObject):
         'href': 'http://vocab.getty.edu/page/aat/300410385',
     }
 
-    def link_media_file(self, image_path, dest_name: Optional[str] = None) -> Optional[Path]:
-        """Copies image_path into the 'media' location (as dest_name, if
-        given -- otherwise under its own name), adds a relation entry
-        recording which file this record is linked to, and populates
-        measurements/location/date from it (see _populate_from_media).
-        One undo snapshot for the whole cascade -- the public per-field
-        methods (insert_child, update_element_data, ...) each snapshot
-        independently, so this works directly against xml_doc instead,
-        the same way create_new_record/_move_to_location already
-        bypass those wrappers.
+    # Fields kept in sync between record and file, keyed by the same name
+    # used throughout compute_media_sync/apply_media_sync's selections dict
+    # -- see _record_field_value/_file_field_value for how each side reads
+    # its current value, and _fill_record_field/_file_fields_to_write for
+    # how a chosen direction actually gets written.
+    _SYNC_FIELDS = ('title', 'description', 'rights', 'agent', 'subject', 'date', 'location')
 
-        Copies rather than moves: the source file can be anywhere on
-        disk (the picker isn't restricted to a single configured
-        folder), so leaving the original in place is the safer
-        default -- nothing about linking a file should require also
-        deleting it from wherever the user keeps their originals.
+    # Fields with a real "write into the file" implementation (see
+    # _file_fields_to_write) -- location is deliberately not one of them:
+    # there's no GPS-EXIF writer, only a GPS reader (see
+    # media_metadata.read_image_info), so a record's location can only
+    # ever flow file -> record, never the other way. compute_media_sync
+    # downgrades what would otherwise be a 'fill_file' classification for
+    # location to 'empty' (nothing actionable), and MediaSyncDialog hides
+    # the "use record value" choice on a location conflict, for the same
+    # reason.
+    _FILE_WRITABLE_FIELDS = ('title', 'description', 'rights', 'agent', 'subject', 'date')
 
-        Returns the file's final path in media/, or None if there's no
-        document loaded, no 'media' location configured, or dest_name
-        collides with a file already there (callers should check that
-        themselves first if they want a more specific message -- see
-        SectionFormPanel._on_link_media_clicked).
-        """
-        if self.xml_doc.xml_root is None or self._current_file is None:
-            return None
-        media_dir = load_locations().get('media')
-        if media_dir is None:
-            return None
+    def compute_media_sync(self, path) -> dict:
+        """Read-only comparison between the current record and an image
+        file the cataloguer just picked (there's no persisted link to
+        read this from -- see the module docstring in media_metadata.py
+        and the "purist" design this replaced). Returns:
+
+          {'measurements': {'width': int, 'height': int,
+                             'resolution': Optional[int], 'file_size': int},
+           'fields': {field_name: {'record': value, 'file': value,
+                                    'status': 'fill_record'|'fill_file'|
+                                              'conflict'|'in_sync'|'empty'}}}
+
+        measurements are always "file replaces record" (dimensions/size are
+        physical facts about the file, not an editorial choice) so they're
+        reported separately, not classified like the other fields.
+
+        fields covers title/description/rights/agent/subject/date/location,
+        each classified by comparing the record's current value against
+        the file's IPTC/EXIF value -- see apply_media_sync for what each
+        status means and _record_field_value/_file_field_value for how
+        each side is actually read."""
+        path = Path(path)
+        info = media_metadata.read_image_info(path)
+        iptc_fields = media_metadata.read_iptc(path)
+
+        measurements = {
+            'width': info.width,
+            'height': info.height,
+            'resolution': int(info.dpi) if info.dpi is not None else None,
+            'file_size': info.file_size,
+        }
+
+        root = self.xml_doc.xml_root
+        fields = {}
+        for name in self._SYNC_FIELDS:
+            record_value = self._record_field_value(root, name)
+            file_value = self._file_field_value(name, info, iptc_fields)
+            status = self._classify_sync_field(record_value, file_value)
+            if status == 'fill_file' and name not in self._FILE_WRITABLE_FIELDS:
+                status = 'empty'
+            fields[name] = {'record': record_value, 'file': file_value, 'status': status}
+
+        return {'measurements': measurements, 'fields': fields}
+
+    @staticmethod
+    def _classify_sync_field(record_value, file_value) -> str:
+        if not record_value and not file_value:
+            return 'empty'
+        if record_value and not file_value:
+            return 'fill_file'
+        if file_value and not record_value:
+            return 'fill_record'
+        return 'in_sync' if record_value == file_value else 'conflict'
+
+    def _record_field_value(self, root, name: str):
+        """The record's current value for a sync field, in the same
+        shape _file_field_value returns for it (str for scalars, list[str]
+        for agent/subject, a '{lat}, {lon}' string for location) so the
+        two are directly comparable in compute_media_sync."""
+        if root is None:
+            return '' if name not in ('agent', 'subject') else []
+        if name == 'title':
+            return self._first_text(root, 'title')
+        if name == 'description':
+            return self._first_text(root, 'description')
+        if name == 'rights':
+            elem = root.find(f'.//{{{VRA_NS}}}rights/{{{VRA_NS}}}text')
+            return (elem.text or '').strip() if elem is not None else ''
+        if name == 'agent':
+            return self._all_sub_text(root, 'agent', 'name')
+        if name == 'subject':
+            return self._all_sub_text(root, 'subject', 'term')
+        if name == 'date':
+            return self._creation_date_text(root)
+        if name == 'location':
+            for location in root.iter(f'{{{VRA_NS}}}location'):
+                if location.get('type') != 'creation':
+                    continue
+                name_elem = location.find(f'{{{VRA_NS}}}name')
+                if name_elem is not None and name_elem.get('type') == 'geographic':
+                    return (name_elem.text or '').strip()
+            return ''
+        raise ValueError(name)
+
+    @staticmethod
+    def _file_field_value(name: str, info, iptc_fields: dict):
+        if name == 'title':
+            return iptc_fields.get('Iptc.Application2.ObjectName', '').strip()
+        if name == 'description':
+            return iptc_fields.get('Iptc.Application2.Caption', '').strip()
+        if name == 'rights':
+            return iptc_fields.get('Iptc.Application2.Copyright', '').strip()
+        if name == 'agent':
+            return [n.strip() for n in iptc_fields.get('Iptc.Application2.Byline', []) if n.strip()]
+        if name == 'subject':
+            return [k.strip() for k in iptc_fields.get('Iptc.Application2.Keywords', []) if k.strip()]
+        if name == 'date':
+            return info.date or ''
+        if name == 'location':
+            if info.gps_lat is None or info.gps_lon is None:
+                return ''
+            return f'{info.gps_lat:.6f}, {info.gps_lon:.6f}'
+        raise ValueError(name)
+
+    def apply_media_sync(self, path, selections: dict) -> None:
+        """Applies a media sync: selections is {field_name: 'record'|'file'}
+        for whichever of compute_media_sync's fields the cataloguer chose
+        to actually write (fill_record/fill_file rows default to their
+        one legal direction; conflict rows may go either way; empty/
+        in_sync rows are typically omitted since there's nothing to do).
+        Measurements (width/height/resolution/file_size) always get
+        written from the file, unconditionally -- see compute_media_sync.
+
+        One undo snapshot for the whole thing, the same way
+        link_media_file/extract_media_metadata used to -- this works
+        directly against xml_doc rather than the public per-field
+        wrappers (insert_child, update_element_data, ...), each of which
+        snapshots independently.
+
+        Callers wanting to write 'date' as 'file' (i.e. into the file's
+        IPTC/EXIF) must first make sure the record's date is an exact
+        calendar date -- see media_metadata.parse_vra_date -- since a
+        fuzzy one silently contributes nothing to build_iptc_fields/
+        build_exif_fields. MediaSyncDialog resolves that before calling
+        this, the same way MediaPreviewPanel's Inject flow used to."""
+        if self.xml_doc.xml_root is None:
+            return
+        path = Path(path)
+        info = media_metadata.read_image_info(path)
+        iptc_fields = media_metadata.read_iptc(path)
 
         records = self.xml_doc.build_tree()
         if not records:
-            return None
+            return
         record_node = records[0]
         record_elem = record_node.element
         record_specs = record_node.child_specs
 
-        media_dir.mkdir(parents=True, exist_ok=True)
-        image_path = Path(image_path)
-        dest_path = (media_dir / (dest_name or image_path.name)).resolve()
-        if dest_path.exists():
-            return None
-        shutil.copy2(str(image_path), str(dest_path))
-
         self._snapshot_before_structural_change()
-
-        relation_set = self._ensure_set(record_elem, record_specs, 'relationSet')
-        relation_type = self._type_name_of(record_specs, 'relationSet')
-        self._add_set_item(relation_set, relation_type, 'relation',
-                            dest_path.name, {'type': 'imageIs'})
-
-        self._populate_from_media(record_elem, record_specs, dest_path)
-
-        self._xml_text = self._rebuild_xml()
-        self.xml_updated.emit(self._xml_text)
-        self.document_loaded.emit(self.xml_doc)
-        return dest_path
-
-    def extract_media_metadata(self) -> bool:
-        """Re-reads the currently-linked media file's dimensions/EXIF and
-        refreshes the record's Measurements/Location/Date sections from
-        it, without touching the relation entry or moving anything --
-        for when the linked file changed after it was first linked, or
-        the initial auto-extraction (see link_media_file) missed
-        something worth retrying. One undo snapshot, like link_media_file.
-        Returns False if there's no document loaded or no file linked.
-        """
-        path = self.find_linked_media_path()
-        if path is None:
-            return False
-        records = self.xml_doc.build_tree()
-        if not records:
-            return False
-        record_node = records[0]
-
-        self._snapshot_before_structural_change()
-        self._populate_from_media(record_node.element, record_node.child_specs, path)
-
-        self._xml_text = self._rebuild_xml()
-        self.xml_updated.emit(self._xml_text)
-        self.document_loaded.emit(self.xml_doc)
-        return True
-
-    def _populate_from_media(self, record_elem, record_specs, path: Path):
-        """Writes dimensions/DPI (always) and GPS/capture-date (only
-        when the file's EXIF actually has them) into record_elem's
-        Measurements/Location/Date sections, then whatever Title/
-        Description/People/Rights/Subjects the file's own IPTC block
-        already carries (see _populate_from_iptc) -- the read half of
-        the round trip Inject writes, so a file that was Injected
-        before (or arrives with IPTC from a photographer/agency's own
-        tooling) can seed those fields instead of leaving them blank.
-
-        Measurements/Location/Date are always machine-derived here, so
-        they're replaced (not duplicated) on every call, identified by
-        their 'type' attribute -- safe to call more than once for the
-        same record (see extract_media_metadata, which is exactly
-        that: a deliberate re-run). Title/Description/... are just as
-        likely to already be hand-entered, so those are only filled in
-        when currently empty -- never overwritten.
-
-        Caller owns the undo snapshot and the emit/rebuild."""
-        info = media_metadata.read_image_info(path)
 
         measurements_set = self._ensure_set(record_elem, record_specs, 'measurementsSet')
         measurements_type = self._type_name_of(record_specs, 'measurementsSet')
@@ -341,8 +399,99 @@ class DocumentController(QObject):
         if info.dpi is not None:
             self._replace_measurement(measurements_set, measurements_type, 'resolution',
                                        str(int(info.dpi)), {'unit': 'dpi', **self._AAT_DPI})
+        self._replace_measurement(measurements_set, measurements_type, 'fileSize',
+                                   str(info.file_size), {'unit': 'bytes'})
 
-        if info.gps_lat is not None and info.gps_lon is not None:
+        record_fields_to_write = {}
+        for name, direction in selections.items():
+            if direction == 'record':
+                self._fill_record_field(record_elem, record_specs, name, info, iptc_fields)
+            elif direction == 'file':
+                record_fields_to_write[name] = True
+
+        if record_fields_to_write:
+            fields, exif_fields = self._file_fields_to_write(record_fields_to_write)
+            if fields:
+                self.inject_iptc(path, fields, exif_fields)
+
+        self._xml_text = self._rebuild_xml()
+        self.xml_updated.emit(self._xml_text)
+        self.document_loaded.emit(self.xml_doc)
+
+    def _fill_record_field(self, record_elem, record_specs, name: str, info, iptc_fields: dict):
+        """Writes one field's file-side value into the record -- the
+        'record' half of apply_media_sync's per-field selections, and
+        (for location/date) the same shape link_media_file's old
+        _populate_from_media used, now driven by an explicit selection
+        instead of an implicit gap-check."""
+        if name == 'title':
+            title = iptc_fields.get('Iptc.Application2.ObjectName', '').strip()
+            if not title:
+                return
+            title_set = self._ensure_set(record_elem, record_specs, 'titleSet')
+            title_type = self._type_name_of(record_specs, 'titleSet')
+            for existing in title_set.findall(f'{{{VRA_NS}}}title'):
+                self.xml_doc.remove_element(existing)
+            # 'main' reads naturally but isn't actually one of
+            # titleTypeType's enumerated values (see vra_core4_strict.xsd)
+            # -- 'descriptive' is the closest fit for a plain imported
+            # title with no more specific classification available.
+            self._add_set_item(title_set, title_type, 'title', title, {'type': 'descriptive'})
+        elif name == 'description':
+            description = iptc_fields.get('Iptc.Application2.Caption', '').strip()
+            if not description:
+                return
+            description_set = self._ensure_set(record_elem, record_specs, 'descriptionSet')
+            description_type = self._type_name_of(record_specs, 'descriptionSet')
+            for existing in description_set.findall(f'{{{VRA_NS}}}description'):
+                self.xml_doc.remove_element(existing)
+            self._add_set_item(description_set, description_type, 'description', description)
+        elif name == 'rights':
+            rights = iptc_fields.get('Iptc.Application2.Copyright', '').strip()
+            if not rights:
+                return
+            rights_set = self._ensure_set(record_elem, record_specs, 'rightsSet')
+            rights_type = self._type_name_of(record_specs, 'rightsSet')
+            for existing in rights_set.findall(f'{{{VRA_NS}}}rights'):
+                self.xml_doc.remove_element(existing)
+            rights_elem = self._add_set_item(rights_set, rights_type, 'rights')
+            self._add_set_item(rights_elem, 'rightsType', 'text', rights)
+        elif name == 'agent':
+            names = [n.strip() for n in iptc_fields.get('Iptc.Application2.Byline', []) if n.strip()]
+            if not names:
+                return
+            agent_set = self._ensure_set(record_elem, record_specs, 'agentSet')
+            agent_type = self._type_name_of(record_specs, 'agentSet')
+            for existing in agent_set.findall(f'{{{VRA_NS}}}agent'):
+                self.xml_doc.remove_element(existing)
+            for person_name in names:
+                agent_elem = self._add_set_item(agent_set, agent_type, 'agent')
+                self._add_set_item(agent_elem, 'agentType', 'name', person_name)
+        elif name == 'subject':
+            keywords = [k.strip() for k in iptc_fields.get('Iptc.Application2.Keywords', []) if k.strip()]
+            if not keywords:
+                return
+            subject_set = self._ensure_set(record_elem, record_specs, 'subjectSet')
+            subject_type = self._type_name_of(record_specs, 'subjectSet')
+            for existing in subject_set.findall(f'{{{VRA_NS}}}subject'):
+                self.xml_doc.remove_element(existing)
+            for keyword in keywords:
+                subject_elem = self._add_set_item(subject_set, subject_type, 'subject')
+                self._add_set_item(subject_elem, 'subjectType', 'term', keyword)
+        elif name == 'date':
+            if info.date is None:
+                return
+            date_set = self._ensure_set(record_elem, record_specs, 'dateSet')
+            date_type = self._type_name_of(record_specs, 'dateSet')
+            for existing in date_set.findall(f'{{{VRA_NS}}}date'):
+                if existing.get('type') == 'creation':
+                    self.xml_doc.remove_element(existing)
+            date_elem = self._add_set_item(date_set, date_type, 'date', attrs={'type': 'creation'})
+            self._add_set_item(date_elem, 'dateType', 'earliestDate', info.date)
+            self._add_set_item(date_elem, 'dateType', 'latestDate', info.date)
+        elif name == 'location':
+            if info.gps_lat is None or info.gps_lon is None:
+                return
             location_set = self._ensure_set(record_elem, record_specs, 'locationSet')
             location_type = self._type_name_of(record_specs, 'locationSet')
             for existing in location_set.findall(f'{{{VRA_NS}}}location'):
@@ -355,81 +504,74 @@ class DocumentController(QObject):
             # vocab="GNS" convention for actual GNS-confirmed places.
             self._add_set_item(location_elem, 'locationType', 'name',
                                 f'{info.gps_lat:.6f}, {info.gps_lon:.6f}', {'type': 'geographic'})
+        else:
+            raise ValueError(name)
 
-        if info.date is not None:
-            date_set = self._ensure_set(record_elem, record_specs, 'dateSet')
-            date_type = self._type_name_of(record_specs, 'dateSet')
-            for existing in date_set.findall(f'{{{VRA_NS}}}date'):
-                if existing.get('type') == 'creation':
-                    self.xml_doc.remove_element(existing)
-            date_elem = self._add_set_item(date_set, date_type, 'date', attrs={'type': 'creation'})
-            self._add_set_item(date_elem, 'dateType', 'earliestDate', info.date)
-            self._add_set_item(date_elem, 'dateType', 'latestDate', info.date)
+    def _file_fields_to_write(self, selected_names: dict) -> tuple:
+        """Builds the (Iptc.Application2.* dict, Exif.* dict) pair for
+        apply_media_sync's 'file' selections, reusing build_iptc_fields/
+        build_exif_fields (the same mapping Inject always used) but
+        limited to just the selected field names -- so a conflict row
+        the cataloguer resolved as "keep record, don't touch the file"
+        for Title doesn't also silently push Description into the file
+        just because Description happened to be a clean fill_file."""
+        name_to_iptc_key = {
+            'title': 'Iptc.Application2.ObjectName',
+            'description': 'Iptc.Application2.Caption',
+            'rights': 'Iptc.Application2.Copyright',
+            'agent': 'Iptc.Application2.Byline',
+            'subject': 'Iptc.Application2.Keywords',
+            'date': 'Iptc.Application2.DateCreated',
+        }
+        all_fields = self.build_iptc_fields()
+        fields = {
+            key: all_fields[key]
+            for name, key in name_to_iptc_key.items()
+            if name in selected_names and key in all_fields
+        }
+        exif_fields = self.build_exif_fields() if 'date' in selected_names else {}
+        return fields, exif_fields
 
-        iptc_fields = media_metadata.read_iptc(path)
-        self._populate_from_iptc(record_elem, record_specs, iptc_fields)
+    def guess_linked_media_path(self) -> Optional[Path]:
+        """A file sitting next to the record's own XML file whose stem
+        matches the record's id -- not an authoritative link (there is
+        none, by design), just a convenience default for
+        MediaSyncDialog's file picker so a file previously saved via
+        copy_media_alongside is found again without re-browsing."""
+        if self.xml_doc.xml_root is None or self._current_file is None:
+            return None
+        records = self.xml_doc.build_tree()
+        if not records:
+            return None
+        record_id = records[0].element.get('id', '').strip()
+        if not record_id:
+            return None
+        record_dir = Path(self._current_file).parent
+        for ext in ('.tif', '.tiff', '.jpg', '.jpeg', '.png'):
+            candidate = record_dir / f'{record_id}{ext}'
+            if candidate.exists():
+                return candidate
+        return None
 
-    def _populate_from_iptc(self, record_elem, record_specs, fields: dict):
-        """The inverse of build_iptc_fields: seeds Title/Description/
-        People/Rights/Subjects from the file's own IPTC block, one
-        section at a time, and only when that section doesn't already
-        have content -- record id is deliberately not round-tripped
-        back into record_elem's own id attribute, since a restored
-        TransmissionReference from another record's old export could
-        collide with (or just be wrong for) this one."""
-        title = fields.get('Iptc.Application2.ObjectName', '').strip()
-        if title and not self._has_content(record_elem, 'title'):
-            title_set = self._ensure_set(record_elem, record_specs, 'titleSet')
-            title_type = self._type_name_of(record_specs, 'titleSet')
-            # 'main' reads naturally but isn't actually one of
-            # titleTypeType's enumerated values (see vra_core4_strict.xsd)
-            # -- 'descriptive' is the closest fit for a plain imported
-            # title with no more specific classification available, and
-            # is what this archive's own sample data mostly uses.
-            self._add_set_item(title_set, title_type, 'title', title, {'type': 'descriptive'})
-
-        description = fields.get('Iptc.Application2.Caption', '').strip()
-        if description and not self._has_content(record_elem, 'description'):
-            description_set = self._ensure_set(record_elem, record_specs, 'descriptionSet')
-            description_type = self._type_name_of(record_specs, 'descriptionSet')
-            self._add_set_item(description_set, description_type, 'description', description)
-
-        rights = fields.get('Iptc.Application2.Copyright', '').strip()
-        if rights and not self._has_content(record_elem, 'rights'):
-            rights_set = self._ensure_set(record_elem, record_specs, 'rightsSet')
-            rights_type = self._type_name_of(record_specs, 'rightsSet')
-            rights_elem = self._add_set_item(rights_set, rights_type, 'rights')
-            self._add_set_item(rights_elem, 'rightsType', 'text', rights)
-
-        names = fields.get('Iptc.Application2.Byline')
-        if names and not self._has_content(record_elem, 'agent'):
-            agent_set = self._ensure_set(record_elem, record_specs, 'agentSet')
-            agent_type = self._type_name_of(record_specs, 'agentSet')
-            for name in names:
-                name = name.strip()
-                if not name:
-                    continue
-                agent_elem = self._add_set_item(agent_set, agent_type, 'agent')
-                self._add_set_item(agent_elem, 'agentType', 'name', name)
-
-        keywords = fields.get('Iptc.Application2.Keywords')
-        if keywords and not self._has_content(record_elem, 'term'):
-            subject_set = self._ensure_set(record_elem, record_specs, 'subjectSet')
-            subject_type = self._type_name_of(record_specs, 'subjectSet')
-            for keyword in keywords:
-                keyword = keyword.strip()
-                if not keyword:
-                    continue
-                subject_elem = self._add_set_item(subject_set, subject_type, 'subject')
-                self._add_set_item(subject_elem, 'subjectType', 'term', keyword)
-
-    @staticmethod
-    def _has_content(record_elem, tag: str) -> bool:
-        """True if record_elem already has a <tag> anywhere under it
-        with non-blank text -- the guard that keeps _populate_from_iptc
-        from overwriting anything a cataloguer already entered by
-        hand."""
-        return any((el.text or '').strip() for el in record_elem.iter(f'{{{VRA_NS}}}{tag}'))
+    def copy_media_alongside(self, path) -> Optional[Path]:
+        """Copies path to sit next to the record's own XML file, named
+        after the record's own id -- plain file I/O, not a document
+        edit, so no undo snapshot and no signal emitted. None if
+        there's no document loaded or no file currently open."""
+        if self.xml_doc.xml_root is None or self._current_file is None:
+            return None
+        records = self.xml_doc.build_tree()
+        if not records:
+            return None
+        record_id = records[0].element.get('id', '').strip()
+        if not record_id:
+            return None
+        path = Path(path)
+        dest_path = Path(self._current_file).parent / f'{record_id}{path.suffix}'
+        if dest_path.resolve() == path.resolve():
+            return dest_path
+        shutil.copy2(str(path), str(dest_path))
+        return dest_path
 
     def _replace_measurement(self, measurements_set, measurements_type, measurement_type: str,
                               text: str, attrs: dict):
@@ -465,23 +607,6 @@ class DocumentController(QObject):
         for key, value in (attrs or {}).items():
             new_elem.set(key, value)
         return new_elem
-
-    def find_linked_media_path(self) -> Optional[Path]:
-        """Resolves the media file linked via a type="imageIs" relation
-        entry (see link_media_file) against the 'media' location. None
-        if there's no such relation, the file's missing, or no 'media'
-        location is configured."""
-        if self.xml_doc.xml_root is None:
-            return None
-        media_dir = load_locations().get('media')
-        if media_dir is None:
-            return None
-        for relation in self.xml_doc.xml_root.iter(f'{{{VRA_NS}}}relation'):
-            if relation.get('type') == 'imageIs' and (relation.text or '').strip():
-                candidate = media_dir / relation.text.strip()
-                if candidate.exists():
-                    return candidate
-        return None
 
     def build_iptc_fields(self) -> dict:
         """The {Iptc.Application2.*: value} dict for inject_iptc, built
@@ -533,9 +658,10 @@ class DocumentController(QObject):
         # writing the raw VRA text (which can be "circa 1990") straight
         # through fails silently at the libexiv2 level. Same fuzziness
         # rule as EXIF: only ever write a date that actually parses as
-        # one, omit it entirely otherwise. See MediaPreviewPanel's Inject
-        # flow, which prompts to fix or skip a fuzzy date before this is
-        # ever reached, rather than silently dropping it here unremarked.
+        # one, omit it entirely otherwise. See MediaSyncDialog's
+        # _resolve_fuzzy_date, which prompts to fix or skip a fuzzy date
+        # before this is ever reached, rather than silently dropping it
+        # here unremarked.
         creation_date = self._creation_date_text(root)
         if creation_date:
             parsed = media_metadata.parse_vra_date(creation_date)
@@ -631,14 +757,18 @@ class DocumentController(QObject):
                 results.append(text)
         return results
 
-    def inject_iptc(self, path, fields: dict) -> None:
+    def inject_iptc(self, path, fields: dict, exif_fields: Optional[dict] = None) -> None:
         """Writes fields (Iptc.Application2.* -- see build_iptc_fields)
-        as the file's IPTC block, and -- if the record has a creation
-        date that parses as a real calendar date -- that same date as
-        the file's EXIF capture date too (see build_exif_fields), so a
-        tool that only reads EXIF (plenty do) still sees it."""
+        as the file's IPTC block, and exif_fields (see build_exif_fields)
+        as its EXIF block -- defaulting to build_exif_fields() itself if
+        the caller doesn't pass exif_fields explicitly, so a plain
+        inject_iptc(path, build_iptc_fields()) call still pushes the
+        record's creation date into EXIF too, the way it always has.
+        apply_media_sync passes an explicit (possibly empty) exif_fields
+        instead, since the creation date is just one of several fields
+        that may or may not have been selected to write into the file."""
         media_metadata.write_iptc(path, fields)
-        media_metadata.write_exif(path, self.build_exif_fields())
+        media_metadata.write_exif(path, self.build_exif_fields() if exif_fields is None else exif_fields)
 
     # ------------------------------------------------------------------
     # Review notes -- a reviewer's todo list for the editor, stored as an

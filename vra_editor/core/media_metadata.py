@@ -49,6 +49,7 @@ class ImageInfo:
     gps_lat: Optional[float]  # decimal degrees, None if no GPS EXIF
     gps_lon: Optional[float]
     date: Optional[str]  # ISO "YYYY-MM-DD", None if no capture timestamp
+    file_size: int  # bytes, from the filesystem -- not an EXIF/IPTC tag
 
 
 def _dms_to_decimal(dms, ref: str) -> float:
@@ -91,7 +92,9 @@ def read_image_info(path) -> ImageInfo:
         exif = im.getexif()
         gps_lat, gps_lon = _read_gps(exif)
         date = _read_date(exif)
-    return ImageInfo(width=width, height=height, dpi=dpi, gps_lat=gps_lat, gps_lon=gps_lon, date=date)
+    file_size = Path(path).stat().st_size
+    return ImageInfo(width=width, height=height, dpi=dpi, gps_lat=gps_lat, gps_lon=gps_lon, date=date,
+                      file_size=file_size)
 
 
 def load_preview_image(path) -> QImage:
