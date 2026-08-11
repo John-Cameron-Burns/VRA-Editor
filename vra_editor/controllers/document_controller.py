@@ -529,9 +529,18 @@ class DocumentController(QObject):
         if subjects:
             fields['Iptc.Application2.Keywords'] = subjects
 
+        # IPTC's DateCreated expects a strict CCYYMMDD, not free text --
+        # writing the raw VRA text (which can be "circa 1990") straight
+        # through fails silently at the libexiv2 level. Same fuzziness
+        # rule as EXIF: only ever write a date that actually parses as
+        # one, omit it entirely otherwise. See MediaPreviewPanel's Inject
+        # flow, which prompts to fix or skip a fuzzy date before this is
+        # ever reached, rather than silently dropping it here unremarked.
         creation_date = self._creation_date_text(root)
         if creation_date:
-            fields['Iptc.Application2.DateCreated'] = creation_date
+            parsed = media_metadata.parse_vra_date(creation_date)
+            if parsed is not None:
+                fields['Iptc.Application2.DateCreated'] = parsed.strftime('%Y%m%d')
 
         return fields
 
@@ -548,6 +557,52 @@ class DocumentController(QObject):
         if not creation_date:
             return {}
         return media_metadata.build_exif_date_field(creation_date)
+
+    def get_creation_date_text(self) -> str:
+        """The record's raw creation-date text (e.g. "circa 1990"), for
+        UI that needs to check whether it is an exact calendar date
+        (see media_metadata.parse_vra_date) before relying on
+        build_iptc_fields/build_exif_fields to have included it. Empty
+        string if there is no creation date, or no document loaded."""
+        root = self.xml_doc.xml_root
+        if root is None:
+            return ''
+        return self._creation_date_text(root)
+
+    def set_creation_date(self, date_str: str):
+        """Sets the record's creation date (creating Dates/date/
+        earliestDate/latestDate if none exists yet) to date_str,
+        replacing whatever was there. Used when Inject's fuzzy-date
+        prompt asks for -- and gets -- an exact replacement; a plain
+        edit like any other, so it is undoable and shows up in the
+        section form immediately, not just in the injected file."""
+        if self.xml_doc.xml_root is None:
+            return
+        records = self.xml_doc.build_tree()
+        if not records:
+            return
+        record_node = records[0]
+        record_elem = record_node.element
+        record_specs = record_node.child_specs
+
+        self._snapshot_before_structural_change()
+        date_set = self._ensure_set(record_elem, record_specs, 'dateSet')
+        date_type = self._type_name_of(record_specs, 'dateSet')
+        date_elem = next(
+            (d for d in date_set.findall(f'{{{VRA_NS}}}date') if d.get('type') == 'creation'),
+            None,
+        )
+        if date_elem is None:
+            date_elem = self._add_set_item(date_set, date_type, 'date', attrs={'type': 'creation'})
+        for sub_tag in ('earliestDate', 'latestDate'):
+            existing = date_elem.find(f'{{{VRA_NS}}}{sub_tag}')
+            if existing is not None:
+                self.xml_doc.remove_element(existing)
+            self._add_set_item(date_elem, 'dateType', sub_tag, date_str)
+
+        self._xml_text = self._rebuild_xml()
+        self.xml_updated.emit(self._xml_text)
+        self.document_loaded.emit(self.xml_doc)
 
     @staticmethod
     def _creation_date_text(root) -> str:

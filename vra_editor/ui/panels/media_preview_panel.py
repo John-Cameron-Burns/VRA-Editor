@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QMessageBox, QSizePolicy,
+    QInputDialog,
 )
 
 from vra_editor.core import media_metadata
@@ -132,9 +133,57 @@ class MediaPreviewPanel(QWidget):
                 "Could not re-read metadata from the linked file.",
             )
 
+    def _resolve_fuzzy_date(self) -> bool:
+        """If the record's creation date is not an exact calendar date,
+        asks whether to correct it or skip writing a date at all --
+        IPTC/EXIF have no way to represent "circa 1990", and writing it
+        verbatim just gets silently dropped by build_iptc_fields/
+        build_exif_fields further down. Returns False if the user backs
+        out of Inject entirely rather than resolving it."""
+        date_text = self._doc_controller.get_creation_date_text()
+        if not date_text or media_metadata.parse_vra_date(date_text) is not None:
+            return True  # nothing to resolve -- no creation date, or already exact
+
+        box = QMessageBox(
+            QMessageBox.Icon.Warning, "Creation date isn't exact",
+            f'This record\'s creation date is "{date_text}", which isn\'t a specific '
+            f'calendar date -- IPTC/EXIF have no way to store that. Enter an exact '
+            f'date, or skip writing a date at all?',
+            parent=self,
+        )
+        enter_button = box.addButton("Enter Exact Date...", QMessageBox.ButtonRole.AcceptRole)
+        box.addButton("Skip Date", QMessageBox.ButtonRole.DestructiveRole)
+        cancel_button = box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+        box.setDefaultButton(cancel_button)
+        box.exec()
+        clicked = box.clickedButton()
+
+        if clicked is cancel_button:
+            return False
+        if clicked is not enter_button:
+            return True  # "Skip Date" -- leave the record's date as-is; it's simply omitted below
+
+        while True:
+            new_date, ok = QInputDialog.getText(
+                self, "Enter exact date", "Creation date (YYYY-MM-DD):", text=date_text,
+            )
+            if not ok:
+                return False
+            new_date = new_date.strip()
+            if media_metadata.parse_vra_date(new_date) is not None:
+                self._doc_controller.set_creation_date(new_date)
+                return True
+            QMessageBox.warning(
+                self, "Not a valid date",
+                "Enter a date as YYYY-MM-DD, YYYY-MM, or YYYY.",
+            )
+
     def _on_inject_clicked(self):
         if self._media_path is None:
             return
+        if not self._resolve_fuzzy_date():
+            return
+
         fields = self._doc_controller.build_iptc_fields()
         if not fields:
             QMessageBox.information(
