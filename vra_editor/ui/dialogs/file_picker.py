@@ -51,8 +51,10 @@ def _human_size(num_bytes: int) -> str:
 
 
 class VraFilePickerDialog(QDialog):
-    """Modal file picker restricted to a single folder, listing each
-    record's parsed VRA title next to its filename.
+    """Modal file picker restricted to a single folder (including its
+    subfolders -- e.g. records Import filed under edit/collectionA/ are
+    still found here, not just ones sitting flat in edit/ itself),
+    listing each record's parsed VRA title next to its path.
 
     Usage:
         dlg = VraFilePickerDialog(directory=locations['edit'], parent=self)
@@ -108,14 +110,17 @@ class VraFilePickerDialog(QDialog):
         seen = set()
         files = []
         for pattern in self.file_filters:
-            for path in self.directory.glob(pattern):
+            for path in self.directory.rglob(pattern):
                 if path not in seen:
                     seen.add(path)
                     files.append(path)
         files.sort()
         self.table.setRowCount(len(files))
         for row, path in enumerate(files):
-            file_item = QTableWidgetItem(path.name)
+            # Relative path, not just the filename -- otherwise two
+            # records in different subfolders (or a subfolder and the
+            # root) would be indistinguishable in the list.
+            file_item = QTableWidgetItem(str(path.relative_to(self.directory)))
             file_item.setData(Qt.UserRole, str(path))
             second_item = QTableWidgetItem(extract_title(path) if is_xml else _human_size(path.stat().st_size))
             self.table.setItem(row, 0, file_item)

@@ -159,13 +159,19 @@ def merge_xml_elements(target: ET.Element, source: ET.Element,
 
 
 def process_vra_directory(input_dir: str, output_dir: str, progress_callback=None):
-    """Scans input_dir for VRA-Core XML files, merges files that share a
-    record ID, and writes one file per record into output_dir. Source
-    files are moved into a "done" subfolder of input_dir once handled --
-    whether that meant writing/merging them or skipping because a file
-    with that record ID already exists in output_dir -- so re-running
-    only ever processes what's newly arrived, and a record ID already
-    present in output_dir isn't overwritten.
+    """Scans input_dir -- including nested subfolders -- for VRA-Core XML
+    files, merges files that share a record ID, and writes one file per
+    record into output_dir. A merged record lands under the same
+    subfolder its first (primary) source file was found in, e.g.
+    input_dir/collectionA/foo.xml produces output_dir/collectionA/<id>.xml,
+    not a flattened output_dir/<id>.xml -- callers further down the
+    pipeline (Submit/Approve/Reject) preserve that same relative path
+    from then on. Source files are moved into a "done" subfolder of
+    input_dir once handled -- whether that meant writing/merging them or
+    skipping because a file with that record ID already exists anywhere
+    under output_dir -- each mirroring its own original subfolder there
+    too, so re-running only ever processes what's newly arrived, and a
+    record ID already present in output_dir isn't overwritten.
 
     progress_callback, if given, is called as
     progress_callback(current: int, total: int, message: str) at each
@@ -190,8 +196,10 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
     # 1. Scan and group XML files by record ID
     records_by_id = defaultdict(list)
 
-    report(0, 0, f"Scanning '{input_dir}' for VRA-Core XML files...")
-    for file_path in sorted(input_path.glob("*.xml")):
+    report(0, 0, f"Scanning '{input_dir}' (including subfolders) for VRA-Core XML files...")
+    for file_path in sorted(input_path.rglob("*.xml")):
+        if file_path.is_relative_to(done_path):
+            continue  # already-processed files from a previous run -- not new arrivals
         try:
             tree = ET.parse(file_path)
             root = tree.getroot()
@@ -232,17 +240,33 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
         if hasattr(ET, 'indent'):
             ET.indent(primary_tree, space="  ")
 
-        out_file = output_path / f"{rec_id}.xml"
-        if out_file.exists():
-            report(index, total, f" [!] '{rec_id}' already exists in '{output_dir}' -- not overwritten.")
+        # Record IDs are meant to be globally unique, so the existence
+        # check looks anywhere under output_dir, not just in the
+        # subfolder this batch would land in -- the same ID showing up
+        # under a different subfolder is still a duplicate, not a
+        # legitimately different record.
+        existing = next(output_path.rglob(f"{rec_id}.xml"), None)
+        if existing is not None:
+            report(index, total,
+                   f" [!] '{rec_id}' already exists in '{existing.relative_to(output_path)}' -- not overwritten.")
         else:
+            relative_dir = primary_path.parent.relative_to(input_path)
+            out_file = output_path / relative_dir / f"{rec_id}.xml"
+            out_file.parent.mkdir(parents=True, exist_ok=True)
             primary_tree.write(out_file, encoding="utf-8", xml_declaration=True)
 
         # Whether written or skipped as a duplicate, this ingest batch is
         # done with these source files -- move them out either way so a
         # re-run doesn't keep re-reporting the same already-handled ones.
+        # Each source file mirrors its own original subfolder under
+        # done/, which need not match the merged record's own (a
+        # secondary file for the same ID could have arrived from a
+        # different subfolder than the primary).
         for file_path, _ in files:
-            dest = done_path / file_path.name
+            relative_dir = file_path.parent.relative_to(input_path)
+            dest_dir = done_path / relative_dir
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            dest = dest_dir / file_path.name
             if dest.exists():
                 dest.unlink()
             shutil.move(str(file_path), str(dest))

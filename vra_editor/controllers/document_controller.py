@@ -764,7 +764,9 @@ class DocumentController(QObject):
         if not valid:
             return False, message
 
-        with open(self._current_file, 'wb') as f:
+        dest_path = Path(self._current_file)
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(dest_path, 'wb') as f:
             f.write(xml_bytes)
         self._dirty = False
         return True, f"Saved to {self._current_file}"
@@ -772,10 +774,13 @@ class DocumentController(QObject):
     def _move_to_location(self, location_key: str, validate: bool) -> tuple[bool, str]:
         """Shared shape for submit/approve/reject: writes the current
         in-memory document (any edits made along the way included) to
-        location_key's configured folder under the same filename, then
-        removes it from wherever it was. Returns (success, message) --
-        the validation error or a missing-location message on failure,
-        or the new path on success.
+        location_key's configured folder, preserving whatever subfolder
+        path the record currently has relative to its own location (see
+        _relative_record_path) -- edit/collectionA/foo.xml submits to
+        pending/collectionA/foo.xml, not a flattened pending/foo.xml --
+        then removes it from wherever it was. Returns (success,
+        message) -- the validation error or a missing-location message
+        on failure, or the new path on success.
 
         validate gates whether this transition requires a schema-valid
         document first. Submit does -- it's the actual gate keeping
@@ -799,10 +804,10 @@ class DocumentController(QObject):
         dest_dir = load_locations().get(location_key)
         if dest_dir is None:
             return False, f"No '{location_key}' folder configured in vra-config.ini."
-        dest_dir.mkdir(parents=True, exist_ok=True)
 
         src_path = Path(self._current_file).resolve()
-        dest_path = (dest_dir / src_path.name).resolve()
+        dest_path = (dest_dir / self._relative_record_path(src_path)).resolve()
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
         with open(dest_path, 'wb') as f:
             f.write(xml_bytes)
 
@@ -813,6 +818,22 @@ class DocumentController(QObject):
         self.file_loaded.emit(self._current_file)
         self._dirty = False
         return True, str(dest_path)
+
+    @staticmethod
+    def _relative_record_path(src_path: Path) -> Path:
+        """src_path's path relative to whichever configured location
+        (edit/ingest/pending/rejected/reviewed/released) it currently
+        sits under, so a submit/approve/reject move can reproduce that
+        same subfolder structure at the destination instead of
+        flattening it to just the filename. Falls back to the bare
+        filename if src_path isn't under any configured location --
+        shouldn't normally happen, but better than raising over it."""
+        for root in load_locations().values():
+            try:
+                return src_path.relative_to(root.resolve())
+            except ValueError:
+                continue
+        return Path(src_path.name)
 
     def submit_file(self) -> tuple[bool, str]:
         """Moves the current record from 'edit' into 'pending', for review."""
