@@ -50,8 +50,9 @@ class MediaPreviewPanel(QWidget):
         self.inject_button.setToolTip(
             "Writes this record's Title, Description, People, Rights, "
             "Subjects, and creation Date into the linked file's own IPTC "
-            "metadata, so the file stays useful outside this app too. "
-            "Modifies the actual file on disk."
+            "metadata (and the creation date into its EXIF capture date "
+            "too), so the file stays useful outside this app. Modifies "
+            "the actual file on disk."
         )
         self.inject_button.clicked.connect(self._on_inject_clicked)
         button_col.addWidget(self.inject_button)
@@ -143,9 +144,13 @@ class MediaPreviewPanel(QWidget):
             )
             return
 
+        exif_fields = self._doc_controller.build_exif_fields()
         summary = "\n".join(f"  {k.split('.')[-1]}: {v}" for k, v in fields.items())
+        if exif_fields:
+            summary += "\n\nAlso updates the file's own EXIF capture date to match:\n" \
+                       + "\n".join(f"  {k.split('.')[-1]}: {v}" for k, v in exif_fields.items())
         confirmed = QMessageBox.question(
-            self, "Write IPTC metadata?",
+            self, "Write metadata into file?",
             f"This will modify the actual file:\n{self._media_path}\n\nFields to write:\n{summary}",
         )
         if confirmed != QMessageBox.StandardButton.Yes:
@@ -154,6 +159,6 @@ class MediaPreviewPanel(QWidget):
         try:
             self._doc_controller.inject_iptc(self._media_path, fields)
         except Exception as exc:
-            QMessageBox.warning(self, "Write failed", f"Could not write IPTC metadata:\n{exc}")
+            QMessageBox.warning(self, "Write failed", f"Could not write metadata:\n{exc}")
             return
-        QMessageBox.information(self, "Done", "IPTC metadata written.")
+        QMessageBox.information(self, "Done", "Metadata written.")

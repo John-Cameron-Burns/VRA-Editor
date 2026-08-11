@@ -314,12 +314,22 @@ class DocumentController(QObject):
     def _populate_from_media(self, record_elem, record_specs, path: Path):
         """Writes dimensions/DPI (always) and GPS/capture-date (only
         when the file's EXIF actually has them) into record_elem's
-        Measurements/Location/Date sections. Replaces (rather than
-        duplicates) whichever of its own previously-auto-populated
-        entries are still there, identified by their 'type' attribute,
-        so this is safe to call more than once for the same record --
-        see extract_media_metadata, which is exactly that: a deliberate
-        re-run. Caller owns the undo snapshot and the emit/rebuild."""
+        Measurements/Location/Date sections, then whatever Title/
+        Description/People/Rights/Subjects the file's own IPTC block
+        already carries (see _populate_from_iptc) -- the read half of
+        the round trip Inject writes, so a file that was Injected
+        before (or arrives with IPTC from a photographer/agency's own
+        tooling) can seed those fields instead of leaving them blank.
+
+        Measurements/Location/Date are always machine-derived here, so
+        they're replaced (not duplicated) on every call, identified by
+        their 'type' attribute -- safe to call more than once for the
+        same record (see extract_media_metadata, which is exactly
+        that: a deliberate re-run). Title/Description/... are just as
+        likely to already be hand-entered, so those are only filled in
+        when currently empty -- never overwritten.
+
+        Caller owns the undo snapshot and the emit/rebuild."""
         info = media_metadata.read_image_info(path)
 
         measurements_set = self._ensure_set(record_elem, record_specs, 'measurementsSet')
@@ -355,6 +365,71 @@ class DocumentController(QObject):
             date_elem = self._add_set_item(date_set, date_type, 'date', attrs={'type': 'creation'})
             self._add_set_item(date_elem, 'dateType', 'earliestDate', info.date)
             self._add_set_item(date_elem, 'dateType', 'latestDate', info.date)
+
+        iptc_fields = media_metadata.read_iptc(path)
+        self._populate_from_iptc(record_elem, record_specs, iptc_fields)
+
+    def _populate_from_iptc(self, record_elem, record_specs, fields: dict):
+        """The inverse of build_iptc_fields: seeds Title/Description/
+        People/Rights/Subjects from the file's own IPTC block, one
+        section at a time, and only when that section doesn't already
+        have content -- record id is deliberately not round-tripped
+        back into record_elem's own id attribute, since a restored
+        TransmissionReference from another record's old export could
+        collide with (or just be wrong for) this one."""
+        title = fields.get('Iptc.Application2.ObjectName', '').strip()
+        if title and not self._has_content(record_elem, 'title'):
+            title_set = self._ensure_set(record_elem, record_specs, 'titleSet')
+            title_type = self._type_name_of(record_specs, 'titleSet')
+            # 'main' reads naturally but isn't actually one of
+            # titleTypeType's enumerated values (see vra_core4_strict.xsd)
+            # -- 'descriptive' is the closest fit for a plain imported
+            # title with no more specific classification available, and
+            # is what this archive's own sample data mostly uses.
+            self._add_set_item(title_set, title_type, 'title', title, {'type': 'descriptive'})
+
+        description = fields.get('Iptc.Application2.Caption', '').strip()
+        if description and not self._has_content(record_elem, 'description'):
+            description_set = self._ensure_set(record_elem, record_specs, 'descriptionSet')
+            description_type = self._type_name_of(record_specs, 'descriptionSet')
+            self._add_set_item(description_set, description_type, 'description', description)
+
+        rights = fields.get('Iptc.Application2.Copyright', '').strip()
+        if rights and not self._has_content(record_elem, 'rights'):
+            rights_set = self._ensure_set(record_elem, record_specs, 'rightsSet')
+            rights_type = self._type_name_of(record_specs, 'rightsSet')
+            rights_elem = self._add_set_item(rights_set, rights_type, 'rights')
+            self._add_set_item(rights_elem, 'rightsType', 'text', rights)
+
+        names = fields.get('Iptc.Application2.Byline')
+        if names and not self._has_content(record_elem, 'agent'):
+            agent_set = self._ensure_set(record_elem, record_specs, 'agentSet')
+            agent_type = self._type_name_of(record_specs, 'agentSet')
+            for name in names:
+                name = name.strip()
+                if not name:
+                    continue
+                agent_elem = self._add_set_item(agent_set, agent_type, 'agent')
+                self._add_set_item(agent_elem, 'agentType', 'name', name)
+
+        keywords = fields.get('Iptc.Application2.Keywords')
+        if keywords and not self._has_content(record_elem, 'term'):
+            subject_set = self._ensure_set(record_elem, record_specs, 'subjectSet')
+            subject_type = self._type_name_of(record_specs, 'subjectSet')
+            for keyword in keywords:
+                keyword = keyword.strip()
+                if not keyword:
+                    continue
+                subject_elem = self._add_set_item(subject_set, subject_type, 'subject')
+                self._add_set_item(subject_elem, 'subjectType', 'term', keyword)
+
+    @staticmethod
+    def _has_content(record_elem, tag: str) -> bool:
+        """True if record_elem already has a <tag> anywhere under it
+        with non-blank text -- the guard that keeps _populate_from_iptc
+        from overwriting anything a cataloguer already entered by
+        hand."""
+        return any((el.text or '').strip() for el in record_elem.iter(f'{{{VRA_NS}}}{tag}'))
 
     def _replace_measurement(self, measurements_set, measurements_type, measurement_type: str,
                               text: str, attrs: dict):
@@ -441,22 +516,50 @@ class DocumentController(QObject):
         if names:
             fields['Iptc.Application2.Byline'] = names
 
-        rights = self._first_text(root, 'rights')
-        if rights:
-            fields['Iptc.Application2.Copyright'] = rights
+        # rights has no text of its own -- its actual statement lives in a
+        # <text> child (see rightsType in the schema) -- so this needs a
+        # scoped lookup rather than _first_text's bare tag search, which
+        # would either find nothing (rights.text is always blank) or, worse,
+        # match some other element's <text> child (inscription has one too).
+        rights_text_elem = root.find(f'.//{{{VRA_NS}}}rights/{{{VRA_NS}}}text')
+        if rights_text_elem is not None and (rights_text_elem.text or '').strip():
+            fields['Iptc.Application2.Copyright'] = rights_text_elem.text.strip()
 
         subjects = self._all_sub_text(root, 'subject', 'term')
         if subjects:
             fields['Iptc.Application2.Keywords'] = subjects
 
+        creation_date = self._creation_date_text(root)
+        if creation_date:
+            fields['Iptc.Application2.DateCreated'] = creation_date
+
+        return fields
+
+    def build_exif_fields(self) -> dict:
+        """The {Exif.*: value} dict for inject_iptc's EXIF half -- just
+        the creation date today. Empty if there's no creation date, or
+        it doesn't parse as a real calendar date (see
+        media_metadata.build_exif_date_field) -- VRA dates can be far
+        fuzzier ("circa 1990") than EXIF has any way to represent."""
+        root = self.xml_doc.xml_root
+        if root is None:
+            return {}
+        creation_date = self._creation_date_text(root)
+        if not creation_date:
+            return {}
+        return media_metadata.build_exif_date_field(creation_date)
+
+    @staticmethod
+    def _creation_date_text(root) -> str:
+        """The record's <date type="creation"><earliestDate> text, used
+        as the source of truth for both IPTC DateCreated and the EXIF
+        capture date -- one field in the record, two places it goes
+        back out to in the file."""
         for date_elem in root.iter(f'{{{VRA_NS}}}date'):
             if date_elem.get('type') == 'creation':
                 earliest = date_elem.find(f'{{{VRA_NS}}}earliestDate')
-                if earliest is not None and (earliest.text or '').strip():
-                    fields['Iptc.Application2.DateCreated'] = earliest.text.strip()
-                break
-
-        return fields
+                return (earliest.text or '').strip() if earliest is not None else ''
+        return ''
 
     @staticmethod
     def _first_text(root, tag: str) -> str:
@@ -474,7 +577,13 @@ class DocumentController(QObject):
         return results
 
     def inject_iptc(self, path, fields: dict) -> None:
+        """Writes fields (Iptc.Application2.* -- see build_iptc_fields)
+        as the file's IPTC block, and -- if the record has a creation
+        date that parses as a real calendar date -- that same date as
+        the file's EXIF capture date too (see build_exif_fields), so a
+        tool that only reads EXIF (plenty do) still sees it."""
         media_metadata.write_iptc(path, fields)
+        media_metadata.write_exif(path, self.build_exif_fields())
 
     # ------------------------------------------------------------------
     # Review notes -- a reviewer's todo list for the editor, stored as an

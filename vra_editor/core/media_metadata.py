@@ -1,16 +1,29 @@
-"""Reading dimensions/EXIF from an image file and writing IPTC back into
-one. Pure functions, no Qt/UI dependency -- vra_editor.ui code calls these,
-not the other way around, matching this app's core/ui layering.
+"""Reading dimensions/EXIF/IPTC from an image file, and writing IPTC back
+into one. Pure functions, no Qt/UI dependency -- vra_editor.ui code calls
+these, not the other way around, matching this app's core/ui layering.
 
 Two libraries, for two different jobs:
   - Pillow: pixel dimensions, DPI, and decoding for the preview pane. Used
     for preview specifically because Qt's own bundled TIFF plugin can't
     open JPEG-compressed TIFFs (confirmed against this project's own real
     sample file) -- QPixmap(path) silently fails where Pillow succeeds.
-  - pyexiv2 (libexiv2): EXIF GPS/timestamp reading and IPTC writing.
-    Pillow's own EXIF support doesn't cover GPS IFD parsing or IPTC at
-    all, and unlike lighter pure-Python IPTC writers (iptcinfo3, JPEG
-    only), pyexiv2 handles TIFF too.
+  - pyexiv2 (libexiv2): EXIF GPS/timestamp reading and IPTC reading/
+    writing. Pillow's own EXIF support doesn't cover GPS IFD parsing or
+    IPTC at all, and unlike lighter pure-Python IPTC writers (iptcinfo3,
+    JPEG only), pyexiv2 handles TIFF too.
+
+read_iptc/write_iptc are the two halves of the same round trip: Inject
+(see DocumentController.build_iptc_fields/inject_iptc) writes a record's
+fields out to a file's IPTC block; read_iptc reads that same block back
+(see DocumentController._populate_from_iptc), so a file that already
+carries IPTC data -- whether from a previous Inject, or from a
+photographer/agency's own tooling -- can seed a record's Title/
+Description/People/Rights/Subjects instead of leaving them blank.
+
+write_exif is the other direction for the record's creation date
+specifically: Inject also pushes it into the file's own EXIF capture-
+date tag, not just IPTC, since plenty of tools (including this app's
+own read_image_info) only ever look at EXIF.
 """
 
 from dataclasses import dataclass
@@ -92,6 +105,19 @@ def load_preview_image(path) -> QImage:
         return qimage.copy()  # detach from `data`, which goes out of scope on return
 
 
+def read_iptc(path) -> dict:
+    """The file's existing IPTC fields, in the same {Iptc.Application2.*
+    key: value} shape build_iptc_fields/write_iptc use -- scalar fields
+    (ObjectName, Caption, ...) come back as str, repeatable ones
+    (Byline, Keywords) as list[str]. Empty dict if the file has no IPTC
+    block at all."""
+    img = pyexiv2.Image(str(path))
+    try:
+        return img.read_iptc()
+    finally:
+        img.close()
+
+
 def write_iptc(path, iptc_fields: dict) -> None:
     """iptc_fields is {Iptc.Application2.* key: value}, already built by
     the caller (DocumentController, which knows the VRA-to-IPTC field
@@ -100,5 +126,50 @@ def write_iptc(path, iptc_fields: dict) -> None:
     img = pyexiv2.Image(str(path))
     try:
         img.modify_iptc(iptc_fields)
+    finally:
+        img.close()
+
+
+# VRA date fields are free text and can be far fuzzier than a real
+# calendar date ("circa 1990", a bare decade, a range) -- these are the
+# only shapes worth trying to write into EXIF, which has no concept of
+# "approximately" at all. Tried in order, most specific first.
+_VRA_DATE_FORMATS = ('%Y-%m-%d', '%Y-%m', '%Y')
+
+
+def parse_vra_date(date_str: str) -> Optional[datetime]:
+    """A real calendar date from a VRA date field's text, or None if it
+    doesn't parse as one of the (limited) shapes EXIF can represent --
+    deliberately conservative: writing a wrong date into EXIF is worse
+    than writing none at all."""
+    date_str = date_str.strip()
+    for fmt in _VRA_DATE_FORMATS:
+        try:
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            continue
+    return None
+
+
+def build_exif_date_field(date_str: str) -> dict:
+    """{Exif.Photo.DateTimeOriginal: 'YYYY:MM:DD HH:MM:SS'} if date_str
+    parses as a real calendar date (see parse_vra_date), else {} --
+    no time-of-day is ever available from a VRA date, so it's always
+    written as midnight."""
+    parsed = parse_vra_date(date_str)
+    if parsed is None:
+        return {}
+    return {'Exif.Photo.DateTimeOriginal': parsed.strftime('%Y:%m:%d 00:00:00')}
+
+
+def write_exif(path, exif_fields: dict) -> None:
+    """exif_fields is {Exif.* key: value} -- see build_exif_date_field.
+    A no-op if exif_fields is empty, so callers don't need to guard
+    against an unparseable date themselves."""
+    if not exif_fields:
+        return
+    img = pyexiv2.Image(str(path))
+    try:
+        img.modify_exif(exif_fields)
     finally:
         img.close()
