@@ -48,6 +48,23 @@ class DocumentController(QObject):
         self._validator = SchemaValidator(str(DEFAULT_XSD_PATH))
         self._undo_stack: list = []  # serialized (bytes) snapshots, most recent last
         self._undo_snapshot_element = None  # element the top-of-stack snapshot precedes editing
+        self._dirty = False
+        # Every content-changing method funnels through xml_updated, so
+        # this one connection is enough to catch all of them -- load_file/
+        # create_new_record/clear/save_file/_move_to_location each reset
+        # the flag back to False afterward (they emit xml_updated too, as
+        # part of refreshing the preview, but that's not a real edit).
+        self.xml_updated.connect(self._mark_dirty)
+
+    def _mark_dirty(self, _xml_text: str = ""):
+        self._dirty = True
+
+    @property
+    def is_dirty(self) -> bool:
+        """True if there are changes since the record was last loaded,
+        created, or saved -- used to gate navigation (Home/Open/Create/
+        Review) so it can warn before silently discarding work."""
+        return self._dirty
 
     # ------------------------------------------------------------------
     # Actions that change state -- each emits the matching signal once
@@ -64,6 +81,7 @@ class DocumentController(QObject):
         self.file_loaded.emit(path)
         self.document_loaded.emit(self.xml_doc)  # tree panel rebuilds itself from this
         self.xml_updated.emit(self._xml_text)
+        self._dirty = False  # a freshly-loaded document has nothing unsaved yet
 
     def create_new_record(self, record_type: str, record_id: str, dest_path):
         """Starts a brand-new, empty record of the given type. Not
@@ -78,6 +96,34 @@ class DocumentController(QObject):
         self.file_loaded.emit(self._current_file)
         self.document_loaded.emit(self.xml_doc)
         self.xml_updated.emit(self._xml_text)
+        self._dirty = False
+
+    def clear(self):
+        """Returns to the pristine no-document state -- used by Home/
+        Cancel to actually leave the current record, rather than just
+        hiding the buttons that act on it while it stays loaded and
+        visible underneath (see is_dirty for the guard that should
+        run before this, if there's anything worth keeping)."""
+        self.xml_doc = VraXmlParser()
+        self._current_file = None
+        self._current_element = None
+        self._xml_text = ""
+        self._undo_stack.clear()
+        self._undo_snapshot_element = None
+        self.document_loaded.emit(self.xml_doc)
+        self.file_loaded.emit("")
+        self.xml_updated.emit(self._xml_text)
+        self._dirty = False
+
+    @property
+    def current_record_type(self) -> Optional[str]:
+        """The open record's own tag ('collection'/'work'/'image'), or
+        None if nothing's loaded -- used to gate record-type-specific
+        UI, e.g. the media preview band only ever applies to images."""
+        if self.xml_doc.xml_root is None:
+            return None
+        records = self.xml_doc.build_tree()
+        return records[0].data.get('tag') if records else None
 
     def set_archive(self, archive_name: str):
         self._current_archive = archive_name
@@ -164,11 +210,10 @@ class DocumentController(QObject):
     }
 
     def link_media_file(self, image_path) -> Optional[Path]:
-        """Moves image_path into the 'media' location, then adds
-        measurements (dimensions + DPI, always), a location and/or a
-        creation date (only when the file's EXIF actually has GPS/a
-        timestamp), and a relation entry recording which file this
-        record is linked to. One undo snapshot for the whole cascade --
+        """Moves image_path into the 'media' location, adds a relation
+        entry recording which file this record is linked to, and
+        populates measurements/location/date from it (see
+        _populate_from_media). One undo snapshot for the whole cascade --
         the public per-field methods (insert_child, update_element_data,
         ...) each snapshot independently, so this works directly against
         xml_doc instead, the same way create_new_record/_move_to_location
@@ -194,26 +239,72 @@ class DocumentController(QObject):
         dest_path = (media_dir / image_path.name).resolve()
         shutil.move(str(image_path), str(dest_path))
 
-        info = media_metadata.read_image_info(dest_path)
+        self._snapshot_before_structural_change()
+
+        relation_set = self._ensure_set(record_elem, record_specs, 'relationSet')
+        relation_type = self._type_name_of(record_specs, 'relationSet')
+        self._add_set_item(relation_set, relation_type, 'relation',
+                            dest_path.name, {'type': 'imageIs'})
+
+        self._populate_from_media(record_elem, record_specs, dest_path)
+
+        self._xml_text = self._rebuild_xml()
+        self.xml_updated.emit(self._xml_text)
+        self.document_loaded.emit(self.xml_doc)
+        return dest_path
+
+    def extract_media_metadata(self) -> bool:
+        """Re-reads the currently-linked media file's dimensions/EXIF and
+        refreshes the record's Measurements/Location/Date sections from
+        it, without touching the relation entry or moving anything --
+        for when the linked file changed after it was first linked, or
+        the initial auto-extraction (see link_media_file) missed
+        something worth retrying. One undo snapshot, like link_media_file.
+        Returns False if there's no document loaded or no file linked.
+        """
+        path = self.find_linked_media_path()
+        if path is None:
+            return False
+        records = self.xml_doc.build_tree()
+        if not records:
+            return False
+        record_node = records[0]
 
         self._snapshot_before_structural_change()
+        self._populate_from_media(record_node.element, record_node.child_specs, path)
+
+        self._xml_text = self._rebuild_xml()
+        self.xml_updated.emit(self._xml_text)
+        self.document_loaded.emit(self.xml_doc)
+        return True
+
+    def _populate_from_media(self, record_elem, record_specs, path: Path):
+        """Writes dimensions/DPI (always) and GPS/capture-date (only
+        when the file's EXIF actually has them) into record_elem's
+        Measurements/Location/Date sections. Replaces (rather than
+        duplicates) whichever of its own previously-auto-populated
+        entries are still there, identified by their 'type' attribute,
+        so this is safe to call more than once for the same record --
+        see extract_media_metadata, which is exactly that: a deliberate
+        re-run. Caller owns the undo snapshot and the emit/rebuild."""
+        info = media_metadata.read_image_info(path)
 
         measurements_set = self._ensure_set(record_elem, record_specs, 'measurementsSet')
         measurements_type = self._type_name_of(record_specs, 'measurementsSet')
-        pixel_attrs = {'type': 'width', 'unit': 'px', **self._AAT_PIXELS}
-        self._add_set_item(measurements_set, measurements_type, 'measurements',
-                            str(info.width), pixel_attrs)
-        pixel_attrs = {'type': 'height', 'unit': 'px', **self._AAT_PIXELS}
-        self._add_set_item(measurements_set, measurements_type, 'measurements',
-                            str(info.height), pixel_attrs)
+        self._replace_measurement(measurements_set, measurements_type, 'width',
+                                   str(info.width), {'unit': 'px', **self._AAT_PIXELS})
+        self._replace_measurement(measurements_set, measurements_type, 'height',
+                                   str(info.height), {'unit': 'px', **self._AAT_PIXELS})
         if info.dpi is not None:
-            dpi_attrs = {'type': 'resolution', 'unit': 'dpi', **self._AAT_DPI}
-            self._add_set_item(measurements_set, measurements_type, 'measurements',
-                                str(int(info.dpi)), dpi_attrs)
+            self._replace_measurement(measurements_set, measurements_type, 'resolution',
+                                       str(int(info.dpi)), {'unit': 'dpi', **self._AAT_DPI})
 
         if info.gps_lat is not None and info.gps_lon is not None:
             location_set = self._ensure_set(record_elem, record_specs, 'locationSet')
             location_type = self._type_name_of(record_specs, 'locationSet')
+            for existing in location_set.findall(f'{{{VRA_NS}}}location'):
+                if existing.get('type') == 'creation':
+                    self.xml_doc.remove_element(existing)
             location_elem = self._add_set_item(location_set, location_type, 'location',
                                                 attrs={'type': 'creation'})
             # Raw EXIF coordinates aren't a verified gazetteer lookup, so
@@ -225,19 +316,20 @@ class DocumentController(QObject):
         if info.date is not None:
             date_set = self._ensure_set(record_elem, record_specs, 'dateSet')
             date_type = self._type_name_of(record_specs, 'dateSet')
+            for existing in date_set.findall(f'{{{VRA_NS}}}date'):
+                if existing.get('type') == 'creation':
+                    self.xml_doc.remove_element(existing)
             date_elem = self._add_set_item(date_set, date_type, 'date', attrs={'type': 'creation'})
             self._add_set_item(date_elem, 'dateType', 'earliestDate', info.date)
             self._add_set_item(date_elem, 'dateType', 'latestDate', info.date)
 
-        relation_set = self._ensure_set(record_elem, record_specs, 'relationSet')
-        relation_type = self._type_name_of(record_specs, 'relationSet')
-        self._add_set_item(relation_set, relation_type, 'relation',
-                            dest_path.name, {'type': 'imageIs'})
-
-        self._xml_text = self._rebuild_xml()
-        self.xml_updated.emit(self._xml_text)
-        self.document_loaded.emit(self.xml_doc)
-        return dest_path
+    def _replace_measurement(self, measurements_set, measurements_type, measurement_type: str,
+                              text: str, attrs: dict):
+        for existing in measurements_set.findall(f'{{{VRA_NS}}}measurements'):
+            if existing.get('type') == measurement_type:
+                self.xml_doc.remove_element(existing)
+        self._add_set_item(measurements_set, measurements_type, 'measurements',
+                            text, {'type': measurement_type, **attrs})
 
     @staticmethod
     def _type_name_of(specs, tag: str) -> Optional[str]:
@@ -430,6 +522,9 @@ class DocumentController(QObject):
         self._xml_text = self._rebuild_xml()
         self.xml_updated.emit(self._xml_text)
         self.document_loaded.emit(self.xml_doc)
+        # An empty stack means every edit since load/create has been
+        # undone -- back to the pristine state, so nothing's unsaved.
+        self._dirty = bool(self._undo_stack)
         return True
 
     def get_initial_xml(self) -> str:
@@ -463,6 +558,7 @@ class DocumentController(QObject):
 
         with open(self._current_file, 'wb') as f:
             f.write(xml_bytes)
+        self._dirty = False
         return True, f"Saved to {self._current_file}"
 
     def _move_to_location(self, location_key: str, validate: bool) -> tuple[bool, str]:
@@ -507,6 +603,7 @@ class DocumentController(QObject):
 
         self._current_file = str(dest_path)
         self.file_loaded.emit(self._current_file)
+        self._dirty = False
         return True, str(dest_path)
 
     def submit_file(self) -> tuple[bool, str]:

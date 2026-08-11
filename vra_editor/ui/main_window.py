@@ -3,7 +3,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence, QShortcut, QPixmap
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QPushButton, QLabel,
+    QMainWindow, QWidget, QPushButton, QLabel, QFrame,
     QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy, QMessageBox, QInputDialog,
     QStackedWidget,
 )
@@ -15,8 +15,8 @@ from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
 from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
 from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
 from vra_editor.ui.error_messages import friendly_validation_error
+from vra_editor.ui.panels.center_pane import CenterPane
 from vra_editor.ui.panels.form_panel.form_container import FormContainerPanel
-from vra_editor.ui.panels.media_preview_panel import MediaPreviewPanel
 from vra_editor.ui.panels.review_notes_panel import ReviewNotesPanel
 from vra_editor.ui.panels.section_panel.section_form import SectionFormPanel
 from vra_editor.ui.panels.section_panel.section_list import SectionListPanel
@@ -54,6 +54,57 @@ QPushButton:disabled {
 }
 """
 
+# Reject is the other consequential, hard-to-walk-back action alongside
+# Submit/Approve (it bounces a record back to the editor), so it gets its
+# own distinct treatment too -- an outlined red rather than Submit/Approve's
+# solid green, so the two don't compete for the same "primary action" read
+# when both could theoretically be visible.
+REJECT_BUTTON_STYLE = """
+QPushButton {
+    background-color: white;
+    color: #B3261E;
+    font-weight: 600;
+    border: 1px solid #B3261E;
+    border-radius: 4px;
+    padding: 6px 16px;
+    min-height: 20px;
+}
+QPushButton:hover {
+    background-color: #FBEAE9;
+}
+QPushButton:pressed {
+    background-color: #F5D4D2;
+}
+QPushButton:disabled {
+    background-color: white;
+    color: #E0B4B1;
+    border-color: #E0B4B1;
+}
+"""
+
+# View toggles (Show XML/Review Notes/Advanced View) and admin actions
+# (Settings/Autofill/About) are things a cataloguer reaches for far less
+# often than Save/Submit -- styled smaller and muted so they read as
+# secondary at a glance instead of competing on equal footing.
+SECONDARY_BUTTON_STYLE = """
+QPushButton {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 3px 10px;
+    font-size: 11px;
+}
+QPushButton:hover {
+    background-color: #e8e8e8;
+}
+QPushButton:checked {
+    background-color: #DCEEFB;
+    color: #0B4C7C;
+    border-color: #7aa7d0;
+}
+"""
+
 
 class ModeBar(QWidget):
     """A single row of buttons whose visible subset changes with the app mode.
@@ -62,13 +113,25 @@ class ModeBar(QWidget):
     only their visibility changes. This avoids duplicating widgets per
     mode and avoids the reparenting bug that comes from sharing widget
     instances across multiple layouts.
+
+    groups (optional) maps each button name to a cluster key ("nav",
+    "action", ...). Buttons must already be contiguous by group in
+    `order` for this to render sensibly -- a thin vertical divider is
+    inserted at each group boundary, so unrelated actions (leaving the
+    record vs. acting on it vs. toggling a view) read as visually
+    separate clusters instead of one undifferentiated row. Each
+    divider's own visibility tracks whether anything in the group it
+    precedes is visible in the current mode, so an empty group doesn't
+    leave a stray divider with nothing next to it.
     """
 
     def __init__(self, variants: dict[str, list[str]], order: list[str] | None = None,
-                 tooltips: dict[str, str] | None = None, parent=None):
+                 tooltips: dict[str, str] | None = None, groups: dict[str, str] | None = None,
+                 parent=None):
         super().__init__(parent)
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(6)
 
         all_names = {name for names in variants.values() for name in names}
         if order is not None:
@@ -85,23 +148,49 @@ class ModeBar(QWidget):
                     if name not in ordered_names:
                         ordered_names.append(name)
 
-        self.buttons: dict[str, QPushButton] = {
-            name: QPushButton(name) for name in ordered_names
-        }
-        for name, btn in self.buttons.items():
+        groups = groups or {}
+        self.buttons: dict[str, QPushButton] = {}
+        self._group_dividers: list[tuple[QFrame, str]] = []  # (divider, group it precedes)
+        current_group = None
+        for name in ordered_names:
+            group = groups.get(name)
+            if group is not None and group != current_group and self.buttons:
+                divider = QFrame()
+                divider.setFrameShape(QFrame.Shape.VLine)
+                divider.setFrameShadow(QFrame.Shadow.Sunken)
+                layout.addWidget(divider)
+                self._group_dividers.append((divider, group))
+            if group is not None:
+                current_group = group
+
+            btn = QPushButton(name)
             if tooltips and name in tooltips:
                 btn.setToolTip(tooltips[name])
+            self.buttons[name] = btn
             layout.addWidget(btn)
         layout.addStretch()
 
         self.variants = variants
+        self.groups = groups
         self.current_mode: str | None = None
 
     def set_mode(self, mode: str):
         visible = set(self.variants[mode])
         for name, btn in self.buttons.items():
             btn.setVisible(name in visible)
+        self.update_dividers(visible)
         self.current_mode = mode
+
+    def update_dividers(self, visible_names: set):
+        """Shows/hides each group divider based on whether anything in
+        the group it precedes is in visible_names. Split out from
+        set_mode so MainWindow.apply_mode -- which drives button
+        visibility itself, through the generic mode_widgets registry,
+        rather than calling set_mode -- can still keep the dividers in
+        sync using the same visible-set it already computed."""
+        for divider, group in self._group_dividers:
+            group_names = [name for name, g in self.groups.items() if g == group]
+            divider.setVisible(any(name in visible_names for name in group_names))
 
 
 class StatusBar(QWidget):
@@ -150,29 +239,82 @@ class StatusBar(QWidget):
         self._set('Archive', value)
 
 
+class ModeStrip(QWidget):
+    """A thin, colored context bar under the top toolbar -- the primary
+    way to tell "editing" and "reviewing" apart at a glance, replacing
+    the 9pt "Mode: edit" status-bar label as the only indicator. The
+    distinction matters (Submit vs. Approve/Reject write to different
+    archives), so it shouldn't be easy to miss.
+
+    Hidden entirely outside edit/review -- there's no record-level
+    context to show on the home screen or in Settings.
+    """
+
+    # mode -> (verb shown before the filename, background, text color)
+    _STYLES = {
+        'edit': ("Editing", "#DCEEFB", "#0B4C7C"),
+        'review': ("Reviewing", "#FDECC8", "#7A4E00"),
+    }
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedHeight(26)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(12, 0, 12, 0)
+        self.label = QLabel()
+        layout.addWidget(self.label)
+        layout.addStretch()
+        self.hide()
+
+    def set_context(self, mode: str, filename: str = ""):
+        info = self._STYLES.get(mode)
+        if info is None:
+            self.hide()
+            return
+        verb, bg, fg = info
+        name = Path(filename).name if filename else ""
+        self.label.setText(f"{verb} — {name}" if name else verb)
+        self.setStyleSheet(f"background-color: {bg};")
+        self.label.setStyleSheet(f"font-weight: 600; color: {fg};")
+        self.show()
+
+
 class MainWindow(QMainWindow):
     # Central place for what's visible in each mode. Extend this if
     # other widgets (not just buttons) need to change with mode --
     # see register_mode_widget / apply_mode below.
     BASE_BUTTONS = ['Home', 'Open', 'Create', 'Review', 'Import']
 
-    # Left-to-right position on the mode bar, independent of which mode a
-    # button belongs to (visibility is still driven by VARIANTS below).
-    # Create/Open/Save/Submit anchor the left edge as the core edit
-    # workflow; Approve rides in Submit's slot since the two are never
-    # visible at once. Advanced View/Show XML/About anchor the right
-    # edge as secondary, view-toggle-style actions.
+    # Left-to-right position on the mode bar, grouped into four clusters
+    # that ModeBar renders as visually separate (a divider between each,
+    # see BUTTON_GROUPS below) rather than one flat row: where to go
+    # (nav), what to do with the open record (action), how to look at it
+    # (view), and rarely-used admin actions. Order within a cluster is
+    # itself meaningful -- Approve rides in Submit's slot since the two
+    # are never visible at once.
     BUTTON_ORDER = [
-        'Create', 'Open', 'Save', 'Submit', 'Approve',
-        'Home', 'Review', 'Import', 'Undo', 'Review Notes', 'Media Preview', 'Cancel', 'Reject',
-        'Settings', 'Autofill', 'Advanced View', 'Show XML', 'About',
+        'Home', 'Open', 'Create', 'Review', 'Import',
+        'Save', 'Undo', 'Submit', 'Approve', 'Reject', 'Cancel',
+        'Show XML', 'Review Notes', 'Advanced View',
+        'Settings', 'Autofill', 'About',
     ]
+
+    # Which visual cluster each button belongs to -- see ModeBar's
+    # `groups` param. Must partition BUTTON_ORDER into contiguous runs
+    # per group for the dividers to land in sensible places.
+    BUTTON_GROUPS = {
+        'Home': 'nav', 'Open': 'nav', 'Create': 'nav', 'Review': 'nav', 'Import': 'nav',
+        'Save': 'action', 'Undo': 'action', 'Submit': 'action', 'Approve': 'action',
+        'Reject': 'action', 'Cancel': 'action',
+        'Show XML': 'view', 'Review Notes': 'view', 'Advanced View': 'view',
+        'Settings': 'admin', 'Autofill': 'admin', 'About': 'admin',
+    }
 
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Media Preview', 'Advanced View',
+        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View',
                               'Submit', 'Cancel', 'About'],
-        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Media Preview', 'Advanced View',
+        review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View',
                                 'Reject', 'Cancel', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'About'],
     )
@@ -187,7 +329,6 @@ class MainWindow(QMainWindow):
         'Undo': "Revert the last change (Ctrl+Z).",
         'Show XML': "Show or hide the raw XML for this record.",
         'Review Notes': "Show or hide notes a reviewer has left for the editor.",
-        'Media Preview': "Show or hide the linked media file's preview and IPTC tools.",
         'Advanced View': "Switch to the structure tree and single-element editor.",
         'Submit': "Send this record for review. Requires it to be schema-valid.",
         'Approve': "Move this record into the reviewed archive.",
@@ -253,26 +394,31 @@ class MainWindow(QMainWindow):
         splitter = QSplitter(Qt.Horizontal)
         self.xml_preview_panel = XmlPreviewPanel()
         self.review_notes_panel = ReviewNotesPanel(self.doc_controller)
-        self.media_preview_panel = MediaPreviewPanel(self.doc_controller)
+        # Wraps form_stack together with the linked-media preview band,
+        # so the preview persists across the Simple/Advanced toggle --
+        # see CenterPane. Its own "Thumbnail" button (not a top-bar
+        # toggle) collapses/restores it.
+        self.center_pane = CenterPane(self.doc_controller, self.form_stack)
         splitter.addWidget(self.nav_stack)
-        splitter.addWidget(self.form_stack)
+        splitter.addWidget(self.center_pane)
         splitter.addWidget(self.review_notes_panel)
-        splitter.addWidget(self.media_preview_panel)
         splitter.addWidget(self.xml_preview_panel)
-        splitter.setSizes([250, 425, 250, 250, 425])
+        splitter.setSizes([250, 425, 250, 425])
         self._splitter = splitter
         self.xml_preview_panel.setVisible(False)  # hidden by default; toggled via the "Show XML" button
         self.review_notes_panel.setVisible(False)  # toggled via "Review Notes"; auto-shown if there's unresolved work
-        self.media_preview_panel.setVisible(False)  # toggled via "Media Preview"
 
         self.status_bar = StatusBar()
         self.status_bar.set_user(user_name())  # fetched once; doesn't change
+
+        self.mode_strip = ModeStrip()
 
         central = QWidget()
         main_layout = QVBoxLayout(central)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         main_layout.addWidget(top_bar)
+        main_layout.addWidget(self.mode_strip)
         main_layout.addWidget(splitter, stretch=1)
         main_layout.addWidget(self.status_bar)
         self.setCentralWidget(central)
@@ -369,17 +515,25 @@ class MainWindow(QMainWindow):
         self.tree_panel.load_document(self.doc_controller.xml_doc)
         self._refresh_navigation()
         self.review_notes_panel.refresh()
-        self.media_preview_panel.refresh()
+        self.center_pane.refresh()
 
-    def _on_file_loaded(self, _path: str):
+    def _on_file_loaded(self, path: str):
         """Surfaced automatically, not just available behind the
         toggle, so an editor opening a record a reviewer left work on
         can't miss it. Deliberately tied to file_loaded rather than
         document_loaded -- the latter also fires on every insert/remove,
         which would reopen the panel right after the user closes it if
-        they then add or delete a Set."""
+        they then add or delete a Set.
+
+        Also where the media band's relevance and collapse state reset
+        -- file_loaded (unlike document_loaded) only fires on a genuine
+        load/create/clear/move, never on a plain edit, so collapsing it
+        to a thumbnail while editing doesn't keep getting undone by
+        every add/remove Set (see CenterPane.set_media_relevant)."""
         if self.review_notes_panel.has_unresolved_notes():
             self.mode_bar.buttons['Review Notes'].setChecked(True)
+        self.mode_strip.set_context(self.mode_bar.current_mode, path)
+        self.center_pane.set_media_relevant(self.doc_controller.current_record_type == 'image')
 
     def _refresh_navigation(self):
         """Re-syncs the Simple view (both the section list and whichever
@@ -440,7 +594,8 @@ class MainWindow(QMainWindow):
             logo.setPixmap(logo_pixmap.scaledToHeight(30, Qt.TransformationMode.SmoothTransformation))
             top_layout.addWidget(logo)
 
-        self.mode_bar = ModeBar(self.VARIANTS, order=self.BUTTON_ORDER, tooltips=self.BUTTON_TOOLTIPS)
+        self.mode_bar = ModeBar(self.VARIANTS, order=self.BUTTON_ORDER, tooltips=self.BUTTON_TOOLTIPS,
+                                 groups=self.BUTTON_GROUPS)
         top_layout.addWidget(self.mode_bar)
 
         # Register buttons in the shared mode-widget registry too, so
@@ -451,6 +606,9 @@ class MainWindow(QMainWindow):
 
         for name in ('Submit', 'Approve'):
             self.mode_bar.buttons[name].setStyleSheet(PRIMARY_BUTTON_STYLE)
+        self.mode_bar.buttons['Reject'].setStyleSheet(REJECT_BUTTON_STYLE)
+        for name in ('Show XML', 'Review Notes', 'Advanced View', 'Settings', 'Autofill', 'About'):
+            self.mode_bar.buttons[name].setStyleSheet(SECONDARY_BUTTON_STYLE)
 
         # A toggle, not an action -- checkable so its pressed state shows
         # whether the XML pane is currently open, and its label always
@@ -462,10 +620,6 @@ class MainWindow(QMainWindow):
         review_notes_button = self.mode_bar.buttons['Review Notes']
         review_notes_button.setCheckable(True)
         review_notes_button.toggled.connect(self._on_toggle_review_notes)
-
-        media_preview_button = self.mode_bar.buttons['Media Preview']
-        media_preview_button.setCheckable(True)
-        media_preview_button.toggled.connect(self._on_toggle_media_preview)
 
         advanced_button = self.mode_bar.buttons['Advanced View']
         advanced_button.setCheckable(True)
@@ -502,11 +656,6 @@ class MainWindow(QMainWindow):
         if checked:
             self.review_notes_panel.refresh()
 
-    def _on_toggle_media_preview(self, checked: bool):
-        self.media_preview_panel.setVisible(checked)
-        if checked:
-            self.media_preview_panel.refresh()
-
     def _on_toggle_advanced(self, checked: bool):
         self.nav_stack.setCurrentIndex(1 if checked else 0)
         self.form_stack.setCurrentIndex(1 if checked else 0)
@@ -531,21 +680,66 @@ class MainWindow(QMainWindow):
         visible_names = set(self.VARIANTS[mode])
         for name, widget in self.mode_widgets.items():
             widget.setVisible(name in visible_names)
+        self.mode_bar.update_dividers(visible_names)
         self.mode_bar.current_mode = mode
         self.status_bar.set_mode(mode)
+        self.mode_strip.set_context(mode, self.doc_controller.current_file or "")
 
     # ------------------------------------------------------------------
     # Button handlers -- implement these; mode-independent by design
     # ------------------------------------------------------------------
 
+    def _confirm_discard_if_dirty(self) -> bool:
+        """True if it's safe to navigate away from the record that's
+        open now -- either nothing's unsaved, or the user explicitly
+        chose to save or discard first. False means stay put; the
+        caller should abort whatever navigation it was about to do.
+
+        Guards Home/Open/Create/Review specifically: each of those
+        replaces or clears doc_controller's loaded document outright
+        (see DocumentController.load_file/create_new_record/clear),
+        with no prompt beforehand -- previously an in-progress edit
+        was silently gone the moment any of those four was clicked."""
+        if not self.doc_controller.is_dirty:
+            return True
+        box = QMessageBox(
+            QMessageBox.Icon.Warning, "Unsaved changes",
+            "This record has changes that haven't been saved. What would you like to do?",
+            parent=self,
+        )
+        save_btn = box.addButton("Save", QMessageBox.ButtonRole.AcceptRole)
+        box.addButton("Discard", QMessageBox.ButtonRole.DestructiveRole)
+        cancel_btn = box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+        box.setDefaultButton(cancel_btn)
+        box.exec()
+        clicked = box.clickedButton()
+        if clicked is cancel_btn:
+            return False
+        if clicked is save_btn:
+            ok, message = self.doc_controller.save_file()
+            if not ok:
+                self._show_validation_error(message)
+                return False  # couldn't save -- stay put rather than silently discard
+        return True
+
     def _on_home(self):
-        ...
+        self._return_to_start()
+
+    def _return_to_start(self):
+        if not self._confirm_discard_if_dirty():
+            return
+        self.doc_controller.clear()
+        self.apply_mode('initial')
 
     def _on_open(self):
-        self._open_from_folder('edit', dialog_title="Open Record")
-        self.apply_mode('edit')
+        if not self._confirm_discard_if_dirty():
+            return
+        if self._open_from_folder('edit', dialog_title="Open Record"):
+            self.apply_mode('edit')
 
     def _on_create(self):
+        if not self._confirm_discard_if_dirty():
+            return
         record_type, ok = QInputDialog.getItem(
             self, "Create Record", "Record type:", ('work', 'image', 'collection'), 0, False,
         )
@@ -576,10 +770,14 @@ class MainWindow(QMainWindow):
         self.apply_mode('edit')
 
     def _on_review(self):
-        self._open_from_folder('pending', dialog_title="Select Record to Review")
-        self.apply_mode('review')
+        if not self._confirm_discard_if_dirty():
+            return
+        if self._open_from_folder('pending', dialog_title="Select Record to Review"):
+            self.apply_mode('review')
 
-    def _open_from_folder(self, location_key: str, dialog_title: str):
+    def _open_from_folder(self, location_key: str, dialog_title: str) -> bool:
+        """Returns True if a file was actually loaded -- callers should
+        only switch mode in that case, not on a cancelled dialog."""
         locations = load_locations()  # re-read so it reflects the latest Settings
         folder = locations.get(location_key)
         if folder is None:
@@ -587,11 +785,13 @@ class MainWindow(QMainWindow):
                 self, "Missing location",
                 f"No '{location_key}' folder is configured in vra-config.ini.",
             )
-            return
+            return False
 
         dlg = VraFilePickerDialog(directory=folder, title=dialog_title, parent=self)
         if dlg.exec() and dlg.selected_path is not None:
             self.doc_controller.load_file(str(dlg.selected_path))
+            return True
+        return False
 
     def _on_settings(self):
         dlg = SettingsDialog(parent=self)
@@ -641,7 +841,7 @@ class MainWindow(QMainWindow):
         self._prompt_and_commit(result)
 
     def _on_cancel(self):
-        self.apply_mode('initial')
+        self._return_to_start()
 
     def _on_approve(self):
         ok, result = self.doc_controller.approve_file()
