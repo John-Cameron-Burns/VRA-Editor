@@ -125,6 +125,12 @@ class SectionFormPanel(QWidget):
             item = self.cards_layout.takeAt(0)
             widget = item.widget()
             if widget is not None:
+                # hide() first -- takeAt() only detaches it from the layout,
+                # it doesn't stop it being painted, and deleteLater()'s
+                # actual deletion is deferred to the next event-loop turn.
+                # Without this, the old card can stay visible (at its last
+                # layout position, overlapping the new one) for a frame.
+                widget.hide()
                 widget.deleteLater()
 
         node = self._current_node
