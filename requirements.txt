@@ -4,5 +4,3 @@ dulwich --config-settings "--build-option=--pure"
 certifi
 Pillow>=10.0.0
 pyexiv2>=2.15.0
-
-psutil
