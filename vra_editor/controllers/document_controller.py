@@ -390,13 +390,24 @@ class DocumentController(QObject):
 
     def build_iptc_fields(self) -> dict:
         """The {Iptc.Application2.*: value} dict for inject_iptc, built
-        from this record's own data per the approved mapping: Title ->
-        ObjectName, Description -> Caption, People -> By-line, Rights ->
-        Copyright, Subjects -> Keywords, creation Date -> DateCreated."""
+        from this record's own data per the approved mapping: record id
+        -> TransmissionReference, Title -> ObjectName, Description ->
+        Caption, People -> By-line, Rights -> Copyright, Subjects ->
+        Keywords, creation Date -> DateCreated.
+
+        TransmissionReference (not a dedicated ID field -- legacy IIM
+        IPTC doesn't have one) is the standard field for a reference/
+        tracking number, unused by the rest of this mapping, and its
+        32-character limit comfortably fits VRA record ids."""
         root = self.xml_doc.xml_root
         if root is None:
             return {}
         fields = {}
+
+        records = self.xml_doc.build_tree()
+        record_id = records[0].element.get('id', '').strip() if records else ''
+        if record_id:
+            fields['Iptc.Application2.TransmissionReference'] = record_id
 
         title = self._first_text(root, 'title')
         if title:
