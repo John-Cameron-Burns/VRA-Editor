@@ -209,17 +209,28 @@ class DocumentController(QObject):
         'href': 'http://vocab.getty.edu/page/aat/300410385',
     }
 
-    def link_media_file(self, image_path) -> Optional[Path]:
-        """Moves image_path into the 'media' location, adds a relation
-        entry recording which file this record is linked to, and
-        populates measurements/location/date from it (see
-        _populate_from_media). One undo snapshot for the whole cascade --
-        the public per-field methods (insert_child, update_element_data,
-        ...) each snapshot independently, so this works directly against
-        xml_doc instead, the same way create_new_record/_move_to_location
-        already bypass those wrappers. Returns the file's final path in
-        media/, or None if there's no document loaded or no 'media'
-        location configured.
+    def link_media_file(self, image_path, dest_name: Optional[str] = None) -> Optional[Path]:
+        """Copies image_path into the 'media' location (as dest_name, if
+        given -- otherwise under its own name), adds a relation entry
+        recording which file this record is linked to, and populates
+        measurements/location/date from it (see _populate_from_media).
+        One undo snapshot for the whole cascade -- the public per-field
+        methods (insert_child, update_element_data, ...) each snapshot
+        independently, so this works directly against xml_doc instead,
+        the same way create_new_record/_move_to_location already
+        bypass those wrappers.
+
+        Copies rather than moves: the source file can be anywhere on
+        disk (the picker isn't restricted to a single configured
+        folder), so leaving the original in place is the safer
+        default -- nothing about linking a file should require also
+        deleting it from wherever the user keeps their originals.
+
+        Returns the file's final path in media/, or None if there's no
+        document loaded, no 'media' location configured, or dest_name
+        collides with a file already there (callers should check that
+        themselves first if they want a more specific message -- see
+        SectionFormPanel._on_link_media_clicked).
         """
         if self.xml_doc.xml_root is None or self._current_file is None:
             return None
@@ -236,8 +247,10 @@ class DocumentController(QObject):
 
         media_dir.mkdir(parents=True, exist_ok=True)
         image_path = Path(image_path)
-        dest_path = (media_dir / image_path.name).resolve()
-        shutil.move(str(image_path), str(dest_path))
+        dest_path = (media_dir / (dest_name or image_path.name)).resolve()
+        if dest_path.exists():
+            return None
+        shutil.copy2(str(image_path), str(dest_path))
 
         self._snapshot_before_structural_change()
 
