@@ -5,7 +5,13 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 from vra_editor.ui.panels.media_preview_panel import MediaPreviewPanel
 
 THUMBNAIL_SIZE = 50
-THUMBNAIL_MARGIN = 10
+THUMBNAIL_RIGHT_MARGIN = 10
+# Every section card in the form below has its own right-aligned header
+# row ("Remove this section", and "+ Link Media File" on Relations) that
+# a plain top-right THUMBNAIL_RIGHT_MARGIN-only offset would sit on top
+# of -- measured empirically at ~33px tall, so this clears it with a
+# small gap rather than covering it.
+THUMBNAIL_TOP_MARGIN = 44
 
 
 class CenterPane(QWidget):
@@ -103,5 +109,5 @@ class CenterPane(QWidget):
         self._reposition_thumbnail()
 
     def _reposition_thumbnail(self):
-        x = self.width() - THUMBNAIL_SIZE - THUMBNAIL_MARGIN
-        self.thumbnail_button.move(max(0, x), THUMBNAIL_MARGIN)
+        x = self.width() - THUMBNAIL_SIZE - THUMBNAIL_RIGHT_MARGIN
+        self.thumbnail_button.move(max(0, x), THUMBNAIL_TOP_MARGIN)
