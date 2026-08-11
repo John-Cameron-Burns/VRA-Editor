@@ -7,7 +7,7 @@ from PySide6.QtCore import QObject, Signal
 from lxml import etree
 
 from vra_editor.config import load_locations
-from vra_editor.core import media_metadata, review_notes, vra_structure
+from vra_editor.core import audit_log, media_metadata, review_notes, vra_structure
 from vra_editor.core.schema_validator import SchemaValidator
 from vra_editor.core.xml_parser import VRA_NS, VraXmlParser
 from vra_editor.utils import user_name
@@ -114,6 +114,26 @@ class DocumentController(QObject):
         self.file_loaded.emit("")
         self.xml_updated.emit(self._xml_text)
         self._dirty = False
+
+    def restore_revision(self, revision: audit_log.Revision, dest_path) -> bool:
+        """Writes revision's historical content (see core/audit_log.py)
+        to dest_path -- which must not already exist, restoring into a
+        new file rather than overwriting anything -- and loads it as
+        the current document, the same as opening any other file.
+        Returns False if dest_path already exists or the content
+        cannot be read from the archive's history.
+        """
+        dest_path = Path(dest_path)
+        if dest_path.exists():
+            return False
+        try:
+            content = audit_log.read_revision_content(revision)
+        except Exception:
+            return False
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        dest_path.write_bytes(content)
+        self.load_file(str(dest_path))
+        return True
 
     @property
     def current_record_type(self) -> Optional[str]:
