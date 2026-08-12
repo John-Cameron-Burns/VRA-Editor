@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=VRA Core 4 XML Editor
+Comment=Desktop editor for VRA Core 4 metadata records
+Exec=vra-editor
+Icon=vra-editor
+Terminal=false
+Categories=Office;Utility;

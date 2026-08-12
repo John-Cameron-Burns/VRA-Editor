@@ -1,0 +1,10 @@
+Package: vra-editor
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: John Burns <john@impactdatametrics.com>
+Depends: libgl1, libegl1, libxkbcommon0, libxkbcommon-x11-0, libdbus-1-3, libfontconfig1, libxcb-cursor0, libxcb-icccm4, libxcb-image0, libxcb-keysyms1, libxcb-randr0, libxcb-render-util0, libxcb-shape0, libxcb-xfixes0, libxcb-xinerama0, libxcb-glx0
+Description: VRA Core 4 XML Editor
+ Desktop editor for VRA Core 4 metadata records. Licensed under
+ CC BY-NC 4.0 by John Burns and Impact Data Metrics Limited.

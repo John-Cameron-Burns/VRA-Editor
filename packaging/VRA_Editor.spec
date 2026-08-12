@@ -28,28 +28,39 @@ images_dir = repo_root / 'vra_editor' / 'images'
 RESOURCE_FILES = ['vra_core4.xsd', 'vra_core4_strict.xsd', 'xml.xsd', 'user_manual.md']
 IMAGE_FILES = [p.name for p in images_dir.iterdir() if p.is_file()]
 
-# pyexiv2's compiled extension (exiv2api.so) links against
-# @rpath/libexiv2.28.dylib with no LC_RPATH set on the binary at all --
-# it only resolves at import time because the actual (unversioned)
-# libexiv2.dylib happens to sit in the same directory dyld falls back to
-# searching. PyInstaller's own dependency walker can't follow an @rpath
-# with no rpath to search, so it's added explicitly here, landing next
-# to exiv2api.so inside the frozen bundle so that same fallback keeps
-# working. Confirmed via `otool -l`/`DYLD_PRINT_LIBRARIES=1` against the
-# installed wheel; skipped with a warning (not an error) if pyexiv2
-# isn't installed, so this spec doesn't hard-fail for a dev environment
-# missing an optional platform-specific piece.
+# pyexiv2's compiled extension (exiv2api.so/.pyd) links against its
+# sibling libexiv2 library with no rpath/DT_NEEDED search path pointing
+# at it -- it only resolves at import time because that library happens
+# to sit in the same directory the loader falls back to searching
+# (dyld on macOS via @rpath fallback; the ELF loader on Linux, where the
+# actual on-disk file is an unversioned libexiv2.so despite the compiled
+# extension's DT_NEEDED entry naming the SONAME-versioned
+# libexiv2.so.28). PyInstaller's own dependency walker can't follow
+# either case, so it's added explicitly here, landing next to
+# exiv2api.so/.pyd inside the frozen bundle so that same fallback keeps
+# working. On Windows this isn't needed -- PyInstaller's walker already
+# resolves exiv2.dll fine on its own via plain DLL search order, so the
+# glob below simply matches nothing there and EXTRA_BINARIES stays
+# empty, same as before. Confirmed via `otool -l`/`DYLD_PRINT_LIBRARIES=1`
+# (macOS) and `ldd`/a real Linux build (this gap was silent -- and real
+# -- until caught there) against the installed wheel; skipped with a
+# warning (not an error) if pyexiv2 isn't installed, so this spec
+# doesn't hard-fail for a dev environment missing an optional
+# platform-specific piece.
 try:
     import pyexiv2
     _pyexiv2_lib_dir = Path(pyexiv2.__file__).resolve().parent / 'lib'
-    _libexiv2_dylib = next(_pyexiv2_lib_dir.glob('libexiv2*.dylib'), None)
+    _libexiv2_lib = (
+        next(_pyexiv2_lib_dir.glob('libexiv2*.dylib'), None)
+        or next(_pyexiv2_lib_dir.glob('libexiv2*.so*'), None)
+    )
 except ImportError:
-    _libexiv2_dylib = None
+    _libexiv2_lib = None
 
-EXTRA_BINARIES = [(str(_libexiv2_dylib), 'pyexiv2/lib')] if _libexiv2_dylib else []
-if _libexiv2_dylib is None:
-    print("WARNING: libexiv2 dylib not found next to pyexiv2 -- IPTC/EXIF features "
-          "will likely fail to import in the built app.", file=sys.stderr)
+EXTRA_BINARIES = [(str(_libexiv2_lib), 'pyexiv2/lib')] if _libexiv2_lib else []
+if _libexiv2_lib is None:
+    print("WARNING: libexiv2 shared library not found next to pyexiv2 -- IPTC/EXIF "
+          "features will likely fail to import in the built app.", file=sys.stderr)
 
 a = Analysis(
     [str(repo_root / 'main.py')],
