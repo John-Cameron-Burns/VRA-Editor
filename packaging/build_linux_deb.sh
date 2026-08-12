@@ -1,11 +1,16 @@
 #!/bin/bash
-# Full Linux packaging pipeline: venv/deps -> PyInstaller -> .deb.
+# Full Linux .deb packaging pipeline: venv/deps -> PyInstaller -> .deb.
 # Run from anywhere -- cd's to the repo root (this script's own
 # grandparent directory) first.
 #
+# For just the raw executable with no system package/install step, use
+# build_linux_executable.sh at the repo root instead -- this script is
+# for when you specifically want an installable .deb (Start Menu entry,
+# apt-managed dependencies, clean uninstall).
+#
 # Produces:
 #   dist/VRA Editor/VRA Editor          (portable app -- see VRA_Editor.spec)
-#   installer_output/vra-editor_<version>_amd64.deb   (installable package)
+#   distributions/vra-editor_<version>_amd64.deb   (installable package)
 #
 # System packages this needs (Debian/Ubuntu names; install once with
 # sudo apt install <these>): python3-venv fakeroot dpkg-dev, plus the
@@ -44,7 +49,7 @@ echo "=== Building with PyInstaller ==="
 echo
 echo "=== Assembling .deb ==="
 VERSION=$(grep '^Version:' packaging/debian/control | awk '{print $2}')
-STAGING="$REPO_ROOT/installer_output/vra-editor_${VERSION}_amd64"
+STAGING="$REPO_ROOT/distributions/vra-editor_${VERSION}_amd64"
 rm -rf "$STAGING"
 
 mkdir -p "$STAGING/DEBIAN"
@@ -65,9 +70,9 @@ WRAPPER
 chmod 755 "$STAGING/usr/bin/vra-editor"
 
 fakeroot dpkg-deb --build --root-owner-group "$STAGING" \
-    "$REPO_ROOT/installer_output/vra-editor_${VERSION}_amd64.deb"
+    "$REPO_ROOT/distributions/vra-editor_${VERSION}_amd64.deb"
 
 echo
 echo "=== Done ==="
 echo "Portable app: dist/VRA Editor/VRA Editor"
-echo "Package:      installer_output/vra-editor_${VERSION}_amd64.deb"
+echo "Package:      distributions/vra-editor_${VERSION}_amd64.deb"

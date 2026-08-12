@@ -3,9 +3,12 @@ __pycache__/
 *.pyc
 .venv/
 
-# PyInstaller build output (see packaging/VRA_Editor.spec)
+# PyInstaller build output (see packaging/VRA_Editor.spec) and the final
+# packaged installers/apps/executables the build_*.{bat,command,sh}
+# scripts at the repo root (and packaging/build_linux_deb.sh) produce.
 /build/
 /dist/
+/distributions/
 
 # Personal IDE config -- not part of the app, and not the same between
 # any two contributors' machines.

@@ -1,10 +1,11 @@
 ; Inno Setup script for the VRA Core 4 XML Editor's Windows installer.
 ;
 ; Build (from the repo root, after pyinstaller has produced
-; dist\VRA Editor\ -- see VRA_Editor.spec):
+; dist\VRA Editor\ -- see VRA_Editor.spec, or just run
+; build_windows_installer.bat at the repo root, which does both steps):
 ;   "C:\Program Files\Inno Setup 7\ISCC.exe" packaging\VRA_Editor.iss
 ;
-; Produces installer_output\VRA_Editor_Setup_<version>.exe. AppId's GUID is
+; Produces distributions\VRA_Editor_Setup_<version>.exe. AppId's GUID is
 ; fixed and must never change across releases -- it's how Windows/Inno
 ; Setup recognizes "this is the same app" for upgrades and uninstall, not
 ; the version number.
@@ -22,7 +23,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\VRA Editor
 DefaultGroupName=VRA Editor
 LicenseFile=..\LICENSE
-OutputDir=..\installer_output
+OutputDir=..\distributions
 OutputBaseFilename=VRA_Editor_Setup_{#MyAppVersion}
 Compression=lzma2
 SolidCompression=yes
