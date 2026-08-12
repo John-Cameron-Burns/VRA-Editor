@@ -4,6 +4,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from .display_i18n import build_display_html, parse_display_html
+from .media_files import DEFAULT_MEDIA_EXTENSIONS, copy_sibling_media, move_sibling_media
 
 # Register standard VRA Core 4 and XML namespaces to maintain clean tag formatting
 NAMESPACES = {
@@ -158,7 +159,8 @@ def merge_xml_elements(target: ET.Element, source: ET.Element,
             target.append(source_child)
 
 
-def process_vra_directory(input_dir: str, output_dir: str, progress_callback=None):
+def process_vra_directory(input_dir: str, output_dir: str, progress_callback=None,
+                           media_extensions=DEFAULT_MEDIA_EXTENSIONS):
     """Scans input_dir -- including nested subfolders -- for VRA-Core XML
     files, merges files that share a record ID, and writes one file per
     record into output_dir. A merged record lands under the same
@@ -172,6 +174,17 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
     under output_dir -- each mirroring its own original subfolder there
     too, so re-running only ever processes what's newly arrived, and a
     record ID already present in output_dir isn't overwritten.
+
+    If a source file has a sibling media file next to it (same base
+    filename, an extension in media_extensions -- see core/media_files.py),
+    that file is carried along too: copied to sit next to the merged
+    output XML (renamed to match, same as the XML itself may be), and
+    moved into done/ alongside its own source XML, so the pair never
+    gets split up by Import. media_extensions is caller-supplied rather
+    than read from config.ini here, matching input_dir/output_dir --
+    this module stays config-decoupled and standalone-scriptable (see
+    the __main__ block below); config.load_media_extensions() is what
+    real callers (import_progress_dialog.py) resolve it from.
 
     progress_callback, if given, is called as
     progress_callback(current: int, total: int, message: str) at each
@@ -254,6 +267,13 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
             out_file = output_path / relative_dir / f"{rec_id}.xml"
             out_file.parent.mkdir(parents=True, exist_ok=True)
             primary_tree.write(out_file, encoding="utf-8", xml_declaration=True)
+            # A copy, not a move -- primary_path itself still needs to
+            # make its own trip to done/ below, exactly like the XML
+            # source file does (out_file is a fresh write of the parsed
+            # tree, not the original file, so this is the media
+            # equivalent of that same "write here, move the original
+            # there" split).
+            copy_sibling_media(primary_path, out_file, media_extensions)
 
         # Whether written or skipped as a duplicate, this ingest batch is
         # done with these source files -- move them out either way so a
@@ -261,12 +281,15 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
         # Each source file mirrors its own original subfolder under
         # done/, which need not match the merged record's own (a
         # secondary file for the same ID could have arrived from a
-        # different subfolder than the primary).
+        # different subfolder than the primary). Any sibling media file
+        # next to a source (primary or secondary) makes the same trip,
+        # so nothing gets left orphaned in input_dir.
         for file_path, _ in files:
             relative_dir = file_path.parent.relative_to(input_path)
             dest_dir = done_path / relative_dir
             dest_dir.mkdir(parents=True, exist_ok=True)
             dest = dest_dir / file_path.name
+            move_sibling_media(file_path, dest, media_extensions)
             if dest.exists():
                 dest.unlink()
             shutil.move(str(file_path), str(dest))

@@ -3,6 +3,7 @@ from PySide6.QtWidgets import (
     QApplication, QDialog, QVBoxLayout, QProgressBar, QPlainTextEdit, QDialogButtonBox,
 )
 
+from vra_editor.config import load_media_extensions
 from vra_editor.core.ingest import process_vra_directory
 
 
@@ -48,6 +49,7 @@ class ImportProgressDialog(QDialog):
             process_vra_directory(
                 str(self.ingest_dir), str(self.edit_dir),
                 progress_callback=self._on_progress,
+                media_extensions=load_media_extensions(),
             )
         except Exception as e:
             self._log(f" [!] Import failed: {e}")

@@ -6,8 +6,8 @@ from typing import Optional
 from PySide6.QtCore import QObject, Signal
 from lxml import etree
 
-from vra_editor.config import load_locations
-from vra_editor.core import audit_log, media_metadata, review_notes, vra_structure
+from vra_editor.config import load_locations, load_media_extensions
+from vra_editor.core import audit_log, media_files, media_metadata, review_notes, vra_structure
 from vra_editor.core.schema_validator import SchemaValidator
 from vra_editor.core.xml_parser import VRA_NS, VraXmlParser
 from vra_editor.utils import user_name
@@ -943,6 +943,11 @@ class DocumentController(QObject):
 
         if src_path != dest_path and src_path.exists():
             src_path.unlink()
+
+        # A sibling media file (same base name, e.g. foo.tif next to
+        # foo.xml) rides along on every submit/approve/reject, so the
+        # pair never gets split across folders -- see core/media_files.py.
+        media_files.move_sibling_media(src_path, dest_path, load_media_extensions())
 
         self._current_file = str(dest_path)
         self.file_loaded.emit(self._current_file)
