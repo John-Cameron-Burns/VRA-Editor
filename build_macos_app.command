@@ -45,5 +45,9 @@ echo "App: distributions/VRA Editor.app"
 
 # Keeps the window open with the summary visible when launched by
 # double-clicking in Finder (Terminal may otherwise close it immediately).
-read -n 1 -s -r -p "Press any key to close this window..."
-echo
+# Skipped under CI (no TTY to read from, and every CI runner sets this)
+# so the release workflow's build step doesn't hang or fail on EOF.
+if [ -z "$CI" ]; then
+    read -n 1 -s -r -p "Press any key to close this window..."
+    echo
+fi
