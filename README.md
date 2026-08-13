@@ -25,6 +25,10 @@ VRA-Editor is built so none of that gets in the way:
   back online, reconcile your offline changes back into the shared
   archive; anything that also changed on the other side while you were
   away is flagged for you to resolve by hand, never silently overwritten.
+  Staging only ever copies the *Edit* folder — records actively being
+  worked on, typically a modest, everyday-sized transfer — not the whole
+  archive; the reviewed/approved collection behind it, which can grow
+  very large over the life of a project, is never touched.
 - **Your data is just files.** Every record is a plain XML file, in a
   folder you control. Back it up, sync it, move it, put it under whatever
   storage you already use — nothing is locked inside a proprietary
