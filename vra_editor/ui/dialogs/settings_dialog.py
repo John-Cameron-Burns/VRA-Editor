@@ -15,8 +15,10 @@ from ...config import (
     DEFAULT_CONFIG_PATH, LOCATION_KEYS, OPTION_TEXT_KEYS,
     to_bool,
 )
+from ...core import offline_staging
 from ...core.media_files import DEFAULT_MEDIA_EXTENSIONS
 from ...utils import strip_quotes
+from .offline_reconcile_dialog import OfflineReconcileDialog
 
 # Not an archive workflow stage like the LOCATION_KEYS -- shown in its own
 # group in the UI -- but still just a path, saved under the same
@@ -71,6 +73,7 @@ class SettingsDialog(QDialog):
 
         outer.addWidget(self._build_locations_group())
         outer.addWidget(self._build_app_data_group())
+        outer.addWidget(self._build_offline_group())
         outer.addWidget(self._build_user_group())
         outer.addWidget(self._build_options_group())
 
@@ -158,6 +161,109 @@ class SettingsDialog(QDialog):
         form.addRow(note)
 
         return group
+
+    def _build_offline_group(self) -> QGroupBox:
+        group = QGroupBox("Offline Work")
+        layout = QVBoxLayout(group)
+
+        note = QLabel(
+            "For working with no network at all (e.g. a field trip): copies "
+            "the Edit folder above to a local folder and points Edit at it, "
+            "then folds your offline edits back in once you're back online."
+        )
+        note.setWordWrap(True)
+        note.setStyleSheet("color: #666;")
+        layout.addWidget(note)
+
+        button_row = QHBoxLayout()
+        start_button = QPushButton("Start Offline Staging...")
+        start_button.setToolTip(
+            "Copies the Edit folder to a local folder you choose, and points Edit at it."
+        )
+        start_button.clicked.connect(self._on_start_staging)
+        button_row.addWidget(start_button)
+        reconcile_button = QPushButton("Reconcile Offline Changes...")
+        reconcile_button.setToolTip(
+            "Folds edits made in a staging folder back into the real Edit folder."
+        )
+        reconcile_button.clicked.connect(self._on_reconcile_offline)
+        button_row.addWidget(reconcile_button)
+        button_row.addStretch()
+        layout.addLayout(button_row)
+
+        return group
+
+    def _on_start_staging(self):
+        primary = self._location_edits['edit'].text().strip()
+        if not primary:
+            QMessageBox.warning(
+                self, "No Edit folder set", "Set the Edit folder above (and Save) before staging offline.",
+            )
+            return
+        primary_path = Path(primary)
+        if not primary_path.is_dir():
+            QMessageBox.warning(
+                self, "Edit folder not found", f"{primary_path} doesn't exist or isn't reachable right now.",
+            )
+            return
+
+        chosen = QFileDialog.getExistingDirectory(
+            self, "Choose a local folder for offline staging", str(Path.home()),
+        )
+        if not chosen:
+            return
+        staging_path = Path(chosen)
+
+        try:
+            offline_staging.start_staging(primary_path, staging_path)
+        except OSError as e:
+            QMessageBox.critical(self, "Couldn't start staging", str(e))
+            return
+
+        self._location_edits['edit'].setText(str(staging_path / offline_staging.LIVE_SUBDIR))
+        QMessageBox.information(
+            self, "Offline staging ready",
+            f"Copied the Edit folder to {staging_path}.\n\n"
+            "Click Save below to actually switch Edit over to it. When you're back "
+            "online, come back here and use \"Reconcile Offline Changes...\" -- it "
+            f"remembers the original Edit folder ({primary_path}) for you.",
+        )
+
+    def _on_reconcile_offline(self):
+        current_edit = self._location_edits['edit'].text().strip()
+        if not current_edit:
+            QMessageBox.warning(self, "No Edit folder set", "Set the Edit folder above first.")
+            return
+
+        staging_dir = Path(current_edit)
+        # "Start Offline Staging..." points Edit at staging_dir/edit (the
+        # live working copy) -- the staging folder itself, which is what
+        # read_staging_origin needs, is that path's parent.
+        if staging_dir.name == offline_staging.LIVE_SUBDIR:
+            staging_dir = staging_dir.parent
+        primary_dir = offline_staging.read_staging_origin(staging_dir)
+        if primary_dir is None:
+            QMessageBox.warning(
+                self, "Not an offline staging folder",
+                f'"{current_edit}" doesn\'t look like it was created by "Start Offline '
+                'Staging..." -- there\'s nothing to reconcile.',
+            )
+            return
+
+        dlg = OfflineReconcileDialog(staging_dir, primary_dir, parent=self)
+        dlg.exec()
+
+        box = QMessageBox(
+            QMessageBox.Icon.Question, "Switch back to the primary folder?",
+            f'Point "Edit" back at {primary_dir} now?',
+            parent=self,
+        )
+        switch_btn = box.addButton("Switch Back", QMessageBox.ButtonRole.AcceptRole)
+        box.addButton("Not Yet", QMessageBox.ButtonRole.RejectRole)
+        box.exec()
+        if box.clickedButton() is switch_btn:
+            self._location_edits['edit'].setText(str(primary_dir))
+            QMessageBox.information(self, "Ready", "Click Save below to switch Edit back to the primary folder.")
 
     def _build_user_group(self) -> QGroupBox:
         group = QGroupBox("User")

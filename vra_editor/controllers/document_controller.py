@@ -22,6 +22,18 @@ RESOURCES_DIR = Path(__file__).resolve().parent.parent / "resources"
 DEFAULT_XSD_PATH = RESOURCES_DIR / "vra_core4_strict.xsd"
 
 
+class LocationUnavailableError(Exception):
+    """Raised by save_file/_move_to_location when the destination folder
+    itself can't be written to (e.g. a network share that's offline) --
+    distinct from the existing (bool, message) contract those methods
+    use for schema-validation failures, since main_window.py's
+    _on_save/_on_submit route that message through
+    friendly_validation_error(), which is XSD-error-shaped-text-specific
+    and would otherwise mangle a plain "can't reach the folder" message
+    into a misleading generic sentence."""
+    pass
+
+
 class DocumentController(QObject):
     """Owns document state and announces changes to it via signals.
 
@@ -881,7 +893,13 @@ class DocumentController(QObject):
         and, only if it passes, writes it back to the file it was
         loaded from. Returns (success, message) -- message is the
         schema validation error on failure, or a short confirmation on
-        success. Never writes an invalid document to disk."""
+        success. Never writes an invalid document to disk.
+
+        Raises LocationUnavailableError (distinct from the (bool,
+        message) contract above) if the destination folder itself can't
+        be written to -- e.g. a network share that's gone offline --
+        rather than the validation failure this method otherwise
+        reports through its return value."""
         if self.xml_doc.xml_root is None or self._current_file is None:
             return False, "No document loaded."
 
@@ -895,9 +913,14 @@ class DocumentController(QObject):
             return False, message
 
         dest_path = Path(self._current_file)
-        dest_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(dest_path, 'wb') as f:
-            f.write(xml_bytes)
+        try:
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(dest_path, 'wb') as f:
+                f.write(xml_bytes)
+        except OSError as e:
+            raise LocationUnavailableError(
+                f"Couldn't save -- {dest_path.parent} isn't reachable right now ({e})."
+            ) from e
         self._dirty = False
         return True, f"Saved to {self._current_file}"
 
@@ -918,6 +941,11 @@ class DocumentController(QObject):
         by then the document was already validated at Submit time, and
         a reviewer needs to be able to reject something broken without
         first having to fix it themselves.
+
+        Raises LocationUnavailableError (see save_file's docstring) if
+        location_key's folder can't actually be written to -- distinct
+        from the (bool, message) "no such location configured" case
+        below, which is a Settings problem, not a connectivity one.
         """
         if self.xml_doc.xml_root is None or self._current_file is None:
             return False, "No document loaded."
@@ -937,17 +965,22 @@ class DocumentController(QObject):
 
         src_path = Path(self._current_file).resolve()
         dest_path = (dest_dir / self._relative_record_path(src_path)).resolve()
-        dest_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(dest_path, 'wb') as f:
-            f.write(xml_bytes)
+        try:
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(dest_path, 'wb') as f:
+                f.write(xml_bytes)
 
-        if src_path != dest_path and src_path.exists():
-            src_path.unlink()
+            if src_path != dest_path and src_path.exists():
+                src_path.unlink()
 
-        # A sibling media file (same base name, e.g. foo.tif next to
-        # foo.xml) rides along on every submit/approve/reject, so the
-        # pair never gets split across folders -- see core/media_files.py.
-        media_files.move_sibling_media(src_path, dest_path, load_media_extensions())
+            # A sibling media file (same base name, e.g. foo.tif next to
+            # foo.xml) rides along on every submit/approve/reject, so the
+            # pair never gets split across folders -- see core/media_files.py.
+            media_files.move_sibling_media(src_path, dest_path, load_media_extensions())
+        except OSError as e:
+            raise LocationUnavailableError(
+                f"Couldn't move this record to '{location_key}' -- {dest_dir} isn't reachable right now ({e})."
+            ) from e
 
         self._current_file = str(dest_path)
         self.file_loaded.emit(self._current_file)

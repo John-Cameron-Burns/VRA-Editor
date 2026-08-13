@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
 )
 
 from vra_editor.config import load_locations
-from vra_editor.controllers.document_controller import DocumentController
+from vra_editor.controllers.document_controller import DocumentController, LocationUnavailableError
 from vra_editor.core.commit_to_git import add_file_to_repo
 from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
 from vra_editor.ui.dialogs.audit_dialog import AuditDialog
@@ -845,8 +845,28 @@ class MainWindow(QMainWindow):
             "<p>See the LICENSE file included with this application for the full license text.</p>",
         )
 
+    def _try_location_op(self, fn):
+        """Runs a DocumentController save/submit/approve/reject call,
+        converting a LocationUnavailableError -- the destination folder
+        itself is unreachable, e.g. an offline network share -- into a
+        plain warning dialog instead of letting it propagate uncaught.
+        Distinct from those methods' own (bool, message) return, which
+        is reserved for schema-validation failures and would otherwise
+        get routed through friendly_validation_error() -- XSD-error-
+        shaped-text-specific, and misleading for a connectivity
+        problem. Returns None on this failure so the caller can bail
+        out the same way it already does for `not ok`."""
+        try:
+            return fn()
+        except LocationUnavailableError as e:
+            QMessageBox.warning(self, "Couldn't reach that folder", str(e))
+            return None
+
     def _on_save(self):
-        ok, message = self.doc_controller.save_file()
+        outcome = self._try_location_op(self.doc_controller.save_file)
+        if outcome is None:
+            return
+        ok, message = outcome
         if not ok:
             self._show_validation_error(message)
             return
@@ -867,7 +887,10 @@ class MainWindow(QMainWindow):
         self.form_panel.show_editor('', {})
 
     def _on_submit(self):
-        ok, result = self.doc_controller.submit_file()
+        outcome = self._try_location_op(self.doc_controller.submit_file)
+        if outcome is None:
+            return
+        ok, result = outcome
         if not ok:
             self._show_validation_error(result)
             return
@@ -878,7 +901,10 @@ class MainWindow(QMainWindow):
         self._return_to_start()
 
     def _on_approve(self):
-        ok, result = self.doc_controller.approve_file()
+        outcome = self._try_location_op(self.doc_controller.approve_file)
+        if outcome is None:
+            return
+        ok, result = outcome
         if not ok:
             QMessageBox.warning(self, "Approve failed", result)
             return
@@ -886,7 +912,10 @@ class MainWindow(QMainWindow):
         self._prompt_and_commit(result)
 
     def _on_reject(self):
-        ok, result = self.doc_controller.reject_file()
+        outcome = self._try_location_op(self.doc_controller.reject_file)
+        if outcome is None:
+            return
+        ok, result = outcome
         if not ok:
             QMessageBox.warning(self, "Reject failed", result)
             return
