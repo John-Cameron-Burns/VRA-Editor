@@ -1,3 +1,4 @@
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QGroupBox, QStackedLayout,
     QComboBox,
@@ -6,6 +7,7 @@ from PySide6.QtWidgets import (
 from vra_editor.core.friendly_labels import friendly_label, friendly_enum_value
 from vra_editor.ui.panels.form_panel.display_editor import DisplayEditorPanel
 from vra_editor.ui.panels.section_panel.field_row import FieldRow
+from vra_editor.ui.widgets.workflow_diagram import WorkflowDiagramWidget
 
 
 class SectionFormPanel(QWidget):
@@ -29,8 +31,10 @@ class SectionFormPanel(QWidget):
 
         self.placeholder = QLabel()
         self.placeholder.setWordWrap(True)
-        self._no_section_message()
         self.layout.addWidget(self.placeholder)
+
+        self.no_document = self._build_no_document_page()
+        self.layout.addWidget(self.no_document)
 
         self.content = QWidget()
         outer = QVBoxLayout(self.content)
@@ -72,7 +76,26 @@ class SectionFormPanel(QWidget):
         outer.addWidget(self.add_button)
 
         self.layout.addWidget(self.content)
-        self.layout.setCurrentWidget(self.placeholder)
+        self.layout.setCurrentWidget(self.no_document)
+
+    def _build_no_document_page(self) -> QWidget:
+        """The app's true first-run state (see show_no_document): with
+        no record open and nothing else to show yet, this is the closest
+        thing the app has to a home screen, so it's where the record
+        lifecycle diagram lives."""
+        page = QWidget()
+        layout = QVBoxLayout(page)
+        layout.addWidget(WorkflowDiagramWidget())
+
+        message = QLabel(
+            "No record is open yet.\n\nClick Open to edit an existing record, "
+            "or Create to start a new one."
+        )
+        message.setWordWrap(True)
+        message.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(message)
+        layout.addStretch()
+        return page
 
     def show_section(self, node):
         """node is the Set-level VraTreeNode to display (e.g. the
@@ -93,14 +116,7 @@ class SectionFormPanel(QWidget):
     def show_no_document(self):
         """Nothing is loaded at all -- the app's true first-run state."""
         self._current_node = None
-        self._no_section_message()
-        self.layout.setCurrentWidget(self.placeholder)
-
-    def _no_section_message(self):
-        self.placeholder.setText(
-            "No record is open yet.\n\nClick Open to edit an existing record, "
-            "or Create to start a new one."
-        )
+        self.layout.setCurrentWidget(self.no_document)
 
     def _rebuild_cards(self):
         while self.cards_layout.count() > 1:  # keep the trailing stretch

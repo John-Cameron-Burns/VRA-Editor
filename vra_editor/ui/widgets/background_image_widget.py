@@ -26,6 +26,11 @@ class BackgroundImageWidget(QWidget):
     tree) can use it too.
     """
 
+    # Keeps the image inset from the widget's own edges on every side,
+    # so it reads as sitting behind the panel's content rather than
+    # bleeding edge-to-edge into the splitter divider next to it.
+    _MARGIN = 10
+
     def __init__(self, image_path: Optional[Path] = None, parent=None):
         super().__init__(parent)
         self._background = QPixmap(str(image_path)) if image_path and image_path.exists() else QPixmap()
@@ -33,11 +38,19 @@ class BackgroundImageWidget(QWidget):
     def paintEvent(self, event):
         if not self._background.isNull():
             painter = QPainter(self)
-            scaled = self._background.scaled(
-                self.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding,
-                Qt.TransformationMode.SmoothTransformation,
-            )
-            x = (self.width() - scaled.width()) // 2
-            y = (self.height() - scaled.height()) // 2
-            painter.drawPixmap(x, y, scaled)
+            target_rect = self.rect().adjusted(self._MARGIN, self._MARGIN, -self._MARGIN, -self._MARGIN)
+            if target_rect.width() > 0 and target_rect.height() > 0:
+                # Clip to the inset rect -- KeepAspectRatioByExpanding
+                # overfills one dimension by design (that's how it crops
+                # rather than letterboxes), and without a clip that
+                # overfill would bleed straight back out to the widget's
+                # real edge, undoing the margin on that side.
+                painter.setClipRect(target_rect)
+                scaled = self._background.scaled(
+                    target_rect.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
+                x = target_rect.x() + (target_rect.width() - scaled.width()) // 2
+                y = target_rect.y() + (target_rect.height() - scaled.height()) // 2
+                painter.drawPixmap(x, y, scaled)
         super().paintEvent(event)
