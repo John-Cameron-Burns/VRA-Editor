@@ -1,10 +1,10 @@
 # VRA Core 4 XML Editor — User Manual
 
 This guide covers day-to-day use of the editor: opening and creating
-records, filling them in, linking media files, and moving records
-through review. It describes the app as it actually behaves — if
-something here doesn't match what you see on screen, that's worth
-reporting.
+records, filling them in, syncing them with linked image files, and
+moving records through review, offline or on. It describes the app as
+it actually behaves — if something here doesn't match what you see on
+screen, that's worth reporting.
 
 ## Contents
 
@@ -12,11 +12,13 @@ reporting.
 - The toolbar
 - Editing a record (Simple view)
 - Controlled vocabularies and authority search
-- Linking a media file
+- Syncing with a linked image file
 - Review Notes
 - Undo
 - Saving, submitting, and reviewing
 - The Advanced view
+- Audits: browsing and restoring history
+- Working offline
 - Settings
 - Tips and troubleshooting
 
@@ -37,6 +39,12 @@ starting points:
 - **Import** — merge newly-arrived source files from the *ingest*
   folder into *edit*, so they show up in Open's list.
 
+This home screen also shows a diagram of the whole record lifecycle —
+Ingest, Edit, Pending, Reviewed, Released — labelled with the exact
+button that moves a record from one to the next, and a reminder that
+Settings is where those folders themselves get configured. Worth a
+glance if you're new to the workflow.
+
 **Home** returns you to this starting screen from anywhere.
 
 ## The toolbar
@@ -48,10 +56,11 @@ by thin vertical dividers:
    available.
 2. **Record actions** — Save, Undo, Submit/Approve, Reject, Cancel.
    Only shown once a record is open; act on that record specifically.
-3. **View toggles** — Show XML, Review Notes, Advanced View. Switch
-   how the current record is displayed; don't change its content.
-4. **Admin** — Settings, Help, About. Rarely-needed, styled smaller
-   and muted so they don't compete for attention.
+3. **View toggles** — Show XML, Review Notes, Advanced View, Sync
+   Media. Switch how the current record is displayed, or open a tool
+   for it; none of them change its content on their own.
+4. **Admin** — Settings, Audits, Help, About. Rarely-needed, styled
+   smaller and muted so they don't compete for attention.
 
 A colored strip just below the toolbar (**Editing — filename** or
 **Reviewing — filename**) shows which record you have open and
@@ -99,50 +108,38 @@ to them. It searches the relevant vocabulary — VIAF, Getty AAT/TGN/
 ULAN, GNS, or the Library of Congress vocabularies (LCSH, LCNAF,
 LCGFT, LCTGM), depending on the field — and, once you pick a result,
 fills in the linked-authority details (record ID and link) for you
-automatically.
+automatically. Results are cached locally, so a repeated or related
+search doesn't need the network again.
 
-## Linking a media file
+## Syncing with a linked image file
 
-Only relevant to **image** records. Open the **Related Works**
-(Relations) section — a **+ Link Media File** button appears there.
+Only relevant to **image** records, and only shown once one is open.
+Click **Sync Media** to open it. There's no persisted link remembered
+between sessions — the app makes a best guess from the filename each
+time, or you're asked to browse to the right file yourself.
 
-Clicking it:
+It compares seven of the record's own fields — Title, Description,
+Rights, People, Subjects, creation Date, and Location — against
+whatever the image file's own EXIF/IPTC metadata already says, and
+shows each as one of:
 
-1. Opens a standard file picker, starting in the *ingest* folder if
-   one's configured, but not restricted to it — you can pick any
-   image file anywhere on disk.
-2. Asks for a filename to save it under in the *media* folder
-   (pre-filled with the original name — change it if you want to
-   rename the file as it comes in). If that name's already taken,
-   you'll be asked to pick a different one rather than silently
-   overwriting anything.
-3. **Copies** the file into *media* (your original is left exactly
-   where it was) and automatically fills in:
-   - **Measurements** — pixel width/height and resolution (DPI),
-     always.
-   - **Location** and **Date** — only if the file's own EXIF data
-     actually has a GPS position and/or a capture timestamp.
-   - A **Related Works** entry recording which file this record is
-     linked to.
+- **In sync** — the record and the file already agree; nothing to do.
+- **Fill record** — the file has it, the record doesn't; can be
+  copied in.
+- **Fill file** — the record has it, the file doesn't; can be copied
+  out to the file's metadata.
+- **Conflict** — the two disagree; pick which one wins.
 
-All of this lands as a single Undo step — one Ctrl+Z reverts the
-whole thing.
+Pixel dimensions, resolution, and file size are always shown too,
+read fresh from the file, purely for information — there's nothing to
+choose there. Tick or choose which direction each row should go, then
+**Sync** applies your choices — this is the only step here that
+writes to the image file itself.
 
-Once a file is linked, a preview band appears at the top of the form,
-with three buttons:
-
-- **Inject** — writes this record's Title, Description, People,
-  Rights, Subjects, creation Date, and record ID into the file's own
-  IPTC metadata, so the file stays useful outside this app too (for
-  instance if it's later handled separately from the XML record).
-  This modifies the actual file on disk, so you'll be asked to
-  confirm first.
-- **Extract** — re-reads the linked file's dimensions/GPS/date and
-  refreshes Measurements/Location/Date from it. Useful if the linked
-  file was swapped out after it was first linked.
-- **Thumbnail** — collapses the preview to a small floating thumbnail
-  in the corner, if you want the vertical space back. Click the
-  thumbnail to bring the full preview back.
+There's also an optional checkbox to copy the image to sit alongside
+the record's own XML file (renamed to match the record's ID) as part
+of the same sync — useful the first time you link a file that's
+sitting somewhere else, so the two stay together going forward.
 
 ## Review Notes
 
@@ -156,10 +153,11 @@ marked resolved or removed.
 ## Undo
 
 **Undo** (or Ctrl+Z) reverts the last change — a field edit, an add,
-a remove, a media link, anything. It's a full document snapshot each
-time, not a per-character history, so a burst of typing into the same
-field collapses into a single undo step; adding or removing something
-always gets its own step.
+a remove, anything done inside the sectioned form or the tree editor.
+It's a full document snapshot each time, not a per-character history,
+so a burst of typing into the same field collapses into a single undo
+step; adding or removing something always gets its own step. It does
+**not** cover Sync Media's file-writing step (see Tips below).
 
 ## Saving, submitting, and reviewing
 
@@ -180,9 +178,10 @@ always gets its own step.
 
 After Save, Submit, Approve, or Reject, you'll be asked for a short
 commit comment; if you give one, the change is recorded in the
-archive's shared version history under your name. Leaving it blank
-just skips that step — the save/submit itself has already happened
-either way.
+archive's shared version history under your name — see **Audits**
+below for browsing and restoring from that history. Leaving the
+comment blank just skips that step; the save/submit itself has
+already happened either way.
 
 ## The Advanced view
 
@@ -193,26 +192,89 @@ view's section list doesn't surface directly, and is useful for
 unusual or highly detailed records. **Show XML** works in either
 view, and highlights whichever element is currently selected.
 
+## Audits: browsing and restoring history
+
+Click **Audits** (always available, in the Admin cluster) to see
+every past revision recorded via the commit-comment prompt above —
+one row per file changed in a commit, most recent first, with who
+made it and when. Type in the filter box to narrow it down by
+filename.
+
+Select a revision and click **Restore to New File...** (or just
+double-click the row) to write that exact past version into a new
+file in the *edit* folder, under whatever name you choose — this
+never overwrites anything, and the new file is opened for you
+afterward, going through the same unsaved-work check as Open or
+Create.
+
+## Working offline
+
+For working somewhere with no network at all — a field trip, a site
+visit, anywhere without a signal. This only ever involves the *edit*
+folder: the records actively being worked on, typically a modest,
+everyday-sized amount — not the reviewed/approved archive behind it,
+which is never touched and can be far larger.
+
+**Before you go** — open **Settings**, and under **Offline Work**
+click **Start Offline Staging...**. Choose a local folder; the app
+copies the current *edit* folder into it and points Edit there.
+Click **Save** to actually switch over.
+
+**While you're away** — use the app exactly as normal: Open, Create,
+Save all work against your local copy. Hold off on **Submit** until
+you're back online — *pending* still points at the real, currently
+unreachable archive, so a Submit attempt while offline will simply
+tell you it can't reach that folder rather than going through.
+
+**When you're back** — open **Settings** again and click **Reconcile
+Offline Changes...**. This lists every record that actually needs
+attention — new ones you created, ones you edited — and applies the
+straightforward ones for you in one go. If a record was *also*
+changed on the primary archive while you were away, it's flagged as a
+conflict instead of being guessed at: you choose whether to keep your
+offline edit, keep what's on primary, or leave it for later. Once
+you're done, it offers to point Edit back at the primary folder.
+
 ## Settings
 
-Configures the folders the app reads from and writes to (edit,
-ingest, media, pending, rejected, reviewed), plus where the app
-stores its own local data (vocabulary cache, etc.) and your display
-name. Changes take effect the next time a folder is used — for
-instance, the next time you click Open.
+Five groups:
+
+- **Locations** — the folders the app reads from and writes to: Edit,
+  Ingest, Pending, Rejected, Reviewed, and Released. The first five
+  are moved between automatically by Import/Submit/Approve/Reject;
+  *Released* has no button of its own anywhere in the app — it's
+  wherever you archive a reviewed record off to by hand once it's
+  actually ready to publish.
+- **Application Data** ("Clutter folder") — where the app keeps its
+  own files (the shared version history behind Audits, and the
+  vocabulary-search cache) separate from the archive itself. Leave
+  blank to use the sensible default shown.
+- **Offline Work** — see **Working offline** above.
+- **User** — your full name, used to label your own Saves/Submits/
+  Approvals in Audits.
+- **Options** — a handful of less-common preferences, most usefully
+  **media_extensions**: which file extensions count as a record's
+  linked media file for Sync Media and for Submit/Approve/Reject
+  carrying it along. Leave blank for a broad, sensible default
+  (shown as a placeholder in the field itself).
+
+Changes take effect the next time a folder is used — for instance,
+the next time you click Open.
 
 ## Tips and troubleshooting
 
 - **"No 'X' folder is configured"** — open Settings and set that
   folder before trying the action again.
+- **"Couldn't reach that folder"** — Save/Submit/Approve/Reject
+  couldn't actually write to the configured location (a network
+  share that's gone offline is the usual cause). Nothing is lost —
+  your edits are still in the open record — but that particular save
+  didn't happen. If this is a recurring problem rather than a one-off
+  outage, see **Working offline** above.
 - **Submit refuses with a validation error** — the message explains
   what the schema requires; the detailed technical error is available
   too if you need it.
-- **A TIFF won't preview** — some TIFF compression variants can't be
-  decoded by every image library; if a linked file's preview fails,
-  the record and the link are still fine, only the on-screen preview
-  is affected.
 - Undo is your safety net for anything done inside the app. It does
-  **not** cover Inject (which writes to the linked file itself,
-  outside the XML record) — that action asks for confirmation
-  precisely because it isn't undoable from within the app.
+  **not** cover Sync Media's actual file-writing step (it modifies
+  the linked image's metadata directly, outside the XML record) —
+  that's why Sync asks for confirmation before it runs.
