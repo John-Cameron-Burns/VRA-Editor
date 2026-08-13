@@ -17,6 +17,7 @@
 # "images", which holds true inside a frozen bundle too as long as the
 # data files land at that same relative path.
 
+import os
 import sys
 from pathlib import Path
 
@@ -24,6 +25,15 @@ block_cipher = None
 repo_root = Path(SPECPATH).resolve().parent
 resources_dir = repo_root / 'vra_editor' / 'resources'
 images_dir = repo_root / 'vra_editor' / 'images'
+
+# Set by the release workflow from the pushed tag (e.g. "1.2.3" from
+# "v1.2.3") so a tagged CI build's .app reports the same version as the
+# tag it came from; a plain local build (env var unset) keeps this
+# fallback, matching VRA_Editor.iss's #ifndef MyAppVersion default and
+# build_linux_deb.sh's packaging/debian/control fallback -- all three
+# platforms' "no override" version lives in one place each, but all
+# three follow the same env-var-first pattern.
+APP_VERSION = os.environ.get('VRA_EDITOR_VERSION', '1.0.0')
 
 RESOURCE_FILES = ['vra_core4.xsd', 'vra_core4_strict.xsd', 'xml.xsd', 'user_manual.md']
 IMAGE_FILES = [p.name for p in images_dir.iterdir() if p.is_file()]
@@ -118,7 +128,7 @@ app = BUNDLE(
     info_plist={
         'CFBundleName': 'VRA Editor',
         'CFBundleDisplayName': 'VRA Core 4 XML Editor',
-        'CFBundleShortVersionString': '1.0.0',
+        'CFBundleShortVersionString': APP_VERSION,
         'NSHumanReadableCopyright': 'Copyright © 2026 John Burns and Impact Data Metrics Limited. Licensed under CC BY-NC 4.0.',
         'NSHighResolutionCapable': True,
     },

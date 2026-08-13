@@ -12,7 +12,14 @@
 
 #define MyAppName "VRA Core 4 XML Editor"
 #define MyAppExeName "VRA Editor.exe"
-#define MyAppVersion "1.0.0"
+; Overridable from the command line with /DMyAppVersion=1.2.3 -- the
+; release workflow does this from the pushed tag, so a tagged CI build
+; produces VRA_Editor_Setup_1.2.3.exe without editing this file. A
+; plain "ISCC.exe VRA_Editor.iss" (no /D) keeps this default, matching
+; VRA_Editor.spec's and build_linux_deb.sh's own env-var-first pattern.
+#ifndef MyAppVersion
+  #define MyAppVersion "1.0.0"
+#endif
 #define MyAppPublisher "John Burns and Impact Data Metrics Limited"
 
 [Setup]

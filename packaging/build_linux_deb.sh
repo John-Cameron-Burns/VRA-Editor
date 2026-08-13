@@ -48,7 +48,10 @@ echo "=== Building with PyInstaller ==="
 
 echo
 echo "=== Assembling .deb ==="
-VERSION=$(grep '^Version:' packaging/debian/control | awk '{print $2}')
+# VRA_EDITOR_VERSION, if set (the release workflow sets it from the
+# pushed tag), overrides packaging/debian/control's own Version: line --
+# same env-var-first pattern as VRA_Editor.spec/.iss.
+VERSION="${VRA_EDITOR_VERSION:-$(grep '^Version:' packaging/debian/control | awk '{print $2}')}"
 STAGING="$REPO_ROOT/distributions/vra-editor_${VERSION}_amd64"
 rm -rf "$STAGING"
 
@@ -58,7 +61,7 @@ mkdir -p "$STAGING/usr/bin"
 mkdir -p "$STAGING/usr/share/applications"
 mkdir -p "$STAGING/usr/share/pixmaps"
 
-cp packaging/debian/control "$STAGING/DEBIAN/control"
+sed "s/^Version:.*/Version: ${VERSION}/" packaging/debian/control > "$STAGING/DEBIAN/control"
 cp -a "dist/VRA Editor/." "$STAGING/opt/vra-editor/"
 cp packaging/debian/vra-editor.desktop "$STAGING/usr/share/applications/vra-editor.desktop"
 cp vra_editor/images/logo.png "$STAGING/usr/share/pixmaps/vra-editor.png"

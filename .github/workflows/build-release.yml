@@ -35,6 +35,13 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Determine version
+        # Only set for a tag push (v1.2.3 -> 1.2.3) -- unset on a
+        # workflow_dispatch dry run, so the build falls back to
+        # VRA_Editor.spec's own hardcoded default.
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "VRA_EDITOR_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
       - name: Build .app
         run: ./build_macos_app.command
         env:
@@ -43,12 +50,14 @@ jobs:
       - name: Zip the .app bundle
         # GitHub Release assets (and upload-artifact) need a single
         # file, not a directory bundle.
-        run: cd distributions && zip -r "VRA Editor.app.zip" "VRA Editor.app"
+        run: |
+          VERSION="${VRA_EDITOR_VERSION:-1.0.0}"
+          cd distributions && zip -r "VRA_Editor_${VERSION}_macOS.app.zip" "VRA Editor.app"
 
       - uses: actions/upload-artifact@v4
         with:
           name: macos-app
-          path: distributions/VRA Editor.app.zip
+          path: distributions/VRA_Editor_*_macOS.app.zip
 
   build-windows:
     runs-on: windows-latest
@@ -59,6 +68,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Determine version
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          Add-Content $env:GITHUB_ENV "VRA_EDITOR_VERSION=$version"
 
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress
@@ -98,6 +114,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Determine version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "VRA_EDITOR_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
 
       - name: Install system dependencies
         # fakeroot/dpkg-dev package the .deb; the rest are PySide6/Qt6's

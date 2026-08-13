@@ -54,7 +54,13 @@ if not exist "%ISCC%" (
     exit /b 1
 )
 
-"%ISCC%" packaging\VRA_Editor.iss
+REM VRA_EDITOR_VERSION, if set (the release workflow sets it from the
+REM pushed tag), overrides VRA_Editor.iss's own default MyAppVersion --
+REM see that file's #ifndef MyAppVersion guard.
+set "ISCC_DEFINES="
+if defined VRA_EDITOR_VERSION set "ISCC_DEFINES=/DMyAppVersion=%VRA_EDITOR_VERSION%"
+
+"%ISCC%" %ISCC_DEFINES% packaging\VRA_Editor.iss
 if errorlevel 1 goto :error
 
 echo.
