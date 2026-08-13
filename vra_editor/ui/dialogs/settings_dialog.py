@@ -15,6 +15,7 @@ from ...config import (
     DEFAULT_CONFIG_PATH, LOCATION_KEYS, OPTION_TEXT_KEYS,
     to_bool,
 )
+from ...core.media_files import DEFAULT_MEDIA_EXTENSIONS
 from ...utils import strip_quotes
 
 # Not an archive workflow stage like the LOCATION_KEYS -- shown in its own
@@ -178,6 +179,15 @@ class SettingsDialog(QDialog):
 
         for key in OPTION_TEXT_KEYS:
             edit = QLineEdit()
+            if key == 'media_extensions':
+                # Matches load_media_extensions()'s own fallback -- shown
+                # as a placeholder rather than pre-filled text, so it's
+                # clearly "what applies if you leave this blank" and not
+                # mistaken for a saved value. Also as a tooltip, since
+                # the field is too narrow to show the full list at once.
+                default_text = ', '.join(DEFAULT_MEDIA_EXTENSIONS)
+                edit.setPlaceholderText(f"(default: {default_text})")
+                edit.setToolTip(f"Used when this is left blank:\n{default_text}")
             self._option_edits[key] = edit
             form.addRow(f"{key}:", edit)
 
