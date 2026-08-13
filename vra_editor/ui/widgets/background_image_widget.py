@@ -34,11 +34,26 @@ class BackgroundImageWidget(QWidget):
     def __init__(self, image_path: Optional[Path] = None, parent=None):
         super().__init__(parent)
         self._background = QPixmap(str(image_path)) if image_path and image_path.exists() else QPixmap()
+        # Extra clearance above the base margin -- for a subclass that
+        # puts a title label directly on this widget (SectionListPanel's
+        # "Sections" heading) with no opaque backing of its own, _MARGIN
+        # alone isn't enough to keep the image from showing through
+        # right behind/around that text. See set_top_inset().
+        self._top_inset = 0
+
+    def set_top_inset(self, pixels: int):
+        """Push the image's top edge down by this many extra pixels
+        (on top of _MARGIN), so it clears a header row that sits
+        directly on this widget instead of inside its own opaque box."""
+        self._top_inset = max(pixels, 0)
+        self.update()
 
     def paintEvent(self, event):
         if not self._background.isNull():
             painter = QPainter(self)
-            target_rect = self.rect().adjusted(self._MARGIN, self._MARGIN, -self._MARGIN, -self._MARGIN)
+            target_rect = self.rect().adjusted(
+                self._MARGIN, self._MARGIN + self._top_inset, -self._MARGIN, -self._MARGIN
+            )
             if target_rect.width() > 0 and target_rect.height() > 0:
                 # Clip to the inset rect -- KeepAspectRatioByExpanding
                 # overfills one dimension by design (that's how it crops

@@ -48,6 +48,11 @@ class SectionListPanel(BackgroundImageWidget):
 
         header = QLabel("<b>Sections</b>")
         layout.addWidget(header)
+        # Unlike list_widget below, this label has no opaque background
+        # of its own -- without this, the raw background image would
+        # show through right behind/around the title instead of staying
+        # clear of it the way _MARGIN alone keeps it off the panel edges.
+        self.set_top_inset(header.sizeHint().height() + layout.contentsMargins().top())
 
         self.list_widget = QListWidget()
         self.list_widget.itemClicked.connect(self._on_item_clicked)
