@@ -13,6 +13,8 @@ urllib rather than adding a new HTTP dependency.
 """
 
 import json
+import logging
+import sqlite3
 import ssl
 import urllib.error
 import urllib.parse
@@ -78,6 +80,22 @@ class AuthorityResult:
 
 class AuthorityLookupError(Exception):
     pass
+
+
+def _cache_call(fn, *args, default=None):
+    """vocab_cache.py's functions can raise OSError (creating its
+    directory failed -- app_data.get_cache_dir() can be a network
+    share) or sqlite3.Error (a stale mount, a corrupt db file on one).
+    The cache is a nice-to-have -- precedent and repeat-query
+    avoidance, see vocab_cache.py's own module docstring -- not a
+    requirement for a lookup to work, so a failure here degrades to
+    `default` (falling back to plain network-only behaviour) instead
+    of failing the whole search."""
+    try:
+        return fn(*args)
+    except (OSError, sqlite3.Error) as e:
+        logging.warning(f"Vocabulary cache unavailable ({e}) -- continuing without it")
+        return default
 
 
 def _get_json(url: str, headers: dict, timeout: float):
@@ -194,12 +212,18 @@ def search(vocab: str, query: str) -> list:
     same authority entry to get reused rather than a fresh-but-
     different alternative winning each time. Only truly new entries
     (not already indexed) get appended after those. Raises
-    AuthorityLookupError on network/API failure or misconfiguration; a
-    fully-local answer can't fail this way."""
-    if vocab_cache.already_fetched(vocab, query):
-        return [AuthorityResult(**hit) for hit in vocab_cache.get_exact(vocab, query)]
+    AuthorityLookupError on network/API failure or misconfiguration --
+    an unreachable cache doesn't fail this way, see _cache_call."""
+    if _cache_call(vocab_cache.already_fetched, vocab, query, default=False):
+        exact = _cache_call(vocab_cache.get_exact, vocab, query, default=None)
+        if exact is not None:
+            return [AuthorityResult(**hit) for hit in exact]
+        # Cache broke between already_fetched succeeding and get_exact
+        # failing (e.g. the share dropped mid-search) -- fall through
+        # to a fresh fetch rather than erroring out over what's really
+        # a caching hiccup.
 
-    local_hits = vocab_cache.search_local(vocab, query)
+    local_hits = _cache_call(vocab_cache.search_local, vocab, query, default=[])
     local_refids = {hit["refid"] for hit in local_hits}
 
     if vocab == "VIAF":
@@ -213,7 +237,7 @@ def search(vocab: str, query: str) -> list:
     else:
         raise AuthorityLookupError(f"Unknown vocabulary: {vocab}")
 
-    vocab_cache.record_fetch(vocab, query, [asdict(r) for r in fresh])
+    _cache_call(vocab_cache.record_fetch, vocab, query, [asdict(r) for r in fresh])
 
     new_only = [r for r in fresh if r.refid not in local_refids]
     return [AuthorityResult(**hit) for hit in local_hits] + new_only

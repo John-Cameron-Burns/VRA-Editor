@@ -904,10 +904,24 @@ class MainWindow(QMainWindow):
         )
         if not accepted or not comment.strip():
             return
-        if not add_file_to_repo(path, comment.strip()):
+        result = add_file_to_repo(path, comment.strip())
+        if result is None:
             QMessageBox.warning(
                 self, "Commit failed",
                 f"{path} was saved, but could not be committed to the version-control repository.",
+            )
+        elif result == 'fallback':
+            # Not a failure -- add_file_to_repo already recorded this
+            # commit locally when the shared repo location wasn't
+            # reachable, and folds it into the shared history
+            # automatically the next time it is (see commit_to_git.py's
+            # _replay_fallback). Worth a heads-up rather than silence,
+            # since "Audits" won't show this commit until that happens.
+            QMessageBox.information(
+                self, "Recorded locally",
+                f"{path} was saved and committed, but the shared version-history location "
+                "isn't reachable right now. This commit was recorded locally instead, and "
+                "will be added to the shared history automatically once it's reachable again.",
             )
 
     def _on_autofill(self):
