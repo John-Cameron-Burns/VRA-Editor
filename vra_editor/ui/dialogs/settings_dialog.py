@@ -2,6 +2,8 @@ import configparser
 from pathlib import Path
 from typing import Optional
 
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFontMetrics
 from PySide6.QtWidgets import (
     QDialog, QWidget, QFormLayout, QVBoxLayout, QHBoxLayout,
     QLineEdit, QCheckBox, QPushButton, QFileDialog, QLabel,
@@ -20,6 +22,18 @@ from ...utils import strip_quotes
 # [locations] section so app_data.get_app_data_dir() can read it back
 # with the same load_locations() call the archive folders use.
 APP_DATA_KEY = 'app_data'
+
+# Human-friendly row labels for LOCATION_KEYS -- config.py and
+# document_controller.py use the bare lowercase keys everywhere else,
+# but "edit:" on its own doesn't read as a folder setting at a glance.
+_LOCATION_LABELS = {
+    'edit': 'Edit folder',
+    'ingest': 'Ingest folder',
+    'pending': 'Pending folder',
+    'rejected': 'Rejected folder',
+    'reviewed': 'Reviewed folder',
+    'released': 'Released folder',
+}
 
 
 # noinspection PyUnresolvedReferences
@@ -69,6 +83,30 @@ class SettingsDialog(QDialog):
     def _build_locations_group(self) -> QGroupBox:
         group = QGroupBox("Locations")
         form = QFormLayout(group)
+        # Left-aligned rather than QFormLayout's default of hugging the
+        # field, so every label starts at the same left edge -- but that
+        # leaves ragged whitespace after the shorter ones (e.g. "Edit
+        # folder" next to "Rejected folder"), which is what the dot
+        # leader below fills in.
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        metrics = QFontMetrics(self.font())
+        widest = max(metrics.horizontalAdvance(f"{lbl} ") for lbl in _LOCATION_LABELS.values())
+        dot_width = metrics.horizontalAdvance('.')
+
+        # QLineEdit's own sizeHint (a generic ~125px, unrelated to what
+        # it actually renders at) isn't a usable baseline for "50%
+        # wider" -- its horizontal Expanding size policy means its real
+        # width is whatever's left in the dialog after the label column
+        # and Browse button, which is what a scholar actually sees these
+        # boxes clipped to. Estimate that leftover directly and widen
+        # off of it instead, so setting this minimum actually grows the
+        # dialog (QDialog enlarges past resize() to honor a child's
+        # minimumWidth) rather than being a no-op inside space it
+        # already had.
+        browse_width = QPushButton("Browse...").sizeHint().width()
+        natural_field_width = self.width() - widest - browse_width - 90
+        target_field_width = int(natural_field_width * 1.5)
 
         for key in LOCATION_KEYS:
             row = QWidget()
@@ -76,15 +114,19 @@ class SettingsDialog(QDialog):
             row_layout.setContentsMargins(0, 0, 0, 0)
 
             edit = QLineEdit()
+            edit.setMinimumWidth(target_field_width)
             browse_btn = QPushButton("Browse...")
-            browse_btn.setToolTip(f"Choose the folder for '{key}'.")
+            browse_btn.setToolTip(f"Choose the {key} folder.")
             browse_btn.clicked.connect(lambda _checked, e=edit: self._browse_for(e))
 
             row_layout.addWidget(edit)
             row_layout.addWidget(browse_btn)
 
             self._location_edits[key] = edit
-            form.addRow(f"{key}:", row)
+
+            base = f"{_LOCATION_LABELS.get(key, key)} "
+            leader_len = max(int((widest - metrics.horizontalAdvance(base)) / dot_width), 3)
+            form.addRow(f"{base}{'.' * leader_len} ", row)
 
         return group
 
