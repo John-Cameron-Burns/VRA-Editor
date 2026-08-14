@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QKeySequence, QShortcut, QPixmap
+from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtGui import QDesktopServices, QKeySequence, QShortcut, QPixmap
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QPushButton, QLabel, QFrame,
     QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy, QMessageBox, QInputDialog,
@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 from vra_editor.config import load_locations
 from vra_editor.controllers.document_controller import DocumentController, LocationUnavailableError
 from vra_editor.core.commit_to_git import add_file_to_repo
+from vra_editor.core.update_check import DEV_BUILD_VERSION, UpdateCheckError, check_for_update, get_app_version
 from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
 from vra_editor.ui.dialogs.audit_dialog import AuditDialog
 from vra_editor.ui.dialogs.help_dialog import HelpDialog
@@ -370,6 +371,12 @@ class MainWindow(QMainWindow):
 
         undo_shortcut = QShortcut(QKeySequence.StandardKey.Undo, self)
         undo_shortcut.activated.connect(self._on_undo)
+
+        # Deferred rather than checked inline here -- lets the window
+        # actually paint and become responsive first, so a slow (not
+        # just absent) network doesn't read as the app hanging on
+        # launch. Silent regardless of outcome; see _check_for_updates.
+        QTimer.singleShot(800, lambda: self._check_for_updates(silent=True))
 
     # ------------------------------------------------------------------
     # Layout construction
@@ -834,16 +841,74 @@ class MainWindow(QMainWindow):
         self._help_dialog.activateWindow()
 
     def _on_about(self):
-        QMessageBox.about(
-            self, "About VRA Core 4 XML Editor",
+        # Built manually (not QMessageBox.about()'s one-button
+        # convenience form) so Check for Updates can sit alongside it --
+        # same reasoning as _confirm_discard_if_dirty's own manually-
+        # built box elsewhere in this file.
+        box = QMessageBox(
+            QMessageBox.Icon.Information, "About VRA Core 4 XML Editor",
             "<h3>VRA Core 4 XML Editor</h3>"
+            f"<p>Version {get_app_version()}</p>"
             "<p>Copyright &copy; 2026 John Burns and Impact Data Metrics Limited.</p>"
             "<p>Licensed under the "
             "<a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">"
             "Creative Commons Attribution-NonCommercial 4.0 International License</a> "
             "(CC BY-NC 4.0).</p>"
             "<p>See the LICENSE file included with this application for the full license text.</p>",
+            parent=self,
         )
+        check_btn = box.addButton("Check for Updates", QMessageBox.ButtonRole.ActionRole)
+        box.addButton("Close", QMessageBox.ButtonRole.RejectRole)
+        box.exec()
+        if box.clickedButton() is check_btn:
+            self._check_for_updates(silent=False)
+
+    def _check_for_updates(self, silent: bool):
+        """Shared by the silent startup check (see __init__'s
+        QTimer.singleShot) and the About dialog's on-demand button --
+        the only difference is how much this says when there's nothing
+        to report. A startup check that popped up a dialog on every
+        single launch just to say "you're current" would be exactly the
+        kind of nagging this app's own offline-first design otherwise
+        goes out of its way to avoid; an explicit on-demand check should
+        say something regardless of the outcome, since silence would
+        just look broken."""
+        if not silent and get_app_version() == DEV_BUILD_VERSION:
+            # check_for_update() itself would just silently return None
+            # for this case (nothing meaningful to compare a dev build
+            # against) -- worth a distinct, honest message here rather
+            # than a misleading "you're up to date" for a version that
+            # was never actually checked.
+            QMessageBox.information(
+                self, "Development build",
+                "Update checks aren't available when running from source -- only in a packaged build.",
+            )
+            return
+        try:
+            info = check_for_update(timeout=5.0 if silent else 10.0)
+        except UpdateCheckError as e:
+            if not silent:
+                QMessageBox.warning(self, "Couldn't check for updates", str(e))
+            return
+
+        if info is None:
+            if not silent:
+                QMessageBox.information(
+                    self, "You're up to date",
+                    f"Version {get_app_version()} is the latest available.",
+                )
+            return
+
+        box = QMessageBox(
+            QMessageBox.Icon.Information, "Update available",
+            f"Version {info.version} is available (you have {get_app_version()}).",
+            parent=self,
+        )
+        open_btn = box.addButton("Open Download Page", QMessageBox.ButtonRole.AcceptRole)
+        box.addButton("Later", QMessageBox.ButtonRole.RejectRole)
+        box.exec()
+        if box.clickedButton() is open_btn:
+            QDesktopServices.openUrl(QUrl(info.url))
 
     def _try_location_op(self, fn):
         """Runs a DocumentController save/submit/approve/reject call,

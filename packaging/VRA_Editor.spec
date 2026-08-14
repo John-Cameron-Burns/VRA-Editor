@@ -19,6 +19,7 @@
 
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 block_cipher = None
@@ -34,6 +35,17 @@ images_dir = repo_root / 'vra_editor' / 'images'
 # platforms' "no override" version lives in one place each, but all
 # three follow the same env-var-first pattern.
 APP_VERSION = os.environ.get('VRA_EDITOR_VERSION', '1.0.0')
+
+# core/update_check.py's get_app_version() reads this back at runtime to
+# know its own version (for display in About, and to compare against
+# the latest release) -- written to a system temp file rather than
+# anywhere under the source tree, so a local build never leaves a
+# modified/generated file behind in the actual repo. Named VERSION
+# itself, not just placed in a temp dir named that -- a `datas` entry's
+# destination is a directory, and PyInstaller keeps the source file's
+# own basename when it lands there.
+_version_file = Path(tempfile.gettempdir()) / 'VERSION'
+_version_file.write_text(APP_VERSION)
 
 RESOURCE_FILES = ['vra_core4.xsd', 'vra_core4_strict.xsd', 'xml.xsd', 'user_manual.md']
 IMAGE_FILES = [p.name for p in images_dir.iterdir() if p.is_file()]
@@ -79,6 +91,7 @@ a = Analysis(
     datas=(
         [(str(resources_dir / name), 'vra_editor/resources') for name in RESOURCE_FILES]
         + [(str(images_dir / name), 'vra_editor/images') for name in IMAGE_FILES]
+        + [(str(_version_file), 'vra_editor/resources')]
     ),
     hiddenimports=[],
     hookspath=[],
