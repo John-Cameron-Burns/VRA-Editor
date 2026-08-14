@@ -6,7 +6,6 @@ from PySide6.QtWidgets import (
     QFileDialog, QInputDialog, QMessageBox,
 )
 
-from vra_editor.config import load_locations
 from vra_editor.core import media_metadata
 
 _IMAGE_FILE_FILTER = "Images (*.tif *.tiff *.jpg *.jpeg *.png);;All Files (*)"
@@ -112,7 +111,13 @@ class MediaSyncDialog(QDialog):
         self._clear_table()
         guessed = doc_controller.guess_linked_media_path()
         if guessed is not None:
-            self._load_path(guessed)
+            choice = self._prompt_initial_source(guessed)
+            if choice == 'matching':
+                self._load_path(guessed)
+            elif choice == 'browse':
+                self._on_browse()
+            # 'cancel' leaves the table empty -- the Browse... button
+            # is still there for the user to pick a file manually.
 
     def _clear_table(self):
         self.measurements_label.setText("Pick an image file to compare it against this record.")
@@ -122,10 +127,36 @@ class MediaSyncDialog(QDialog):
             self.table.setCellWidget(row, 3, None)
         self._row_controls = {}
 
+    def _prompt_initial_source(self, guessed: Path) -> str:
+        """Called once, at dialog open, only when a file matching this
+        record's id was found sitting next to its XML. Returns
+        'matching' | 'browse' | 'cancel' -- the dialog otherwise stayed
+        silent about this before, always preloading the guessed file
+        without asking."""
+        box = QMessageBox(
+            QMessageBox.Icon.Question, "Locate Media File",
+            f'Found a file with the same name as this record: "{guessed.name}".\n\n'
+            f'Use that file, or choose a different one?',
+            parent=self,
+        )
+        use_button = box.addButton(f'Use "{guessed.name}"', QMessageBox.ButtonRole.AcceptRole)
+        browse_button = box.addButton("Choose a File...", QMessageBox.ButtonRole.ActionRole)
+        cancel_button = box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+        box.setDefaultButton(use_button)
+        box.exec()
+        clicked = box.clickedButton()
+
+        if clicked is use_button:
+            return 'matching'
+        if clicked is browse_button:
+            return 'browse'
+        assert clicked is cancel_button
+        return 'cancel'
+
     def _on_browse(self):
-        locations = load_locations()
-        ingest_dir = locations.get('ingest')
-        start_dir = str(ingest_dir) if ingest_dir and ingest_dir.exists() else str(Path.home())
+        current_file = self._doc_controller.current_file
+        record_dir = Path(current_file).parent if current_file else None
+        start_dir = str(record_dir) if record_dir and record_dir.exists() else str(Path.home())
         path_str, _ = QFileDialog.getOpenFileName(self, "Select Image File", start_dir, _IMAGE_FILE_FILTER)
         if not path_str:
             return
