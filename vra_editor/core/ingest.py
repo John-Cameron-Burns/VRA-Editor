@@ -159,6 +159,25 @@ def merge_xml_elements(target: ET.Element, source: ET.Element,
             target.append(source_child)
 
 
+def stash_orphan_media(file_path, input_dir) -> Path:
+    """Moves a leftover media file -- one process_vra_directory reported
+    as having no matching source XML this run (see its return value) --
+    into ingest's own done/ folder, mirroring its own subfolder, exactly
+    like a normally-consumed source's sibling media would have been
+    moved there. Used by OrphanMediaDialog's "Stash" choice."""
+    input_path = Path(input_dir)
+    file_path = Path(file_path)
+    done_path = input_path / "done"
+    relative_dir = file_path.parent.relative_to(input_path)
+    dest_dir = done_path / relative_dir
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / file_path.name
+    if dest.exists():
+        dest.unlink()
+    shutil.move(str(file_path), str(dest))
+    return dest
+
+
 def process_vra_directory(input_dir: str, output_dir: str, progress_callback=None,
                            media_extensions=DEFAULT_MEDIA_EXTENSIONS):
     """Scans input_dir -- including nested subfolders -- for VRA-Core XML
@@ -185,6 +204,19 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
     this module stays config-decoupled and standalone-scriptable (see
     the __main__ block below); config.load_media_extensions() is what
     real callers (import_progress_dialog.py) resolve it from.
+
+    Returns a list of "leftover" media files: anything under input_dir
+    (excluding done/) with an extension in media_extensions that never
+    got looked at above, because the whole scan is XML-driven (a media
+    file is only ever discovered as a *sibling* of an XML file this
+    function is already processing) -- so a stray image with no XML
+    counterpart at all is otherwise invisible to Import, silently
+    remaining in input_dir forever with no feedback. Callers decide what
+    to do with these (see ui/dialogs/orphan_media_dialog.py); this
+    function itself doesn't move or otherwise touch them, and doesn't
+    know about core/ingest_ignored_cache.py -- filtering already-
+    dismissed leftovers out of this list is the caller's job, keeping
+    this function's own dependencies unchanged.
 
     progress_callback, if given, is called as
     progress_callback(current: int, total: int, message: str) at each
@@ -295,7 +327,23 @@ def process_vra_directory(input_dir: str, output_dir: str, progress_callback=Non
             shutil.move(str(file_path), str(dest))
         report(index, total, f" -> Moved {len(files)} source file(s) for '{rec_id}' to '{done_path.name}/'.")
 
+    # 3. Anything still sitting directly under input_dir (outside done/)
+    # with a media extension has no XML sibling that got processed
+    # above -- it was never looked at, since the whole scan is
+    # XML-driven (see this function's own docstring).
+    lower_exts = {ext.lower() for ext in media_extensions}
+    leftover_media = [
+        file_path for file_path in sorted(input_path.rglob("*"))
+        if file_path.is_file()
+        and not file_path.is_relative_to(done_path)
+        and file_path.suffix.lower() in lower_exts
+    ]
+    if leftover_media:
+        report(total, total,
+               f" [!] {len(leftover_media)} media file(s) have no matching record and were left in place.")
+
     report(total, total, f"Finished! Processed {total} record(s).")
+    return leftover_media
 
 
 if __name__ == "__main__":

@@ -4,7 +4,9 @@ from PySide6.QtWidgets import (
 )
 
 from vra_editor.config import load_media_extensions
+from vra_editor.core import ingest_ignored_cache
 from vra_editor.core.ingest import process_vra_directory
+from vra_editor.ui.dialogs.orphan_media_dialog import OrphanMediaDialog
 
 
 class ImportProgressDialog(QDialog):
@@ -26,6 +28,7 @@ class ImportProgressDialog(QDialog):
 
         self.ingest_dir = ingest_dir
         self.edit_dir = edit_dir
+        self.orphans = []
 
         layout = QVBoxLayout(self)
 
@@ -46,14 +49,19 @@ class ImportProgressDialog(QDialog):
 
     def _run(self):
         try:
-            process_vra_directory(
+            leftover_media = process_vra_directory(
                 str(self.ingest_dir), str(self.edit_dir),
                 progress_callback=self._on_progress,
                 media_extensions=load_media_extensions(),
             )
+            # ingest.py itself doesn't know about this cache -- see its
+            # own docstring on why that filtering is left to the caller.
+            self.orphans = [p for p in leftover_media if not ingest_ignored_cache.is_ignored(p)]
         except Exception as e:
             self._log(f" [!] Import failed: {e}")
         self.buttons.button(QDialogButtonBox.Close).setEnabled(True)
+        if self.orphans:
+            OrphanMediaDialog(self.orphans, self.ingest_dir, parent=self).exec()
 
     def _on_progress(self, current: int, total: int, message: str):
         if total > 0:
