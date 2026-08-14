@@ -64,7 +64,7 @@ mkdir -p "$STAGING/usr/share/pixmaps"
 sed "s/^Version:.*/Version: ${VERSION}/" packaging/debian/control > "$STAGING/DEBIAN/control"
 cp -a "dist/VRA Editor/." "$STAGING/opt/vra-editor/"
 cp packaging/debian/vra-editor.desktop "$STAGING/usr/share/applications/vra-editor.desktop"
-cp vra_editor/images/logo.png "$STAGING/usr/share/pixmaps/vra-editor.png"
+cp packaging/icons/app_icon_256.png "$STAGING/usr/share/pixmaps/vra-editor.png"
 
 cat > "$STAGING/usr/bin/vra-editor" <<'WRAPPER'
 #!/bin/sh

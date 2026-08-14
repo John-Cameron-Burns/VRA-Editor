@@ -26,6 +26,7 @@ block_cipher = None
 repo_root = Path(SPECPATH).resolve().parent
 resources_dir = repo_root / 'vra_editor' / 'resources'
 images_dir = repo_root / 'vra_editor' / 'images'
+icons_dir = repo_root / 'packaging' / 'icons'
 
 # Set by the release workflow from the pushed tag (e.g. "1.2.3" from
 # "v1.2.3") so a tagged CI build's .app reports the same version as the
@@ -120,6 +121,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=str(icons_dir / 'app_icon.ico'),
 )
 
 coll = COLLECT(
@@ -136,7 +138,7 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='VRA Editor.app',
-    icon=None,
+    icon=str(icons_dir / 'app_icon.icns'),
     bundle_identifier='com.impactdatametrics.vraeditor',
     info_plist={
         'CFBundleName': 'VRA Editor',

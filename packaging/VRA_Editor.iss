@@ -32,6 +32,7 @@ DefaultGroupName=VRA Editor
 LicenseFile=..\LICENSE
 OutputDir=..\distributions
 OutputBaseFilename=VRA_Editor_Setup_{#MyAppVersion}
+SetupIconFile=icons\app_icon.ico
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
