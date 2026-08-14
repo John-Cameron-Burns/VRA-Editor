@@ -11,6 +11,13 @@ name: Build distributions
 # sanity-check them without publishing anything -- the three build jobs
 # still run and their output is downloadable from that run's Summary
 # page, but the release job only runs for an actual tag push.
+#
+# This repo is private -- Releases are published to a separate public
+# repo instead (see the release job) so distributions and a future
+# "check for updates" feature don't need GitHub auth to reach. Until
+# that's set up (repo variable RELEASES_REPO + secret
+# RELEASES_REPO_TOKEN, both under Settings -> Secrets and variables ->
+# Actions), releases fall back to publishing here as before.
 on:
   push:
     tags:
@@ -162,8 +169,18 @@ jobs:
           path: artifacts
 
       - name: Publish release
+        # Published to a separate, public repo -- not this one, which
+        # stays private -- so distributions and "check for updates" are
+        # reachable with no GitHub auth. RELEASES_REPO_TOKEN is a PAT
+        # scoped only to that public repo, since the default
+        # GITHUB_TOKEN can't write to any repo but the one the workflow
+        # runs in. Both the repo variable and token fall back to this
+        # (private) repo's own default until they're actually set up --
+        # see the setup checklist for provisioning them for real.
         uses: softprops/action-gh-release@v2
         with:
+          repository: ${{ vars.RELEASES_REPO || github.repository }}
+          token: ${{ secrets.RELEASES_REPO_TOKEN || secrets.GITHUB_TOKEN }}
           files: |
             artifacts/macos-app/*.zip
             artifacts/windows-installer/*.exe
