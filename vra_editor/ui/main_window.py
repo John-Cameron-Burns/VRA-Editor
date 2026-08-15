@@ -5,7 +5,7 @@ from PySide6.QtGui import QDesktopServices, QKeySequence, QShortcut, QPixmap
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QPushButton, QLabel, QFrame,
     QHBoxLayout, QVBoxLayout, QSplitter, QSizePolicy, QMessageBox, QInputDialog,
-    QStackedWidget,
+    QStackedWidget, QFileDialog,
 )
 
 from vra_editor.config import load_locations
@@ -298,7 +298,7 @@ class MainWindow(QMainWindow):
     BUTTON_ORDER = [
         'Home', 'Open', 'Create', 'Review', 'Import',
         'Save', 'Undo', 'Submit', 'Approve', 'Reject', 'Cancel',
-        'Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
+        'Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
         'Settings', 'Autofill', 'Audits', 'Help', 'About',
     ]
 
@@ -310,15 +310,16 @@ class MainWindow(QMainWindow):
         'Save': 'action', 'Undo': 'action', 'Submit': 'action', 'Approve': 'action',
         'Reject': 'action', 'Cancel': 'action',
         'Show XML': 'view', 'Review Notes': 'view', 'Advanced View': 'view', 'Sync Media': 'view',
+        'Export': 'view',
         'Settings': 'admin', 'Autofill': 'admin', 'Audits': 'admin', 'Help': 'admin', 'About': 'admin',
     }
 
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'Audits', 'Help', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
+        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
                               'Submit', 'Cancel', 'Audits', 'Help', 'About'],
         review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
-                                'Reject', 'Cancel', 'Audits', 'Help', 'About'],
+                                'Export', 'Reject', 'Cancel', 'Audits', 'Help', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'Audits', 'Help', 'About'],
     )
 
@@ -334,6 +335,7 @@ class MainWindow(QMainWindow):
         'Review Notes': "Show or hide notes a reviewer has left for the editor.",
         'Advanced View': "Switch to the structure tree and single-element editor.",
         'Sync Media': "Compare this record against an image file and fill in gaps on either side.",
+        'Export': "Export this record as Dublin Core or LIDO XML.",
         'Submit': "Send this record for review. Requires it to be schema-valid.",
         'Approve': "Move this record into the reviewed archive.",
         'Reject': "Send this record back to the editor for revision.",
@@ -607,7 +609,7 @@ class MainWindow(QMainWindow):
         for name in ('Submit', 'Approve'):
             self.mode_bar.buttons[name].setStyleSheet(PRIMARY_BUTTON_STYLE)
         self.mode_bar.buttons['Reject'].setStyleSheet(REJECT_BUTTON_STYLE)
-        for name in ('Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
+        for name in ('Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
                      'Settings', 'Autofill', 'Audits', 'Help', 'About'):
             self.mode_bar.buttons[name].setStyleSheet(SECONDARY_BUTTON_STYLE)
 
@@ -650,6 +652,7 @@ class MainWindow(QMainWindow):
         buttons['Autofill'].clicked.connect(self._on_autofill)
         buttons['Import'].clicked.connect(self._on_import)
         buttons['Sync Media'].clicked.connect(self._on_sync_media)
+        buttons['Export'].clicked.connect(self._on_export)
 
     def _on_toggle_xml(self, checked: bool):
         self.xml_preview_panel.setVisible(checked)
@@ -1038,3 +1041,39 @@ class MainWindow(QMainWindow):
     def _on_sync_media(self):
         dlg = MediaSyncDialog(self.doc_controller, parent=self)
         dlg.exec()
+
+    # name -> (export method name on DocumentController, filename suffix, save-dialog title)
+    _EXPORT_FORMATS = {
+        'Dublin Core (Simple DC / oai_dc)': ('export_dublin_core_xml', '_dc.xml', "Export as Dublin Core"),
+        'LIDO (Lightweight Information Describing Objects)': ('export_lido_xml', '_lido.xml', "Export as LIDO"),
+    }
+
+    def _on_export(self):
+        format_name, ok = QInputDialog.getItem(
+            self, "Export Record", "Export as:", list(self._EXPORT_FORMATS), 0, False,
+        )
+        if not ok:
+            return
+        method_name, suffix, dialog_title = self._EXPORT_FORMATS[format_name]
+        xml_text = getattr(self.doc_controller, method_name)()
+        if xml_text is None:
+            return
+
+        record_id = ''
+        records = self.doc_controller.xml_doc.build_tree()
+        if records:
+            record_id = records[0].element.get('id', '').strip()
+
+        current_file = self.doc_controller.current_file
+        start_dir = Path(current_file).parent if current_file else Path.home()
+        start_path = str(start_dir / f"{record_id or 'record'}{suffix}")
+
+        path_str, _ = QFileDialog.getSaveFileName(self, dialog_title, start_path, "XML Files (*.xml)")
+        if not path_str:
+            return
+        try:
+            Path(path_str).write_text(xml_text, encoding='utf-8')
+        except OSError as e:
+            QMessageBox.warning(self, "Export failed", f"Couldn't write {path_str}: {e}")
+            return
+        QMessageBox.information(self, "Exported", f"Exported {format_name} record to {path_str}")

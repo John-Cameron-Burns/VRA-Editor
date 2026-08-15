@@ -1,0 +1,36 @@
+# A disposable LDAP server for running webapp/'s test suite locally or
+# in CI -- not the persistent dev server (that's a separate lldap
+# container on the Proxmox host, see the [ldap] section documented in
+# webapp/config.py). Same image/bootstrap approach as that dev server
+# (lldap, not osixia/openldap -- see tests/ldap-bootstrap/ for why),
+# just running on localhost with throwaway state.
+#
+# Usage:
+#   docker compose -f docker-compose.web-test.yml up -d
+#   docker compose -f docker-compose.web-test.yml exec lldap-test /bootstrap/bootstrap.sh
+#   pytest tests/
+#   docker compose -f docker-compose.web-test.yml down -v
+
+services:
+  lldap-test:
+    image: lldap/lldap:stable
+    container_name: vra-ldap-test
+    ports:
+      - "3389:3890"
+      - "17171:17170"
+    volumes:
+      - lldap_test_data:/data
+      - ./tests/ldap-bootstrap:/bootstrap
+    environment:
+      LLDAP_JWT_SECRET: "test-only-jwt-secret"
+      LLDAP_LDAP_USER_EMAIL: admin@vra.local
+      LLDAP_LDAP_USER_PASS: TestAdminPass123!
+      LLDAP_LDAP_BASE_DN: dc=vra,dc=local
+      LLDAP_URL: http://localhost:17170
+      LLDAP_ADMIN_USERNAME: admin
+      LLDAP_ADMIN_PASSWORD: TestAdminPass123!
+      USER_CONFIGS_DIR: /bootstrap/user-configs
+      GROUP_CONFIGS_DIR: /bootstrap/group-configs
+      DO_CLEANUP: "false"
+volumes:
+  lldap_test_data:

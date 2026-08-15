@@ -1,0 +1,11 @@
+flask>=3.0
+ldap3>=2.9
+waitress>=3.0
+
+# Transitive requirements of vra_editor.core/vra_editor.config, the
+# same versions requirements.txt (the desktop app) pins -- everything
+# else there (PySide6, Pillow, pyexiv2, certifi) is desktop-only and
+# never imported by webapp/'s own code path.
+lxml>=4.9.0
+regex
+dulwich --config-settings "--build-option=--pure"

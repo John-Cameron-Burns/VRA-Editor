@@ -1,0 +1,361 @@
+import datetime
+
+from lxml import etree
+from flask import Blueprint, jsonify, request
+
+from vra_editor.config import load_locations, load_media_extensions
+from vra_editor.core import record_locks, record_transitions, review_notes
+from vra_editor.core.schema_validator import DEFAULT_XSD_PATH, SchemaValidator
+from vra_editor.core.xml_parser import VraXmlParser
+
+from ..auth import config_path_for_request, current_username, login_required
+from ..records_common import commit_change, owns_lock, resolve_record_path
+from ..tree_json import node_to_json, resolve_path
+
+record_bp = Blueprint('records', __name__, url_prefix='/api/records')
+
+
+@record_bp.get('/<key>/<path:rel_path>')
+@login_required
+def open_record(key, rel_path):
+    """Opens a record for editing: acquires the lock (409 if someone
+    else holds it) and returns the record's tree as JSON (see
+    tree_json.node_to_json) plus its review notes."""
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+    username = current_username()
+
+    held_by = record_locks.acquire(record_path, username, config_path)
+    if held_by is not None:
+        return jsonify({'error': f'Locked by {held_by}'}), 409
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    records = parser.build_tree()
+    if not records:
+        record_locks.release(record_path, username, config_path)
+        return jsonify({'error': 'Could not parse this record'}), 500
+
+    return jsonify({
+        'record': node_to_json(records[0]),
+        'review_notes': review_notes.get_review_notes(parser.xml_root),
+        'heartbeat_interval': record_locks.HEARTBEAT_INTERVAL_SECONDS,
+    })
+
+
+@record_bp.post('/<key>/<path:rel_path>/heartbeat')
+@login_required
+def heartbeat_record(key, rel_path):
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None:
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+    if not record_locks.heartbeat(record_path, current_username(), config_path):
+        return jsonify({'error': 'Lock lost -- someone else may hold this record now'}), 409
+    return jsonify({'ok': True})
+
+
+@record_bp.post('/<key>/<path:rel_path>/release')
+@login_required
+def release_record(key, rel_path):
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None:
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+    record_locks.release(record_path, current_username(), config_path)
+    return jsonify({'ok': True})
+
+
+@record_bp.put('/<key>/<path:rel_path>')
+@login_required
+def save_record(key, rel_path):
+    """Applies field edits, validates, and writes to disk (Save).
+
+    Body: {"edits": [{"path": [i, j, ...], "text": "...", "vocab": "...",
+    "refid": "...", "href": "...", "lang": "...", "type": "..."}, ...],
+    "commit_message": "..." (optional)}.
+
+    Each edit's node is resolved fresh against a just-reloaded document
+    (tree_json.resolve_path -- the path addressing has no meaning past
+    a single request) and written back with the same leaf/container
+    write-back VraXmlParser.set_element_data/set_element_type uses
+    everywhere else in this app. Requires the caller to currently hold
+    this record's lock (i.e. they opened it via GET first) -- prevents
+    writing over someone else's edit after losing the lock to an
+    expired heartbeat.
+    """
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+
+    username = current_username()
+    if not owns_lock(record_path, username, config_path):
+        return jsonify({'error': 'You must have this record open (and its lock) to save it'}), 409
+
+    data = request.get_json(silent=True) or {}
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    records = parser.build_tree()
+    if not records:
+        return jsonify({'error': 'Could not parse this record'}), 500
+    record_node = records[0]
+
+    for edit in data.get('edits', []):
+        try:
+            node = resolve_path(record_node, edit.get('path', []))
+        except (IndexError, TypeError, KeyError):
+            return jsonify({'error': f"Invalid edit path: {edit.get('path')}"}), 400
+
+        if node.node_type == 'leaf':
+            parser.set_element_data(
+                node.element, edit.get('text', ''),
+                vocab=edit.get('vocab', ''), refid=edit.get('refid', ''),
+                href=edit.get('href', ''), lang=edit.get('lang', ''),
+                type_value=edit.get('type', ''),
+            )
+        elif node.node_type in ('set', 'container'):
+            parser.set_element_type(node.element, edit.get('type', ''))
+        else:
+            return jsonify({'error': f"Cannot edit a node of type '{node.node_type}'"}), 400
+
+    xml_bytes = etree.tostring(parser.xml_root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+    validator = SchemaValidator(str(DEFAULT_XSD_PATH))
+    valid, message = validator.validate(xml_bytes)
+    if not valid:
+        return jsonify({'error': message}), 422
+
+    try:
+        record_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(record_path, 'wb') as f:
+            f.write(xml_bytes)
+    except OSError as e:
+        return jsonify({'error': f"Couldn't save -- {record_path.parent} isn't reachable right now ({e})."}), 503
+
+    commit_change(record_path, data.get('commit_message'), username, config_path)
+    return jsonify({'ok': True})
+
+
+@record_bp.post('/<key>/<path:rel_path>/submit')
+@login_required
+def submit_record(key, rel_path):
+    """Validates and moves the record from 'edit' into 'pending', for
+    review -- the same operation as the desktop's Submit button,
+    calling the same extracted core/record_transitions.move_to_location
+    both use. Releases the lock on success (there's nothing left under
+    'edit' to hold a lock on)."""
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+
+    username = current_username()
+    if not owns_lock(record_path, username, config_path):
+        return jsonify({'error': 'You must have this record open (and its lock) to submit it'}), 409
+
+    data = request.get_json(silent=True) or {}
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    if parser.xml_root is None:
+        return jsonify({'error': 'Could not parse this record'}), 500
+
+    validator = SchemaValidator(str(DEFAULT_XSD_PATH))
+    result = record_transitions.move_to_location(
+        parser.xml_root, 'pending', load_locations(config_path), record_path,
+        validator, validate=True, media_extensions=load_media_extensions(config_path),
+    )
+    if not result.success:
+        return jsonify({'error': result.message}), 422
+
+    commit_change(result.dest_path, data.get('commit_message'), username, config_path)
+    record_locks.release(record_path, username, config_path)
+    return jsonify({'ok': True, 'dest_path': str(result.dest_path)})
+
+
+@record_bp.post('/<key>/<path:rel_path>/approve')
+@login_required
+def approve_record(key, rel_path):
+    """Moves the record from 'pending' into 'reviewed' -- the same
+    operation as the desktop's Approve button. Unlike Submit, doesn't
+    re-validate (the document was already validated at Submit time --
+    see record_transitions.move_to_location's own docstring), and
+    always commits (a reviewer action needs a permanent history entry,
+    unlike a routine Save)."""
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+
+    username = current_username()
+    if not owns_lock(record_path, username, config_path):
+        return jsonify({'error': 'You must have this record open (and its lock) to approve it'}), 409
+
+    data = request.get_json(silent=True) or {}
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    if parser.xml_root is None:
+        return jsonify({'error': 'Could not parse this record'}), 500
+
+    result = record_transitions.move_to_location(
+        parser.xml_root, 'reviewed', load_locations(config_path), record_path,
+        SchemaValidator(str(DEFAULT_XSD_PATH)), validate=False,
+        media_extensions=load_media_extensions(config_path),
+    )
+    if not result.success:
+        return jsonify({'error': result.message}), 422
+
+    commit_change(result.dest_path, data.get('commit_message'), username, config_path,
+                  default_message=f'Approved by {username}')
+    record_locks.release(record_path, username, config_path)
+    return jsonify({'ok': True, 'dest_path': str(result.dest_path)})
+
+
+@record_bp.post('/<key>/<path:rel_path>/reject')
+@login_required
+def reject_record(key, rel_path):
+    """Moves the record from 'pending' into 'rejected', for the
+    editor to revisit -- the same operation as the desktop's Reject
+    button. An optional {"reason": "..."} is appended as a review
+    note (so it travels with the file) before the move."""
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+
+    username = current_username()
+    if not owns_lock(record_path, username, config_path):
+        return jsonify({'error': 'You must have this record open (and its lock) to reject it'}), 409
+
+    data = request.get_json(silent=True) or {}
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    if parser.xml_root is None:
+        return jsonify({'error': 'Could not parse this record'}), 500
+
+    reason = (data.get('reason') or '').strip()
+    if reason:
+        notes = review_notes.get_review_notes(parser.xml_root)
+        notes.append({'text': reason, 'author': username,
+                       'date': datetime.date.today().isoformat(), 'resolved': False})
+        review_notes.set_review_notes(parser.xml_root, notes)
+
+    result = record_transitions.move_to_location(
+        parser.xml_root, 'rejected', load_locations(config_path), record_path,
+        SchemaValidator(str(DEFAULT_XSD_PATH)), validate=False,
+        media_extensions=load_media_extensions(config_path),
+    )
+    if not result.success:
+        return jsonify({'error': result.message}), 422
+
+    commit_change(result.dest_path, data.get('commit_message'), username, config_path,
+                  default_message=f'Rejected by {username}')
+    record_locks.release(record_path, username, config_path)
+    return jsonify({'ok': True, 'dest_path': str(result.dest_path)})
+
+
+@record_bp.post('/<key>/<path:rel_path>/notes')
+@login_required
+def add_note(key, rel_path):
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+
+    username = current_username()
+    if not owns_lock(record_path, username, config_path):
+        return jsonify({'error': 'You must have this record open (and its lock) to add a note'}), 409
+
+    text = ((request.get_json(silent=True) or {}).get('text') or '').strip()
+    if not text:
+        return jsonify({'error': 'text is required'}), 400
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    notes = review_notes.get_review_notes(parser.xml_root)
+    notes.append({'text': text, 'author': username,
+                   'date': __import__('datetime').date.today().isoformat(), 'resolved': False})
+    review_notes.set_review_notes(parser.xml_root, notes)
+    _write_notes_only(parser, record_path)
+
+    commit_change(record_path, None, username, config_path, default_message='Add review note')
+    return jsonify({'notes': notes})
+
+
+@record_bp.put('/<key>/<path:rel_path>/notes/<int:index>')
+@login_required
+def update_note(key, rel_path, index):
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+
+    username = current_username()
+    if not owns_lock(record_path, username, config_path):
+        return jsonify({'error': 'You must have this record open (and its lock) to update a note'}), 409
+
+    data = request.get_json(silent=True) or {}
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    notes = review_notes.get_review_notes(parser.xml_root)
+    if not 0 <= index < len(notes):
+        return jsonify({'error': 'No such note'}), 404
+    if 'resolved' in data:
+        notes[index]['resolved'] = bool(data['resolved'])
+    review_notes.set_review_notes(parser.xml_root, notes)
+    _write_notes_only(parser, record_path)
+
+    commit_change(record_path, None, username, config_path, default_message='Update review note')
+    return jsonify({'notes': notes})
+
+
+@record_bp.delete('/<key>/<path:rel_path>/notes/<int:index>')
+@login_required
+def delete_note(key, rel_path, index):
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+
+    username = current_username()
+    if not owns_lock(record_path, username, config_path):
+        return jsonify({'error': 'You must have this record open (and its lock) to remove a note'}), 409
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    notes = review_notes.get_review_notes(parser.xml_root)
+    if not 0 <= index < len(notes):
+        return jsonify({'error': 'No such note'}), 404
+    notes.pop(index)
+    review_notes.set_review_notes(parser.xml_root, notes)
+    _write_notes_only(parser, record_path)
+
+    commit_change(record_path, None, username, config_path, default_message='Remove review note')
+    return jsonify({'notes': notes})
+
+
+def _write_notes_only(parser: VraXmlParser, record_path) -> None:
+    """Review notes are a structural (XML-comment) change, not a leaf
+    edit, so it bypasses save_record's schema-validation/edits path --
+    a comment can't make the document schema-invalid, so there's
+    nothing to validate here."""
+    xml_bytes = etree.tostring(parser.xml_root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+    record_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(record_path, 'wb') as f:
+        f.write(xml_bytes)

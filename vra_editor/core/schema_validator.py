@@ -1,4 +1,15 @@
+from pathlib import Path
+
 from lxml import etree
+
+RESOURCES_DIR = Path(__file__).resolve().parent.parent / "resources"
+# vra_core4.xsd is explicitly the *unrestricted* variant ("all attributes are
+# uncontrolled", per its own header) -- every sample record's own
+# xsi:schemaLocation declares conformance to the *strict* schema instead,
+# which redefines vra_core4_strict.xsd's controlled-vocabulary attributes
+# (title type, relation type, ...) as real enumerations. Validating against
+# the unrestricted one let invalid attribute values silently pass.
+DEFAULT_XSD_PATH = RESOURCES_DIR / "vra_core4_strict.xsd"
 
 
 class SchemaValidator:

@@ -7,31 +7,17 @@ from PySide6.QtCore import QObject, Signal
 from lxml import etree
 
 from vra_editor.config import load_locations, load_media_extensions
-from vra_editor.core import audit_log, media_files, media_metadata, review_notes, vra_structure
-from vra_editor.core.schema_validator import SchemaValidator
+from vra_editor.core import audit_log, media_files, media_metadata, record_transitions, review_notes, vra_structure
+from vra_editor.core.export import dublin_core, lido
+from vra_editor.core.record_transitions import LocationUnavailableError
+from vra_editor.core.schema_validator import DEFAULT_XSD_PATH, SchemaValidator
 from vra_editor.core.xml_parser import VRA_NS, VraXmlParser
 from vra_editor.utils import user_name
 
-RESOURCES_DIR = Path(__file__).resolve().parent.parent / "resources"
-# vra_core4.xsd is explicitly the *unrestricted* variant ("all attributes are
-# uncontrolled", per its own header) -- every sample record's own
-# xsi:schemaLocation declares conformance to the *strict* schema instead,
-# which redefines vra_core4_strict.xsd's controlled-vocabulary attributes
-# (title type, relation type, ...) as real enumerations. Validating against
-# the unrestricted one let invalid attribute values silently pass.
-DEFAULT_XSD_PATH = RESOURCES_DIR / "vra_core4_strict.xsd"
-
-
-class LocationUnavailableError(Exception):
-    """Raised by save_file/_move_to_location when the destination folder
-    itself can't be written to (e.g. a network share that's offline) --
-    distinct from the existing (bool, message) contract those methods
-    use for schema-validation failures, since main_window.py's
-    _on_save/_on_submit route that message through
-    friendly_validation_error(), which is XSD-error-shaped-text-specific
-    and would otherwise mangle a plain "can't reach the folder" message
-    into a misleading generic sentence."""
-    pass
+# LocationUnavailableError re-exported from core/record_transitions.py (also
+# raised directly by save_file below) -- kept importable from here so
+# main_window.py's existing `from ...document_controller import
+# DocumentController, LocationUnavailableError` doesn't need to change.
 
 
 class DocumentController(QObject):
@@ -783,6 +769,32 @@ class DocumentController(QObject):
         media_metadata.write_exif(path, self.build_exif_fields() if exif_fields is None else exif_fields)
 
     # ------------------------------------------------------------------
+    # Export -- crosswalks to other metadata schemas (see core/export/).
+    # ------------------------------------------------------------------
+
+    def export_dublin_core_xml(self) -> Optional[str]:
+        """The open record as Simple Dublin Core (oai_dc XML), or None
+        if there's no document loaded. See core/export/dublin_core.py
+        for the crosswalk itself."""
+        if self.xml_doc.xml_root is None:
+            return None
+        records = self.xml_doc.build_tree()
+        if not records:
+            return None
+        return dublin_core.to_oai_dc_xml(records[0].element)
+
+    def export_lido_xml(self) -> Optional[str]:
+        """The open record as LIDO v1.1 XML, or None if there's no
+        document loaded. See core/export/lido.py for the crosswalk
+        itself."""
+        if self.xml_doc.xml_root is None:
+            return None
+        records = self.xml_doc.build_tree()
+        if not records:
+            return None
+        return lido.to_lido_xml(records[0].element)
+
+    # ------------------------------------------------------------------
     # Review notes -- a reviewer's todo list for the editor, stored as an
     # XML comment rather than document content (see core/review_notes.py).
     # ------------------------------------------------------------------
@@ -925,15 +937,13 @@ class DocumentController(QObject):
         return True, f"Saved to {self._current_file}"
 
     def _move_to_location(self, location_key: str, validate: bool) -> tuple[bool, str]:
-        """Shared shape for submit/approve/reject: writes the current
-        in-memory document (any edits made along the way included) to
-        location_key's configured folder, preserving whatever subfolder
-        path the record currently has relative to its own location (see
-        _relative_record_path) -- edit/collectionA/foo.xml submits to
-        pending/collectionA/foo.xml, not a flattened pending/foo.xml --
-        then removes it from wherever it was. Returns (success,
-        message) -- the validation error or a missing-location message
-        on failure, or the new path on success.
+        """Shared shape for submit/approve/reject: thin wrapper around
+        core/record_transitions.move_to_location (the actual file-move/
+        validate/sibling-media logic, extracted there since none of it
+        touches Qt) that additionally tracks this controller's own
+        "currently open file" state and emits its signal. Returns
+        (success, message) -- the validation error or a missing-location
+        message on failure, or the new path on success.
 
         validate gates whether this transition requires a schema-valid
         document first. Submit does -- it's the actual gate keeping
@@ -950,58 +960,17 @@ class DocumentController(QObject):
         if self.xml_doc.xml_root is None or self._current_file is None:
             return False, "No document loaded."
 
-        xml_bytes = etree.tostring(
-            self.xml_doc.xml_root, pretty_print=True,
-            xml_declaration=True, encoding='UTF-8',
+        result = record_transitions.move_to_location(
+            self.xml_doc.xml_root, location_key, load_locations(),
+            Path(self._current_file), self._validator, validate, load_media_extensions(),
         )
-        if validate:
-            valid, message = self._validator.validate(xml_bytes)
-            if not valid:
-                return False, message
+        if not result.success:
+            return False, result.message
 
-        dest_dir = load_locations().get(location_key)
-        if dest_dir is None:
-            return False, f"No '{location_key}' folder configured in vra-config.ini."
-
-        src_path = Path(self._current_file).resolve()
-        dest_path = (dest_dir / self._relative_record_path(src_path)).resolve()
-        try:
-            dest_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(dest_path, 'wb') as f:
-                f.write(xml_bytes)
-
-            if src_path != dest_path and src_path.exists():
-                src_path.unlink()
-
-            # A sibling media file (same base name, e.g. foo.tif next to
-            # foo.xml) rides along on every submit/approve/reject, so the
-            # pair never gets split across folders -- see core/media_files.py.
-            media_files.move_sibling_media(src_path, dest_path, load_media_extensions())
-        except OSError as e:
-            raise LocationUnavailableError(
-                f"Couldn't move this record to '{location_key}' -- {dest_dir} isn't reachable right now ({e})."
-            ) from e
-
-        self._current_file = str(dest_path)
+        self._current_file = str(result.dest_path)
         self.file_loaded.emit(self._current_file)
         self._dirty = False
-        return True, str(dest_path)
-
-    @staticmethod
-    def _relative_record_path(src_path: Path) -> Path:
-        """src_path's path relative to whichever configured location
-        (edit/ingest/pending/rejected/reviewed/released) it currently
-        sits under, so a submit/approve/reject move can reproduce that
-        same subfolder structure at the destination instead of
-        flattening it to just the filename. Falls back to the bare
-        filename if src_path isn't under any configured location --
-        shouldn't normally happen, but better than raising over it."""
-        for root in load_locations().values():
-            try:
-                return src_path.relative_to(root.resolve())
-            except ValueError:
-                continue
-        return Path(src_path.name)
+        return True, str(result.dest_path)
 
     def submit_file(self) -> tuple[bool, str]:
         """Moves the current record from 'edit' into 'pending', for review."""
