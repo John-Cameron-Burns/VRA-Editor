@@ -23,13 +23,21 @@ class Revision:
     message: str
 
 
-def _repo_root() -> Optional[Path]:
+def _repo_root(config_path: Optional[Path] = None) -> Optional[Path]:
     """Same working-tree root commit_to_git.py's _archive_repo_root
     resolves to -- the common parent of the 'edit' and 'reviewed'
-    locations, if they share one. None if they don't (nothing to show)."""
+    locations, if they share one. None if they don't (nothing to show).
+
+    config_path overrides which vra-config.ini's [locations] entries
+    are consulted -- the desktop app never passes this (it only ever
+    has the one, OS-default config.ini), but the web backend, reading
+    a possibly different config.ini per request, needs this resolved
+    against that same config instead of silently falling back to the
+    OS default (the same gap record_locks.py/vocab_cache.py had
+    before being fixed the same way earlier this session)."""
     locations = {
         key: Path(value).resolve()
-        for key, value in load_locations().items()
+        for key, value in (load_locations(config_path) if config_path else load_locations()).items()
         if key in ('edit', 'reviewed')
     }
     parents = {loc.parent for loc in locations.values()}
@@ -38,8 +46,8 @@ def _repo_root() -> Optional[Path]:
     return None
 
 
-def _open_repo() -> Optional[Repo]:
-    root = _repo_root()
+def _open_repo(config_path: Optional[Path] = None) -> Optional[Repo]:
+    root = _repo_root(config_path)
     if root is None or not (root / '.git').is_file():
         return None  # no shared location, or nothing's ever been committed
     return Repo(str(root))
@@ -52,7 +60,7 @@ def _clean_author(raw: str) -> str:
     return raw.split('<')[0].strip()
 
 
-def list_revisions(limit: int = 1000) -> list[Revision]:
+def list_revisions(limit: int = 1000, config_path: Optional[Path] = None) -> list[Revision]:
     """Every (commit, changed file) pair in the archive's shared
     history, most recent first -- the raw material for the Audits
     dialog's table. Empty if there is no repo yet, nothing has been
@@ -66,7 +74,7 @@ def list_revisions(limit: int = 1000) -> list[Revision]:
     stale mount). So both opening and reading are covered here, broadly,
     rather than guessing which specific exception to expect."""
     try:
-        repo = _open_repo()
+        repo = _open_repo(config_path)
     except Exception as e:
         logging.warning(f"Archive history repository is unavailable: {e}")
         return []
@@ -108,14 +116,14 @@ def list_revisions(limit: int = 1000) -> list[Revision]:
     return revisions
 
 
-def read_revision_content(revision: Revision) -> bytes:
+def read_revision_content(revision: Revision, config_path: Optional[Path] = None) -> bytes:
     """The file's exact byte content as of that revision -- for
     restoring it into a new file (see
     DocumentController.restore_revision). Raises RuntimeError if the
     repository isn't available, for whatever reason -- see
     list_revisions's docstring on why that's caught broadly."""
     try:
-        repo = _open_repo()
+        repo = _open_repo(config_path)
         if repo is None:
             raise RuntimeError("The archive's history repository is not available.")
         try:

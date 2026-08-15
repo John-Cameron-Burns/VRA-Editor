@@ -4,6 +4,7 @@ import LoginView from './views/LoginView.vue'
 import FolderView from './views/FolderView.vue'
 import RecordEditView from './views/RecordEditView.vue'
 import CreateRecordView from './views/CreateRecordView.vue'
+import AuditsView from './views/AuditsView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,6 +21,12 @@ const router = createRouter({
       path: '/create',
       name: 'create',
       component: CreateRecordView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/audits',
+      name: 'audits',
+      component: AuditsView,
       meta: { requiresAuth: true },
     },
     {

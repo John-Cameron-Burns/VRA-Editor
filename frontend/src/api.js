@@ -68,6 +68,10 @@ export const api = {
   listVocabularies: () => request('GET', '/api/vocab/vocabularies'),
   searchVocab: (vocab, query) =>
     request('GET', `/api/vocab/search?vocab=${encodeURIComponent(vocab)}&q=${encodeURIComponent(query)}`),
+
+  listAudits: (limit) => request('GET', `/api/audits${limit ? `?limit=${limit}` : ''}`),
+  restoreAudit: (sha, filename, destRelPath) =>
+    request('POST', '/api/audits/restore', { sha, filename, dest_rel_path: destRelPath }),
 }
 
 export { ApiError }

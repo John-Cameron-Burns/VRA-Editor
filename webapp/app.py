@@ -6,6 +6,7 @@ from typing import Optional
 from flask import Flask, abort, send_from_directory
 
 from .config import load_web_config
+from .routes.audit_routes import audit_bp
 from .routes.auth_routes import auth_bp
 from .routes.export_routes import export_bp
 from .routes.folder_routes import folder_bp
@@ -34,6 +35,7 @@ def create_app(config_path: Optional[Path] = None) -> Flask:
     app.config['SECRET_KEY'] = web_config['secret_key']
     app.config['VRA_CONFIG_PATH'] = config_path
 
+    app.register_blueprint(audit_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(export_bp)
     app.register_blueprint(folder_bp)
