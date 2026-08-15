@@ -64,6 +64,10 @@ export const api = {
     request('POST', `/api/records/${key}/${relPath}/remove-element`, { path }),
   setDisplay: (key, relPath, path, translations) =>
     request('POST', `/api/records/${key}/${relPath}/display`, { path, translations }),
+
+  listVocabularies: () => request('GET', '/api/vocab/vocabularies'),
+  searchVocab: (vocab, query) =>
+    request('GET', `/api/vocab/search?vocab=${encodeURIComponent(vocab)}&q=${encodeURIComponent(query)}`),
 }
 
 export { ApiError }

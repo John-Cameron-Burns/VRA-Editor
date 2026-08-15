@@ -10,6 +10,7 @@ from .routes.auth_routes import auth_bp
 from .routes.folder_routes import folder_bp
 from .routes.record_routes import record_bp
 from .routes.structure_routes import structure_bp
+from .routes.vocab_routes import vocab_bp
 
 # frontend/'s production build (npm run build), if present -- lets this
 # one process serve the whole app on one port with no reverse proxy in
@@ -36,6 +37,7 @@ def create_app(config_path: Optional[Path] = None) -> Flask:
     app.register_blueprint(folder_bp)
     app.register_blueprint(record_bp)
     app.register_blueprint(structure_bp)
+    app.register_blueprint(vocab_bp)
 
     if _FRONTEND_DIST.is_dir():
         @app.route('/', defaults={'path': ''})

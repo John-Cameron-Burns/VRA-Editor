@@ -196,7 +196,7 @@ def search_loc(query: str, vocab: str, timeout: float = 10.0) -> list:
     return out
 
 
-def search(vocab: str, query: str) -> list:
+def search(vocab: str, query: str, config_path=None) -> list:
     """Dispatches to the right backend for `vocab` -- but checks the
     local cache (vocab_cache.py) first.
 
@@ -213,9 +213,16 @@ def search(vocab: str, query: str) -> list:
     different alternative winning each time. Only truly new entries
     (not already indexed) get appended after those. Raises
     AuthorityLookupError on network/API failure or misconfiguration --
-    an unreachable cache doesn't fail this way, see _cache_call."""
-    if _cache_call(vocab_cache.already_fetched, vocab, query, default=False):
-        exact = _cache_call(vocab_cache.get_exact, vocab, query, default=None)
+    an unreachable cache doesn't fail this way, see _cache_call.
+
+    config_path overrides which vra-config.ini's [locations] app_data
+    entry (and so which vocab_cache.db) is used -- the desktop app
+    never passes this (it only ever has the one, OS-default
+    config.ini), but the web backend, reading a possibly different
+    config.ini, needs its cache reads/writes to follow that same
+    config instead of silently falling back to the OS default."""
+    if _cache_call(vocab_cache.already_fetched, vocab, query, config_path, default=False):
+        exact = _cache_call(vocab_cache.get_exact, vocab, query, config_path, default=None)
         if exact is not None:
             return [AuthorityResult(**hit) for hit in exact]
         # Cache broke between already_fetched succeeding and get_exact
@@ -223,7 +230,7 @@ def search(vocab: str, query: str) -> list:
         # to a fresh fetch rather than erroring out over what's really
         # a caching hiccup.
 
-    local_hits = _cache_call(vocab_cache.search_local, vocab, query, default=[])
+    local_hits = _cache_call(vocab_cache.search_local, vocab, query, config_path, default=[])
     local_refids = {hit["refid"] for hit in local_hits}
 
     if vocab == "VIAF":
@@ -237,7 +244,7 @@ def search(vocab: str, query: str) -> list:
     else:
         raise AuthorityLookupError(f"Unknown vocabulary: {vocab}")
 
-    _cache_call(vocab_cache.record_fetch, vocab, query, [asdict(r) for r in fresh])
+    _cache_call(vocab_cache.record_fetch, vocab, query, [asdict(r) for r in fresh], config_path)
 
     new_only = [r for r in fresh if r.refid not in local_refids]
     return [AuthorityResult(**hit) for hit in local_hits] + new_only

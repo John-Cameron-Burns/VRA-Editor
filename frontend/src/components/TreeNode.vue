@@ -1,5 +1,6 @@
 <script setup>
 import { computed, inject, reactive, ref, watch } from 'vue'
+import VocabSearchModal from './VocabSearchModal.vue'
 
 const props = defineProps({
   node: { type: Object, required: true },
@@ -39,6 +40,29 @@ if (isLeaf) {
     (value) => registerEdit(props.node.path, { path: props.node.path, ...value }),
     { immediate: true, deep: true },
   )
+}
+
+// --- vocab/refid/href/lang (has_vocab leaves only) ---
+
+const hasVocab = isLeaf && !!props.node.data.has_vocab
+// Start expanded if there's already something to show -- otherwise
+// collapsed, matching desktop's field_row.py (the attrs row only
+// matters once a vocab-backed value exists or is being looked up).
+const showVocabDetails = ref(hasVocab && !!(field.vocab || field.refid || field.href || field.lang))
+const showVocabModal = ref(false)
+
+function onVocabPick(result) {
+  // lang is deliberately untouched -- a vocab pick fills the
+  // controlled-vocabulary attributes, not xml:lang; VRA Core's own
+  // mechanism for multi-language content is a second sibling element
+  // with a different lang, not a lang override here (matches
+  // desktop's field_row.py _on_search_clicked exactly).
+  field.text = result.label
+  field.vocab = result.vocab
+  field.refid = result.refid
+  field.href = result.href
+  showVocabModal.value = false
+  showVocabDetails.value = true
 }
 
 function friendlyLabel() {
@@ -142,14 +166,49 @@ async function saveDisplayRows() {
 </script>
 
 <template>
-  <div v-if="isLeaf" class="field-row">
-    <label>{{ friendlyLabel() }}</label>
-    <select v-if="node.data.type_choices && node.data.type_choices.length" v-model="field.type">
-      <option value="">(none)</option>
-      <option v-for="choice in node.data.type_choices" :key="choice" :value="choice">{{ choice }}</option>
-    </select>
-    <input v-model="field.text" type="text" />
-    <button class="icon-button" :disabled="removeBusy" title="Remove" @click="onRemove">✕</button>
+  <div v-if="isLeaf" class="leaf-field">
+    <div class="field-row">
+      <label>{{ friendlyLabel() }}</label>
+      <select v-if="node.data.type_choices && node.data.type_choices.length" v-model="field.type">
+        <option value="">(none)</option>
+        <option v-for="choice in node.data.type_choices" :key="choice" :value="choice">{{ choice }}</option>
+      </select>
+      <input v-model="field.text" type="text" />
+      <button
+        v-if="hasVocab"
+        class="icon-button"
+        :title="showVocabDetails ? 'Hide authority details' : 'Show authority details'"
+        @click="showVocabDetails = !showVocabDetails"
+      >{{ showVocabDetails ? '▾' : '▸' }}</button>
+      <button class="icon-button" :disabled="removeBusy" title="Remove" @click="onRemove">✕</button>
+    </div>
+
+    <div v-if="hasVocab && showVocabDetails" class="vocab-details">
+      <label class="vocab-attr">
+        Vocab
+        <input v-model="field.vocab" type="text" />
+      </label>
+      <label class="vocab-attr">
+        Ref ID
+        <input v-model="field.refid" type="text" />
+      </label>
+      <label class="vocab-attr">
+        URI
+        <input v-model="field.href" type="text" />
+      </label>
+      <label class="vocab-attr">
+        Lang
+        <input v-model="field.lang" type="text" placeholder="e.g. en" />
+      </label>
+      <button class="secondary small" type="button" @click="showVocabModal = true">Search authority…</button>
+    </div>
+
+    <VocabSearchModal
+      v-if="showVocabModal"
+      :initial-query="field.text"
+      @close="showVocabModal = false"
+      @pick="onVocabPick"
+    />
   </div>
 
   <section v-else-if="isBranch || isRoot" class="node-section" :style="{ marginLeft: depth === 0 ? '0' : '14px' }">
@@ -215,11 +274,38 @@ async function saveDisplayRows() {
   display: flex;
   gap: 4px;
 }
+.leaf-field {
+  margin-bottom: 8px;
+}
 .field-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+}
+.vocab-details {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 4px 148px;
+  padding: 8px;
+  background: #f7f7f5;
+  border: 1px solid #e3e3e0;
+  border-radius: 4px;
+}
+.vocab-attr {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.78em;
+  color: #555;
+}
+.vocab-attr input {
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.95em;
+  width: 130px;
 }
 .field-row label {
   flex: 0 0 140px;
