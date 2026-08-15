@@ -34,6 +34,9 @@ export const api = {
 
   listFolder: (key) => request('GET', `/api/folders/${key}`),
 
+  createRecord: (recordType, recordId) =>
+    request('POST', '/api/records/edit', { record_type: recordType, record_id: recordId }),
+
   openRecord: (key, relPath) => request('GET', `/api/records/${key}/${relPath}`),
   heartbeat: (key, relPath) => request('POST', `/api/records/${key}/${relPath}/heartbeat`),
   release: (key, relPath) => request('POST', `/api/records/${key}/${relPath}/release`),

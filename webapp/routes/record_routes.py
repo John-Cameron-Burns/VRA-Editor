@@ -14,6 +14,71 @@ from ..tree_json import node_to_json
 
 record_bp = Blueprint('records', __name__, url_prefix='/api/records')
 
+# work/image/collection, matching desktop's own record-type dropdown
+# exactly (main_window.py's _on_create) -- these three are the only
+# valid top-level VRA Core 4 record elements.
+RECORD_TYPES = ('work', 'image', 'collection')
+
+
+@record_bp.post('/edit')
+@login_required
+def create_record():
+    """Creates a new, empty record directly under the edit location --
+    the same operation as desktop's New action (main_window.py's
+    _on_create / DocumentController.create_new_record): same three
+    record types, same record_id validation (non-empty, no '/' or
+    '\\'), same destination (edit_dir/{record_id}.xml, flat, no
+    subfolders), same already-exists check.
+
+    Deliberately written to disk immediately, unlike desktop (which
+    holds the new record in memory until the first Save) -- the web
+    app has no server-side "open unsaved document" state between
+    requests, so there's nowhere else for it to live between this call
+    and a later Save/structural edit. Always commits, same reasoning
+    as the structural-mutation endpoints: no client-side undo exists
+    for the web app, so skipping the commit would leave no recovery
+    path if a record were created by mistake.
+
+    Body: {"record_type": "work"|"image"|"collection", "record_id": "..."}.
+    Returns {"rel_path": "{record_id}.xml"}, 201.
+    """
+    config_path = config_path_for_request()
+    data = request.get_json(silent=True) or {}
+
+    record_type = (data.get('record_type') or '').strip()
+    if record_type not in RECORD_TYPES:
+        return jsonify({'error': f"record_type must be one of {', '.join(RECORD_TYPES)}"}), 400
+
+    record_id = (data.get('record_id') or '').strip()
+    if not record_id:
+        return jsonify({'error': 'record_id is required'}), 400
+    if '/' in record_id or '\\' in record_id:
+        return jsonify({'error': "record_id can't contain '/' or '\\'"}), 400
+
+    resolved = resolve_record_path('edit', f'{record_id}.xml', config_path)
+    if resolved is None:
+        return jsonify({'error': "No 'edit' folder is configured"}), 404
+    _folder, record_path = resolved
+    if record_path.exists():
+        return jsonify({'error': f'{record_path.name} already exists'}), 409
+
+    parser = VraXmlParser()
+    parser.new_document(record_type, record_id)
+    xml_bytes = etree.tostring(parser.xml_root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+
+    try:
+        record_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(record_path, 'wb') as f:
+            f.write(xml_bytes)
+    except OSError as e:
+        return jsonify({'error': f"Couldn't create -- {record_path.parent} isn't reachable right now ({e})."}), 503
+
+    commit_change(
+        record_path, data.get('commit_message'), current_username(), config_path,
+        default_message=f'Create {record_type} {record_id}',
+    )
+    return jsonify({'rel_path': f'{record_id}.xml'}), 201
+
 
 @record_bp.get('/<key>/<path:rel_path>')
 @login_required

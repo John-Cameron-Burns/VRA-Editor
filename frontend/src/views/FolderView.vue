@@ -37,6 +37,7 @@ watch(() => props.folderKey, load)
     <div class="header-row">
       <h1>{{ title }}</h1>
       <div class="header-actions">
+        <RouterLink v-if="folderKey === 'edit'" to="/create" class="link-button">+ Create record</RouterLink>
         <button class="link-button" @click="load" :disabled="loading">Refresh</button>
       </div>
     </div>

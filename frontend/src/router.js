@@ -3,6 +3,7 @@ import { session, refreshSession } from './session'
 import LoginView from './views/LoginView.vue'
 import FolderView from './views/FolderView.vue'
 import RecordEditView from './views/RecordEditView.vue'
+import CreateRecordView from './views/CreateRecordView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -13,6 +14,12 @@ const router = createRouter({
       name: 'folder',
       component: FolderView,
       props: { folderKey: 'edit' },
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/create',
+      name: 'create',
+      component: CreateRecordView,
       meta: { requiresAuth: true },
     },
     {
