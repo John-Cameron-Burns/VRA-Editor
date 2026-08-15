@@ -7,6 +7,7 @@ from flask import Flask, abort, send_from_directory
 
 from .config import load_web_config
 from .routes.auth_routes import auth_bp
+from .routes.export_routes import export_bp
 from .routes.folder_routes import folder_bp
 from .routes.record_routes import record_bp
 from .routes.structure_routes import structure_bp
@@ -34,6 +35,7 @@ def create_app(config_path: Optional[Path] = None) -> Flask:
     app.config['VRA_CONFIG_PATH'] = config_path
 
     app.register_blueprint(auth_bp)
+    app.register_blueprint(export_bp)
     app.register_blueprint(folder_bp)
     app.register_blueprint(record_bp)
     app.register_blueprint(structure_bp)

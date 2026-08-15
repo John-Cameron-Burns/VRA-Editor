@@ -206,6 +206,12 @@ onBeforeRouteLeave(async () => {
         This record's lock was lost -- someone else may now hold it. Saving may fail.
       </p>
 
+      <div class="export-links">
+        Export as:
+        <a :href="`/api/records/${folderKey}/${relPath}/export/dublin-core`">Dublin Core</a>
+        <a :href="`/api/records/${folderKey}/${relPath}/export/lido`">LIDO</a>
+      </div>
+
       <p v-if="structureError" class="error">{{ structureError }}</p>
       <TreeNode :key="treeVersion" :node="tree" />
 
@@ -260,6 +266,17 @@ onBeforeRouteLeave(async () => {
   margin-bottom: 16px;
   color: #555;
   font-size: 0.85em;
+}
+.export-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85em;
+  color: #555;
+  margin-bottom: 16px;
+}
+.export-links a {
+  color: #2e7d5b;
 }
 .save-bar {
   position: sticky;
