@@ -17,6 +17,7 @@ async function onLogout() {
         <RouterLink to="/" class="brand">VRA Editor</RouterLink>
         <RouterLink to="/" class="nav-link">Edit folder</RouterLink>
         <RouterLink to="/review" class="nav-link">Review queue</RouterLink>
+        <RouterLink to="/import" class="nav-link">Import</RouterLink>
         <RouterLink to="/audits" class="nav-link">History</RouterLink>
       </div>
       <div class="top-bar-right">

@@ -5,6 +5,7 @@ import FolderView from './views/FolderView.vue'
 import RecordEditView from './views/RecordEditView.vue'
 import CreateRecordView from './views/CreateRecordView.vue'
 import AuditsView from './views/AuditsView.vue'
+import ImportView from './views/ImportView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,6 +22,12 @@ const router = createRouter({
       path: '/create',
       name: 'create',
       component: CreateRecordView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/import',
+      name: 'import',
+      component: ImportView,
       meta: { requiresAuth: true },
     },
     {

@@ -72,6 +72,10 @@ export const api = {
   listAudits: (limit) => request('GET', `/api/audits${limit ? `?limit=${limit}` : ''}`),
   restoreAudit: (sha, filename, destRelPath) =>
     request('POST', '/api/audits/restore', { sha, filename, dest_rel_path: destRelPath }),
+
+  runImport: () => request('POST', '/api/import/run'),
+  stashOrphan: (relPath) => request('POST', '/api/import/orphans/stash', { rel_path: relPath }),
+  ignoreOrphan: (relPath) => request('POST', '/api/import/orphans/ignore', { rel_path: relPath }),
 }
 
 export { ApiError }
