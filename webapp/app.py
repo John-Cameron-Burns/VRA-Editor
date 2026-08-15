@@ -11,6 +11,7 @@ from .routes.auth_routes import auth_bp
 from .routes.export_routes import export_bp
 from .routes.folder_routes import folder_bp
 from .routes.import_routes import import_bp
+from .routes.media_routes import media_bp
 from .routes.record_routes import record_bp
 from .routes.structure_routes import structure_bp
 from .routes.vocab_routes import vocab_bp
@@ -41,6 +42,7 @@ def create_app(config_path: Optional[Path] = None) -> Flask:
     app.register_blueprint(export_bp)
     app.register_blueprint(folder_bp)
     app.register_blueprint(import_bp)
+    app.register_blueprint(media_bp)
     app.register_blueprint(record_bp)
     app.register_blueprint(structure_bp)
     app.register_blueprint(vocab_bp)

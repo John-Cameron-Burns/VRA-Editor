@@ -4,8 +4,20 @@ waitress>=3.0
 
 # Transitive requirements of vra_editor.core/vra_editor.config, the
 # same versions requirements.txt (the desktop app) pins -- everything
-# else there (PySide6, Pillow, pyexiv2, certifi) is desktop-only and
-# never imported by webapp/'s own code path.
+# else there (PySide6, pyexiv2, certifi) is desktop-only and never
+# imported by webapp/'s own code path.
 lxml>=4.9.0
 regex
 dulwich --config-settings "--build-option=--pure"
+
+# Media Sync's compare endpoint needs core/media_metadata.read_image_info
+# (dimensions/DPI/EXIF date/GPS), which is Pillow-only -- required here,
+# unlike pyexiv2 below.
+Pillow>=10.0.0
+
+# Optional: only the 5 IPTC-backed compare fields (title/description/
+# rights/agent/subject) need pyexiv2 -- measurements/date/location work
+# without it. webapp/routes/media_routes.py feature-detects its absence
+# and reports those 5 fields as 'unavailable' rather than failing the
+# whole endpoint. Uncomment to enable them on this deployment:
+# pyexiv2>=2.15.0

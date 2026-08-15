@@ -4,6 +4,7 @@ import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { api, ApiError } from '../api'
 import TreeNode from '../components/TreeNode.vue'
 import ReviewNotesPanel from '../components/ReviewNotesPanel.vue'
+import MediaSyncModal from '../components/MediaSyncModal.vue'
 
 const props = defineProps({
   folderKey: { type: String, required: true },
@@ -25,6 +26,7 @@ const commitMessage = ref('')
 const lockLost = ref(false)
 const showRejectPrompt = ref(false)
 const rejectReason = ref('')
+const showMediaSync = ref(false)
 
 // Bumped every time a structural mutation replaces tree.value, and
 // used as part of <TreeNode>'s :key -- forces Vue to fully discard and
@@ -184,6 +186,16 @@ async function onReject() {
   }
 }
 
+function onMediaSyncApplied(record) {
+  // Same after-the-fact resync runStructureAction does: the endpoint
+  // already wrote and committed, so just adopt its response and clear
+  // any now-stale pending edits rather than re-fetching.
+  tree.value = record
+  edits.clear()
+  treeVersion.value += 1
+  showMediaSync.value = false
+}
+
 onMounted(load)
 onBeforeUnmount(releaseLock)
 onBeforeRouteLeave(async () => {
@@ -210,7 +222,16 @@ onBeforeRouteLeave(async () => {
         Export as:
         <a :href="`/api/records/${folderKey}/${relPath}/export/dublin-core`">Dublin Core</a>
         <a :href="`/api/records/${folderKey}/${relPath}/export/lido`">LIDO</a>
+        <button class="link-button" @click="showMediaSync = true">Sync with image file…</button>
       </div>
+
+      <MediaSyncModal
+        v-if="showMediaSync"
+        :folder-key="folderKey"
+        :rel-path="relPath"
+        @close="showMediaSync = false"
+        @applied="onMediaSyncApplied"
+      />
 
       <p v-if="structureError" class="error">{{ structureError }}</p>
       <TreeNode :key="treeVersion" :node="tree" />
@@ -277,6 +298,15 @@ onBeforeRouteLeave(async () => {
 }
 .export-links a {
   color: #2e7d5b;
+}
+.export-links .link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #2e7d5b;
+  font-size: 1em;
+  cursor: pointer;
+  text-decoration: underline;
 }
 .save-bar {
   position: sticky;
