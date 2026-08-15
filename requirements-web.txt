@@ -4,11 +4,22 @@ waitress>=3.0
 
 # Transitive requirements of vra_editor.core/vra_editor.config, the
 # same versions requirements.txt (the desktop app) pins -- everything
-# else there (PySide6, pyexiv2, certifi) is desktop-only and never
-# imported by webapp/'s own code path.
+# else there (PySide6, pyexiv2) is desktop-only and never imported by
+# webapp/'s own code path.
 lxml>=4.9.0
 regex
 dulwich --config-settings "--build-option=--pure"
+
+# core/authority_lookup.py (imported at module load by
+# webapp/routes/vocab_routes.py, so this is needed just to start the
+# app, not only to actually use vocab search) does `import certifi`
+# unconditionally, for an explicit CA bundle rather than relying on
+# the host Python's own SSL config -- see that module's own comment.
+# Missing this only "worked" in earlier manual testing because certifi
+# happened to already be present from some other package's own
+# dependency chain on that machine; confirmed as a real gap by a
+# ModuleNotFoundError on a clean venv on a real deployment target.
+certifi
 
 # Media Sync's compare endpoint needs core/media_metadata.read_image_info
 # (dimensions/DPI/EXIF date/GPS), which is Pillow-only -- required here,

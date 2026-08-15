@@ -12,6 +12,10 @@
 # fail with a "file in use"-style error -- close it first if that
 # happens; this script won't force-quit it for you (could discard
 # unsaved edits in an open record).
+#
+# Also needs node + npm on PATH -- VRA_Editor.spec bundles
+# frontend/dist/ as part of the "Install web companion" feature's
+# payload (see core/web_installer.py) and refuses to run without it.
 
 set -e
 
@@ -28,6 +32,10 @@ echo
 echo "=== Installing dependencies ==="
 .venv/bin/python -m pip install --upgrade pip -q
 .venv/bin/python -m pip install -r requirements.txt pyinstaller -q
+
+echo
+echo "=== Building the web companion frontend ==="
+(cd frontend && npm ci && npm run build)
 
 echo
 echo "=== Building with PyInstaller ==="

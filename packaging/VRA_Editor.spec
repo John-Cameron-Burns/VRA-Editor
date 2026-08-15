@@ -51,6 +51,58 @@ _version_file.write_text(APP_VERSION)
 RESOURCE_FILES = ['vra_core4.xsd', 'vra_core4_strict.xsd', 'xml.xsd', 'user_manual.md']
 IMAGE_FILES = [p.name for p in images_dir.iterdir() if p.is_file()]
 
+# Web companion app bundle -- webapp/'s own source, the subset of
+# vra_editor/ it actually imports (config.py, app_data.py, utils.py,
+# and all of core/ -- not vra_editor/ui/, which is Qt-only and never
+# touched by the web backend), the built frontend, and
+# requirements-web.txt. Lets "Install web companion" (see
+# core/web_installer.py) ship a fully self-contained install script
+# from any built desktop app, with no separate download step.
+#
+# Unlike RESOURCE_FILES/IMAGE_FILES above, this recursively globs
+# whole subtrees rather than naming files one by one -- those are flat
+# resource folders where a stray extra file is the risk to avoid; this
+# is a live Python package tree where the opposite is true (a missing
+# file breaks imports at deploy time), so a complete recursive copy is
+# the right call here. Destination paths mirror the source tree's own
+# relative layout, so core/web_installer.py's bundle_dir() -- the same
+# Path(__file__)-relative pattern core/schema_validator.py's
+# RESOURCES_DIR already uses -- resolves it with no path rewriting,
+# and the extracted copy on a target machine needs no import-path
+# changes either (from vra_editor.config import ... just works,
+# because vra_editor/ sits next to webapp/ exactly as it does here).
+webapp_dir = repo_root / 'webapp'
+vra_editor_dir = repo_root / 'vra_editor'
+frontend_dist_dir = repo_root / 'frontend' / 'dist'
+
+if not frontend_dist_dir.is_dir():
+    raise SystemExit(
+        "frontend/dist/ doesn't exist -- run `npm ci && npm run build` in frontend/ "
+        "before building this spec (see build_linux_deb.sh)."
+    )
+
+def _bundled(source_root: Path, dest_root: str, pattern: str = '*.py'):
+    """(source_path, dest_dir) pairs for every file matching pattern
+    under source_root, with dest_dir built via Path joining (not raw
+    f-string concatenation) so a file sitting directly in source_root
+    -- where relative_to(...).parent is '.' -- normalizes to dest_root
+    itself instead of a stray trailing '/.'."""
+    return [
+        (str(p), str(Path(dest_root) / p.relative_to(source_root).parent))
+        for p in source_root.rglob(pattern)
+        if p.is_file()
+    ]
+
+
+WEBAPP_BUNDLE_DATAS = (
+    _bundled(webapp_dir, 'vra_editor/resources/webapp_bundle/webapp')
+    + [(str(vra_editor_dir / name), 'vra_editor/resources/webapp_bundle/vra_editor')
+       for name in ('__init__.py', 'config.py', 'app_data.py', 'utils.py')]
+    + _bundled(vra_editor_dir / 'core', 'vra_editor/resources/webapp_bundle/vra_editor/core')
+    + _bundled(frontend_dist_dir, 'vra_editor/resources/webapp_bundle/frontend/dist', pattern='*')
+    + [(str(repo_root / 'requirements-web.txt'), 'vra_editor/resources/webapp_bundle')]
+)
+
 # pyexiv2's compiled extension (exiv2api.so/.pyd) links against its
 # sibling libexiv2 library with no rpath/DT_NEEDED search path pointing
 # at it -- it only resolves at import time because that library happens
@@ -93,6 +145,7 @@ a = Analysis(
         [(str(resources_dir / name), 'vra_editor/resources') for name in RESOURCE_FILES]
         + [(str(images_dir / name), 'vra_editor/images') for name in IMAGE_FILES]
         + [(str(_version_file), 'vra_editor/resources')]
+        + WEBAPP_BUNDLE_DATAS
     ),
     hiddenimports=[],
     hookspath=[],
