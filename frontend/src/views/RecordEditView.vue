@@ -17,6 +17,7 @@ const notes = ref([])
 const loading = ref(true)
 const loadError = ref('')
 const saveError = ref('')
+const structureError = ref('')
 const statusMessage = ref('')
 const saving = ref(false)
 const submitting = ref(false)
@@ -25,8 +26,41 @@ const lockLost = ref(false)
 const showRejectPrompt = ref(false)
 const rejectReason = ref('')
 
+// Bumped every time a structural mutation replaces tree.value, and
+// used as part of <TreeNode>'s :key -- forces Vue to fully discard and
+// recreate the tree's components rather than reuse them by position,
+// since a leaf editor's local field state (in TreeNode.vue) is seeded
+// once from its node prop at creation and won't otherwise resync when
+// node paths shift after an add/remove.
+const treeVersion = ref(0)
+
 const edits = reactive(new Map())
 provide('registerEdit', (path, data) => edits.set(JSON.stringify(path), data))
+
+provide('treeActions', {
+  addChild: (parentPath, tag) =>
+    runStructureAction(() => api.addChild(props.folderKey, props.relPath, parentPath, tag)),
+  removeElement: (path) =>
+    runStructureAction(() => api.removeElement(props.folderKey, props.relPath, path)),
+  setDisplay: (path, translations) =>
+    runStructureAction(() => api.setDisplay(props.folderKey, props.relPath, path, translations)),
+})
+
+async function runStructureAction(fn) {
+  structureError.value = ''
+  try {
+    // Structural endpoints read the file fresh from disk, not the
+    // in-flight edit list -- flush pending field edits first so they
+    // aren't silently discarded by the tree-replacing response.
+    await flushEdits()
+    const data = await fn()
+    tree.value = data.record
+    edits.clear()
+    treeVersion.value += 1
+  } catch (e) {
+    structureError.value = e.message || 'That change could not be applied'
+  }
+}
 
 let heartbeatTimer = null
 let released = false
@@ -79,11 +113,15 @@ async function releaseLock() {
 }
 
 async function flushEdits() {
-  // No commit message on this save: it's an implementation detail of
-  // whatever action triggered it, not a separate thing the user asked
-  // to commit -- only that action's own commit should land in git
-  // history, matching the desktop's one-commit-per-action.
-  await api.save(props.folderKey, props.relPath, Array.from(edits.values()))
+  // Unvalidated on purpose: this persists pending field edits to the
+  // working file right before some other action (Submit/Approve/
+  // Reject, or a structural mutation) does its own validated/immediate
+  // write -- using the validating Save endpoint here would 422 (and
+  // permanently block that other action) whenever the document is
+  // currently in one of the momentarily-invalid in-between states
+  // structural mutations are allowed to leave it in. See
+  // flush_edits's docstring in webapp/routes/record_routes.py.
+  await api.flushEdits(props.folderKey, props.relPath, Array.from(edits.values()))
 }
 
 async function onSave() {
@@ -168,7 +206,8 @@ onBeforeRouteLeave(async () => {
         This record's lock was lost -- someone else may now hold it. Saving may fail.
       </p>
 
-      <TreeNode :node="tree" />
+      <p v-if="structureError" class="error">{{ structureError }}</p>
+      <TreeNode :key="treeVersion" :node="tree" />
 
       <ReviewNotesPanel :folder-key="folderKey" :rel-path="relPath" :notes="notes" @update:notes="notes = $event" />
 

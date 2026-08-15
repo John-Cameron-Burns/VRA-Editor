@@ -13,6 +13,7 @@ compared across requests, only resolved against the tree just built
 for the current one.
 """
 
+from vra_editor.core.friendly_labels import friendly_label
 from vra_editor.core.vra_structure import ChildSpec
 from vra_editor.core.xml_parser import VraTreeNode
 
@@ -20,6 +21,7 @@ from vra_editor.core.xml_parser import VraTreeNode
 def _child_spec_to_json(spec: ChildSpec) -> dict:
     return {
         'tag': spec.tag,
+        'label': friendly_label(spec.tag),
         'is_leaf': spec.is_leaf,
         'has_vocab': spec.has_vocab,
         'min_occurs': spec.min_occurs,

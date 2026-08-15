@@ -9,8 +9,8 @@ from vra_editor.core.schema_validator import DEFAULT_XSD_PATH, SchemaValidator
 from vra_editor.core.xml_parser import VraXmlParser
 
 from ..auth import config_path_for_request, current_username, login_required
-from ..records_common import commit_change, owns_lock, resolve_record_path
-from ..tree_json import node_to_json, resolve_path
+from ..records_common import apply_field_edits, commit_change, owns_lock, resolve_record_path
+from ..tree_json import node_to_json
 
 record_bp = Blueprint('records', __name__, url_prefix='/api/records')
 
@@ -108,23 +108,9 @@ def save_record(key, rel_path):
         return jsonify({'error': 'Could not parse this record'}), 500
     record_node = records[0]
 
-    for edit in data.get('edits', []):
-        try:
-            node = resolve_path(record_node, edit.get('path', []))
-        except (IndexError, TypeError, KeyError):
-            return jsonify({'error': f"Invalid edit path: {edit.get('path')}"}), 400
-
-        if node.node_type == 'leaf':
-            parser.set_element_data(
-                node.element, edit.get('text', ''),
-                vocab=edit.get('vocab', ''), refid=edit.get('refid', ''),
-                href=edit.get('href', ''), lang=edit.get('lang', ''),
-                type_value=edit.get('type', ''),
-            )
-        elif node.node_type in ('set', 'container'):
-            parser.set_element_type(node.element, edit.get('type', ''))
-        else:
-            return jsonify({'error': f"Cannot edit a node of type '{node.node_type}'"}), 400
+    error = apply_field_edits(parser, record_node, data.get('edits', []))
+    if error:
+        return jsonify({'error': error}), 400
 
     xml_bytes = etree.tostring(parser.xml_root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
     validator = SchemaValidator(str(DEFAULT_XSD_PATH))
@@ -140,6 +126,63 @@ def save_record(key, rel_path):
         return jsonify({'error': f"Couldn't save -- {record_path.parent} isn't reachable right now ({e})."}), 503
 
     commit_change(record_path, data.get('commit_message'), username, config_path)
+    return jsonify({'ok': True})
+
+
+@record_bp.post('/<key>/<path:rel_path>/flush-edits')
+@login_required
+def flush_edits(key, rel_path):
+    """Writes pending field edits to the working file WITHOUT schema
+    validation and without committing -- used internally by the
+    frontend right before a structural/display/notes/lifecycle action
+    (see RecordEditView.vue's flushEdits/runStructureAction), never
+    called directly by a user action.
+
+    Save (PUT above) always validates, because it's the real "I'm done
+    editing" gate. But a structural mutation is allowed to leave the
+    document momentarily invalid (structure_routes.py's whole module
+    docstring is about exactly that -- an empty freshly-added titleSet,
+    say). If the pre-action flush went through the validating Save
+    instead, it would 422 whenever the document happened to already be
+    in one of those allowed-but-invalid in-between states, permanently
+    blocking the very next structural click that would have fixed it
+    -- a deadlock. This endpoint exists to break that: same unvalidated
+    write structure_routes.py's own endpoints already use. The
+    structural action that follows does its own write immediately
+    after and carries its own commit, which captures these field edits
+    too (both land in the same commit) -- no separate commit here.
+    """
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+
+    username = current_username()
+    if not owns_lock(record_path, username, config_path):
+        return jsonify({'error': 'You must have this record open (and its lock) to edit it'}), 409
+
+    data = request.get_json(silent=True) or {}
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    records = parser.build_tree()
+    if not records:
+        return jsonify({'error': 'Could not parse this record'}), 500
+    record_node = records[0]
+
+    error = apply_field_edits(parser, record_node, data.get('edits', []))
+    if error:
+        return jsonify({'error': error}), 400
+
+    xml_bytes = etree.tostring(parser.xml_root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+    try:
+        record_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(record_path, 'wb') as f:
+            f.write(xml_bytes)
+    except OSError as e:
+        return jsonify({'error': f"Couldn't save -- {record_path.parent} isn't reachable right now ({e})."}), 503
+
     return jsonify({'ok': True})
 
 

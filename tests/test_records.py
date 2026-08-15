@@ -213,6 +213,78 @@ def test_save_rejects_schema_invalid_value(app, test_archive):
 
 
 @requires_ldap
+def test_flush_edits_persists_without_validating_or_committing(app, test_archive):
+    """flush-edits is the internal pre-structural-action write: unlike
+    Save, it must NOT validate (so it can't deadlock against a
+    momentarily-invalid document -- see its docstring in
+    record_routes.py) and must NOT commit (the structural action that
+    follows carries its own commit, which picks up this write too)."""
+    from vra_editor.app_data import get_git_dir
+
+    config_path, locations = test_archive
+    record_path = write_sample_record(locations['edit'], 'rec1', 'Original Title')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    tree = client.get('/api/records/edit/rec1.xml').get_json()['record']
+    title_path = tree['children'][0]['children'][0]['path']
+
+    r = client.post('/api/records/edit/rec1.xml/flush-edits', json={
+        'edits': [{'path': title_path, 'text': 'Flushed Title', 'type': 'not-a-real-type'}],
+    })
+    assert r.status_code == 200, r.get_json()
+    assert 'Flushed Title' in record_path.read_text()
+    assert 'not-a-real-type' in record_path.read_text()  # written even though schema-invalid
+
+    # No commit made -- the git repo shouldn't even have been
+    # initialized yet, since nothing has committed to it so far.
+    assert not get_git_dir(config_path).exists()
+
+
+@requires_ldap
+def test_flush_edits_requires_lock(app, test_archive):
+    _config_path, locations = test_archive
+    write_sample_record(locations['edit'], 'rec1', 'Unopened')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    r = client.post('/api/records/edit/rec1.xml/flush-edits', json={'edits': []})
+    assert r.status_code == 409
+
+
+@requires_ldap
+def test_flush_edits_then_structural_action_does_not_deadlock(app, test_archive):
+    """Reproduces the real bug: add a section (leaves the document
+    momentarily schema-invalid, which structure_routes.py explicitly
+    allows), stage an unrelated field edit, then take the very next
+    structural action that would normally fix it up. If the pre-action
+    flush used the validating Save, this would 422 and the fix-up
+    action would never even run -- a permanent deadlock."""
+    _config_path, locations = test_archive
+    write_sample_record(locations['edit'], 'rec1', 'Has A Title')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    tree = client.get('/api/records/edit/rec1.xml').get_json()['record']
+
+    # Add an empty dateSet -- schema-invalid on its own (date's
+    # min_occurs is 1), same as the browser-verified scenario.
+    r = client.post('/api/records/edit/rec1.xml/children', json={'parent_path': [], 'tag': 'dateSet'})
+    assert r.status_code == 200, r.get_json()
+    tree = r.get_json()['record']
+    date_set_path = next(c for c in tree['children'] if c['data']['tag'] == 'dateSet')['path']
+
+    # The document is now schema-invalid. flush-edits must still
+    # succeed (it doesn't validate) so the fix-up add below can happen.
+    r = client.post('/api/records/edit/rec1.xml/flush-edits', json={'edits': []})
+    assert r.status_code == 200, r.get_json()
+
+    # The fix-up: add the date that makes dateSet valid again.
+    r = client.post('/api/records/edit/rec1.xml/children', json={'parent_path': date_set_path, 'tag': 'date'})
+    assert r.status_code == 200, r.get_json()
+
+
+@requires_ldap
 def test_submit_moves_to_pending_preserving_subfolder(app, test_archive):
     config_path, locations = test_archive
     record_path = write_sample_record(locations['edit'], 'rec1', 'Submit Me', subfolder='collectionA')

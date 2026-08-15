@@ -10,6 +10,7 @@ from typing import Optional
 
 from vra_editor.config import load_locations
 from vra_editor.core import commit_to_git, record_locks
+from .tree_json import resolve_path
 
 # 'edit' (cataloguing) and 'pending' (review queue) are the only
 # locations exposed through the web app -- reviewed/rejected/released
@@ -39,6 +40,38 @@ def resolve_record_path(key: str, rel_path: str, config_path) -> Optional[tuple]
 def owns_lock(record_path: Path, username: str, config_path) -> bool:
     lock = record_locks.status(record_path, config_path)
     return lock is not None and lock['holder'] == username and not lock['expired']
+
+
+def apply_field_edits(parser, record_node, edits) -> Optional[str]:
+    """Applies each {path, text, vocab, refid, href, lang, type} edit to
+    record_node's tree via parser's own leaf/container write-back.
+    Returns None on success, or an error message string if some edit's
+    path doesn't resolve or targets a node type that isn't editable.
+
+    Shared by save_record (validates afterwards -- the user-facing
+    Save) and flush_edits (does not -- an internal step that persists
+    pending field edits to the working file just before a structural
+    mutation, which is allowed to leave the document momentarily
+    schema-invalid; see structure_routes.py's module docstring).
+    """
+    for edit in edits:
+        try:
+            node = resolve_path(record_node, edit.get('path', []))
+        except (IndexError, TypeError, KeyError):
+            return f"Invalid edit path: {edit.get('path')}"
+
+        if node.node_type == 'leaf':
+            parser.set_element_data(
+                node.element, edit.get('text', ''),
+                vocab=edit.get('vocab', ''), refid=edit.get('refid', ''),
+                href=edit.get('href', ''), lang=edit.get('lang', ''),
+                type_value=edit.get('type', ''),
+            )
+        elif node.node_type in ('set', 'container'):
+            parser.set_element_type(node.element, edit.get('type', ''))
+        else:
+            return f"Cannot edit a node of type '{node.node_type}'"
+    return None
 
 
 def commit_change(path, commit_message: Optional[str], username: str, config_path,

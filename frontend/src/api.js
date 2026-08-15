@@ -39,6 +39,8 @@ export const api = {
   release: (key, relPath) => request('POST', `/api/records/${key}/${relPath}/release`),
   save: (key, relPath, edits, commitMessage) =>
     request('PUT', `/api/records/${key}/${relPath}`, { edits, commit_message: commitMessage || undefined }),
+  flushEdits: (key, relPath, edits) =>
+    request('POST', `/api/records/${key}/${relPath}/flush-edits`, { edits }),
   submit: (key, relPath, commitMessage) =>
     request('POST', `/api/records/${key}/${relPath}/submit`, { commit_message: commitMessage || undefined }),
   approve: (key, relPath, commitMessage) =>
@@ -52,6 +54,13 @@ export const api = {
   updateNote: (key, relPath, index, resolved) =>
     request('PUT', `/api/records/${key}/${relPath}/notes/${index}`, { resolved }),
   deleteNote: (key, relPath, index) => request('DELETE', `/api/records/${key}/${relPath}/notes/${index}`),
+
+  addChild: (key, relPath, parentPath, tag) =>
+    request('POST', `/api/records/${key}/${relPath}/children`, { parent_path: parentPath, tag }),
+  removeElement: (key, relPath, path) =>
+    request('POST', `/api/records/${key}/${relPath}/remove-element`, { path }),
+  setDisplay: (key, relPath, path, translations) =>
+    request('POST', `/api/records/${key}/${relPath}/display`, { path, translations }),
 }
 
 export { ApiError }
