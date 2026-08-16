@@ -2,6 +2,20 @@ flask>=3.0
 ldap3>=2.9
 waitress>=3.0
 
+# webapp/auth.py's local-account backends: PAM on Linux (python-pam, a
+# ctypes wrapper around libpam -- no compiled extension, same
+# pure-Python-first preference as ldap3/dulwich above) and Win32
+# LogonUser on Windows (pywin32). The environment markers below (PEP
+# 508 -- no prior precedent in this file, but standard syntax pip
+# already understands) keep pip from even attempting to install the
+# wrong one on the other OS's venv. Neither is imported at module load
+# time -- webapp/auth.py imports each lazily, only inside the function
+# that actually needs it -- so a deployment that never sets
+# [local_auth] enabled = true never touches either package regardless
+# of platform.
+python-pam>=2.0 ; sys_platform == 'linux'
+pywin32>=306 ; sys_platform == 'win32'
+
 # Transitive requirements of vra_editor.core/vra_editor.config, the
 # same versions requirements.txt (the desktop app) pins -- everything
 # else there (PySide6, pyexiv2) is desktop-only and never imported by

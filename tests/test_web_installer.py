@@ -108,6 +108,81 @@ def test_ldap_options_reach_the_config_merge_step(fixture_bundle):
     assert "parser['ldap'] = {" in script
 
 
+def test_local_auth_disabled_by_default(fixture_bundle):
+    script = generate_install_script(_default_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert 'LOCAL_AUTH_ENABLED=false' in script
+
+
+def test_local_auth_enabled_reaches_config_merge_step(fixture_bundle):
+    script = generate_install_script(
+        _default_options(local_auth_enabled=True), source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert 'LOCAL_AUTH_ENABLED=true' in script
+    assert "parser['local_auth'] = {'enabled': local_auth_enabled}" in script
+
+
+def test_ldap_omitted_from_config_merge_when_ldap_server_blank(fixture_bundle):
+    script = generate_install_script(
+        _default_options(ldap_server='', ldap_bind_pattern='', local_auth_enabled=True),
+        source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert "LDAP_SERVER=''" in script
+    assert "parser.remove_section('ldap')" in script
+
+
+def test_linux_warns_when_local_auth_enabled_and_service_user_not_root(fixture_bundle):
+    script = generate_install_script(
+        _default_options(local_auth_enabled=True, service_user='jsmith'), source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert 'WARNING: Local-account login is enabled' in script
+    # Printed once right after the dependency check, and again in the
+    # final summary -- the function is defined once, called twice.
+    assert script.count('warn_if_local_auth_needs_root') == 3
+
+
+@requires_bash
+@pytest.mark.parametrize('local_auth_enabled,service_user,expect_warning', [
+    (True, 'jsmith', True),
+    (True, 'root', False),
+    (False, 'jsmith', False),
+])
+def test_local_auth_warning_actually_fires_at_runtime(
+    tmp_path, fixture_bundle, local_auth_enabled, service_user, expect_warning,
+):
+    """Runs the real generated script's warn_if_local_auth_needs_root
+    function against a real bash subprocess (not a static text check),
+    to prove the runtime condition genuinely fires (or doesn't) as
+    intended -- past the point where "$EUID" -ne 0 would normally exit,
+    since this test isn't running as root."""
+    script = generate_install_script(
+        _default_options(local_auth_enabled=local_auth_enabled, service_user=service_user),
+        source_dir=fixture_bundle,
+    ).decode('utf-8')
+    # Extract just the SERVICE_USER/LOCAL_AUTH_ENABLED assignments and
+    # the warn_if_local_auth_needs_root function definition -- everything
+    # up to (not including) the root-EUID check, which would otherwise
+    # exit this test subprocess immediately since it isn't running as root.
+    func_start = script.index('warn_if_local_auth_needs_root() {')
+    func_end = script.index('\n}\n', func_start) + len('\n}\n')
+    preamble = script[script.index('SERVICE_USER='):script.index('if [ "$EUID"')]
+    snippet = preamble + script[func_start:func_end] + 'warn_if_local_auth_needs_root\n'
+    script_path = tmp_path / 'warn_check.sh'
+    script_path.write_text('#!/bin/bash\n' + snippet)
+    result = subprocess.run(['bash', str(script_path)], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    if expect_warning:
+        assert 'WARNING: Local-account login is enabled' in result.stderr
+    else:
+        assert result.stderr == ''
+
+
+def test_linux_no_warning_when_local_auth_disabled(fixture_bundle):
+    script = generate_install_script(
+        _default_options(local_auth_enabled=False, service_user='jsmith'), source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert 'LOCAL_AUTH_ENABLED=false' in script
+
+
 def test_tls_is_never_configured(fixture_bundle):
     """The whole point of scoping certs out -- assert no cert/TLS
     directives sneak into either proxy template."""
@@ -272,6 +347,40 @@ def test_windows_ldap_options_reach_the_config_merge_step(fixture_bundle, fake_n
     assert "$LdapBindPattern = 'cn={username},ou=people,dc=example,dc=org'" in script
     assert '$LdapUseSsl = $false' in script
     assert "parser['ldap'] = {" in script
+
+
+def test_windows_local_auth_disabled_by_default(fixture_bundle, fake_nssm):
+    script = generate_windows_install_script(_default_windows_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert '$LocalAuthEnabled = $false' in script
+
+
+def test_windows_local_auth_enabled_reaches_config_merge_step(fixture_bundle, fake_nssm):
+    script = generate_windows_install_script(
+        _default_windows_options(local_auth_enabled=True), source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert '$LocalAuthEnabled = $true' in script
+    assert 'localAuthEnabledArg' in script
+    assert "parser['local_auth'] = {'enabled': local_auth_enabled}" in script
+
+
+def test_windows_ldap_omitted_from_config_merge_when_ldap_server_blank(fixture_bundle, fake_nssm):
+    script = generate_windows_install_script(
+        _default_windows_options(ldap_server='', ldap_bind_pattern='', local_auth_enabled=True),
+        source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert "$LdapServer = ''" in script
+    assert "parser.remove_section('ldap')" in script
+
+
+def test_windows_no_service_user_warning_anywhere(fixture_bundle, fake_nssm):
+    """Unlike Linux, Windows has no service_user field and no privilege
+    gap for LogonUser -- confirm no such warning text was accidentally
+    carried over."""
+    script = generate_windows_install_script(
+        _default_windows_options(local_auth_enabled=True), source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert 'shadow' not in script.lower()
+    assert 'LocalSystem can call' in script  # the explanatory comment, present instead
 
 
 def test_windows_tls_is_never_configured(fixture_bundle, fake_nssm):

@@ -65,9 +65,12 @@ class InstallWebAppDialog(QDialog):
         self.win_server_name_edit: QLineEdit | None = None
 
         # Shared
+        self.ldap_enable_check: QCheckBox | None = None
         self.ldap_server_edit: QLineEdit | None = None
         self.ldap_bind_pattern_edit: QLineEdit | None = None
         self.ldap_use_ssl_check: QCheckBox | None = None
+        self.local_auth_check: QCheckBox | None = None
+        self.local_auth_warning_label: QLabel | None = None
 
         self._build_ui()
 
@@ -101,7 +104,14 @@ class InstallWebAppDialog(QDialog):
         self.proxy_stack.addWidget(self._build_windows_proxy_group())
         outer.addWidget(self.proxy_stack)
 
-        outer.addWidget(self._build_ldap_group())
+        outer.addWidget(self._build_auth_group())
+
+        # Wired here, not where the individual widgets are built --
+        # service_user_edit (Linux deployment group) and local_auth_check
+        # (auth group) are constructed in different methods, and the
+        # warning needs both to exist first.
+        self.local_auth_check.toggled.connect(self._update_local_auth_warning)
+        self.service_user_edit.textChanged.connect(self._update_local_auth_warning)
 
         # Default tab follows this machine's own OS -- a reasonable
         # starting guess (most likely to match the intended target),
@@ -137,6 +147,11 @@ class InstallWebAppDialog(QDialog):
     def _on_os_changed(self, index: int):
         self.deployment_stack.setCurrentIndex(index)
         self.proxy_stack.setCurrentIndex(index)
+        self.local_auth_check.setText(
+            "Enable local Windows accounts" if index == _WINDOWS_TAB
+            else "Enable local Linux system accounts (PAM)"
+        )
+        self._update_local_auth_warning()
 
     def _build_linux_deployment_group(self) -> QWidget:
         group = QGroupBox("Deployment")
@@ -251,13 +266,18 @@ class InstallWebAppDialog(QDialog):
 
         return group
 
-    def _build_ldap_group(self) -> QGroupBox:
-        group = QGroupBox("LDAP (for web login)")
-        form = QFormLayout(group)
+    def _build_auth_group(self) -> QGroupBox:
+        group = QGroupBox("Authentication (for web login)")
+        layout = QVBoxLayout(group)
 
+        self.ldap_enable_check = QCheckBox("Enable LDAP directory login")
+        self.ldap_enable_check.setChecked(True)  # preserves this dialog's previous, LDAP-only default
+        layout.addWidget(self.ldap_enable_check)
+
+        ldap_form = QFormLayout()
         self.ldap_server_edit = QLineEdit()
         self.ldap_server_edit.setPlaceholderText("ldap://ldap.yourarchive.org:389")
-        form.addRow("Server:", self.ldap_server_edit)
+        ldap_form.addRow("Server:", self.ldap_server_edit)
 
         self.ldap_bind_pattern_edit = QLineEdit()
         self.ldap_bind_pattern_edit.setPlaceholderText("cn={username},ou=people,dc=example,dc=org")
@@ -266,12 +286,51 @@ class InstallWebAppDialog(QDialog):
             "the web login form. Use '{username}@example.org' or 'EXAMPLE\\\\{username}' for "
             "Active Directory's UPN/NetBIOS forms instead."
         )
-        form.addRow("Bind pattern:", self.ldap_bind_pattern_edit)
+        ldap_form.addRow("Bind pattern:", self.ldap_bind_pattern_edit)
 
         self.ldap_use_ssl_check = QCheckBox()
-        form.addRow("Use SSL/TLS to LDAP:", self.ldap_use_ssl_check)
+        ldap_form.addRow("Use SSL/TLS to LDAP:", self.ldap_use_ssl_check)
+        layout.addLayout(ldap_form)
+
+        # Only meaningful/required while LDAP itself is enabled.
+        self.ldap_enable_check.toggled.connect(self.ldap_server_edit.setEnabled)
+        self.ldap_enable_check.toggled.connect(self.ldap_bind_pattern_edit.setEnabled)
+        self.ldap_enable_check.toggled.connect(self.ldap_use_ssl_check.setEnabled)
+
+        self.local_auth_check = QCheckBox("Enable local system accounts")
+        self.local_auth_check.setToolTip(
+            "Validates credentials against this machine's own OS accounts (PAM on Linux, local "
+            "Windows accounts on Windows) as an additional login method alongside LDAP -- useful "
+            "as a break-glass admin login not in the directory. Off by default: this widens what "
+            "a compromised or guessed web login can be used to test."
+        )
+        layout.addWidget(self.local_auth_check)
+
+        self.local_auth_warning_label = QLabel()
+        self.local_auth_warning_label.setWordWrap(True)
+        self.local_auth_warning_label.setStyleSheet("color: #a15c00;")
+        self.local_auth_warning_label.setVisible(False)
+        layout.addWidget(self.local_auth_warning_label)
 
         return group
+
+    def _update_local_auth_warning(self):
+        """PAM needs the service to run as root (or in the 'shadow'
+        group) to read /etc/shadow -- see the generated Linux script's
+        own runtime warning (web_installer.py). Windows needs no
+        equivalent warning: LocalSystem always holds the privilege
+        LogonUser needs."""
+        is_linux = self.os_group.checkedId() == _LINUX_TAB
+        service_user = self.service_user_edit.text().strip() if self.service_user_edit else ''
+        show = is_linux and self.local_auth_check.isChecked() and service_user != 'root'
+        if show:
+            self.local_auth_warning_label.setText(
+                f"Local-account login requires the service to run as root (or in the 'shadow' "
+                f"group) to read /etc/shadow. \"Run service as\" is currently \"{service_user}\" -- "
+                "local logins will likely fail until this is fixed. The generated script will "
+                "also warn about this at runtime."
+            )
+        self.local_auth_warning_label.setVisible(show)
 
     # ------------------------------------------------------------------
     # Generate
@@ -280,6 +339,35 @@ class InstallWebAppDialog(QDialog):
     def _selected_proxy(self, group: QButtonGroup) -> str:
         checked = group.checkedButton()
         return checked.property('proxy_value') if checked else 'none'
+
+    # Reserved for the reverse proxy's own public listener -- 443 isn't
+    # actually opened by anything this dialog generates (TLS is out of
+    # scope), but it's blocked too since an operator adding TLS
+    # themselves later would hit the exact same conflict.
+    _RESERVED_PROXY_PORTS = (80, 443)
+
+    def _check_port_not_reserved(self, port: int, reverse_proxy: str) -> bool:
+        """False (after showing an explanatory warning) if `port` --
+        the INTERNAL port the app itself listens on -- collides with a
+        port the reverse proxy needs for its own public listener. Real,
+        previously-hit failure mode: IIS/Nginx/Apache's own HTTP
+        listener exclusively reserves :80 (Windows' HTTP.SYS in
+        particular blocks any other process from binding it at all,
+        even scoped to 127.0.0.1 only) -- a plausible-looking value
+        here silently produces a service stuck crash-looping, not an
+        error at generate time, unless this is caught first."""
+        if reverse_proxy != 'none' and port in self._RESERVED_PROXY_PORTS:
+            QMessageBox.warning(
+                self, "Port conflict",
+                f"Port {port} is reserved for the reverse proxy's own public listener -- "
+                "the \"Port\" field above is a different, private port the web app itself "
+                "listens on (127.0.0.1 only), which the reverse proxy then forwards to. "
+                "Using the same port for both won't work: the reverse proxy already owns "
+                "it, so the app can't also bind it, and the service will fail to start. "
+                "Leave this as 8000, or pick any other unused port.",
+            )
+            return False
+        return True
 
     def _on_generate(self):
         is_windows = self.os_group.checkedId() == _WINDOWS_TAB
@@ -293,12 +381,16 @@ class InstallWebAppDialog(QDialog):
         config_path = self.config_path_edit.text().strip()
         service_user = self.service_user_edit.text().strip()
         server_name = self.server_name_edit.text().strip()
-        ldap_server = self.ldap_server_edit.text().strip()
-        ldap_bind_pattern = self.ldap_bind_pattern_edit.text().strip()
+        ldap_enabled = self.ldap_enable_check.isChecked()
+        local_auth_enabled = self.local_auth_check.isChecked()
+        ldap_server = self.ldap_server_edit.text().strip() if ldap_enabled else ''
+        ldap_bind_pattern = self.ldap_bind_pattern_edit.text().strip() if ldap_enabled else ''
         reverse_proxy = self._selected_proxy(self.proxy_group)
 
         port = self._parse_port(self.port_edit.text().strip())
         if port is None:
+            return
+        if not self._check_port_not_reserved(port, reverse_proxy):
             return
 
         missing = []
@@ -310,10 +402,12 @@ class InstallWebAppDialog(QDialog):
             missing.append("Run service as")
         if reverse_proxy != 'none' and not server_name:
             missing.append("Server name")
-        if not ldap_server:
+        if ldap_enabled and not ldap_server:
             missing.append("LDAP server")
-        if not ldap_bind_pattern:
+        if ldap_enabled and not ldap_bind_pattern:
             missing.append("LDAP bind pattern")
+        if not ldap_enabled and not local_auth_enabled:
+            missing.append("At least one authentication method (LDAP or local system accounts)")
         if missing:
             QMessageBox.warning(self, "Missing fields", "Fill in: " + ", ".join(missing))
             return
@@ -328,6 +422,7 @@ class InstallWebAppDialog(QDialog):
             ldap_server=ldap_server,
             ldap_bind_pattern=ldap_bind_pattern,
             ldap_use_ssl=self.ldap_use_ssl_check.isChecked(),
+            local_auth_enabled=local_auth_enabled,
         )
 
         try:
@@ -346,12 +441,16 @@ class InstallWebAppDialog(QDialog):
         config_path = self.win_config_path_edit.text().strip()
         site_name = self.win_site_name_edit.text().strip()
         server_name = self.win_server_name_edit.text().strip()
-        ldap_server = self.ldap_server_edit.text().strip()
-        ldap_bind_pattern = self.ldap_bind_pattern_edit.text().strip()
+        ldap_enabled = self.ldap_enable_check.isChecked()
+        local_auth_enabled = self.local_auth_check.isChecked()
+        ldap_server = self.ldap_server_edit.text().strip() if ldap_enabled else ''
+        ldap_bind_pattern = self.ldap_bind_pattern_edit.text().strip() if ldap_enabled else ''
         reverse_proxy = self._selected_proxy(self.win_proxy_group)
 
         port = self._parse_port(self.win_port_edit.text().strip())
         if port is None:
+            return
+        if not self._check_port_not_reserved(port, reverse_proxy):
             return
 
         missing = []
@@ -364,10 +463,12 @@ class InstallWebAppDialog(QDialog):
                 missing.append("Server name")
             if not site_name:
                 missing.append("IIS site name")
-        if not ldap_server:
+        if ldap_enabled and not ldap_server:
             missing.append("LDAP server")
-        if not ldap_bind_pattern:
+        if ldap_enabled and not ldap_bind_pattern:
             missing.append("LDAP bind pattern")
+        if not ldap_enabled and not local_auth_enabled:
+            missing.append("At least one authentication method (LDAP or local system accounts)")
         if missing:
             QMessageBox.warning(self, "Missing fields", "Fill in: " + ", ".join(missing))
             return
@@ -382,6 +483,7 @@ class InstallWebAppDialog(QDialog):
             ldap_server=ldap_server,
             ldap_bind_pattern=ldap_bind_pattern,
             ldap_use_ssl=self.ldap_use_ssl_check.isChecked(),
+            local_auth_enabled=local_auth_enabled,
         )
 
         try:
@@ -400,9 +502,17 @@ class InstallWebAppDialog(QDialog):
 
         self._save_script(
             script, default_name="install-vra-web.ps1", chmod_executable=False,
-            run_instructions="Right-click {dest} and \"Run with PowerShell\" as Administrator, "
-                              "or from an elevated PowerShell prompt: powershell -ExecutionPolicy "
-                              "Bypass -File {dest}",
+            # Explorer's own "Run with PowerShell" context-menu entry does
+            # neither of the two things this script actually needs -- it
+            # doesn't elevate, and it doesn't bypass the default execution
+            # policy -- so it fails silently (the window flashes and closes
+            # before the error is readable) rather than doing anything.
+            # There's no built-in "as Administrator" variant of that menu
+            # item, so don't suggest it; an elevated prompt is the only
+            # reliable path.
+            run_instructions="Open an elevated PowerShell prompt (Start menu -> search "
+                              "\"PowerShell\" -> right-click -> Run as administrator), then: "
+                              "powershell -ExecutionPolicy Bypass -File {dest}",
         )
 
     def _parse_port(self, port_text: str) -> int | None:
