@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
     QHeaderView, QDialogButtonBox, QAbstractItemView,
 )
 
+from vra_editor.core import record_locks
 from vra_editor.core.record_titles import extract_title, human_size
 
 
@@ -16,12 +17,16 @@ class VraFilePickerDialog(QDialog):
     in edit/ itself), listing each record's parsed VRA title next to
     its path.
 
-    directory is either a single Path (the common case -- no Status
-    column), or {label: Path} to merge several locations into one
-    list with a Status column showing which one each row is actually
-    in -- e.g. Open browsing both 'edit' and 'rejected' together, so a
-    record a reviewer sent back has somewhere it can be reopened from
-    (see main_window._on_open).
+    directory is either a single Path (the common case), or {label:
+    Path} to merge several locations into one list -- e.g. Open
+    browsing both 'edit' and 'rejected' together, so a record a
+    reviewer sent back has somewhere it can be reopened from (see
+    main_window._on_open). Either way, XML listings get a Status
+    column: the source label (when merged), a "Locked by ..." note
+    (see core/record_locks.py) if someone else already has that record
+    open, or both. This is just a hint -- opening a locked record is
+    actually refused where it's requested (main_window._open_from_folder),
+    not prevented here.
 
     Usage:
         dlg = VraFilePickerDialog(directory=locations['edit'], parent=self)
@@ -39,7 +44,11 @@ class VraFilePickerDialog(QDialog):
         self.sources: dict[str, Path] = directory if isinstance(directory, dict) else {'': directory}
         self.file_filters = [file_filter] if isinstance(file_filter, str) else list(file_filter)
         self.selected_path: Path | None = None
-        self._show_status = len(self.sources) > 1
+        self._show_source_label = len(self.sources) > 1
+        # Locks are a record (XML) concept -- meaningless for a non-XML
+        # filter, e.g. browsing for an image file to link.
+        self._is_xml = self.file_filters == ['*.xml']
+        self._show_status = self._show_source_label or self._is_xml
 
         layout = QVBoxLayout(self)
 
@@ -49,10 +58,8 @@ class VraFilePickerDialog(QDialog):
 
         # The second column parses each file as VRA XML for a title preview
         # -- meaningless (and wasted work) for a non-XML filter, e.g. picking
-        # an image file, so it becomes a plain file-size column instead. A
-        # third Status column only appears when merging multiple labeled
-        # sources.
-        is_xml = self.file_filters == ['*.xml']
+        # an image file, so it becomes a plain file-size column instead.
+        is_xml = self._is_xml
         columns = (['File', 'Title'] if is_xml else ['File', 'Size']) + (['Status'] if self._show_status else [])
         self.table = QTableWidget(0, len(columns))
         self.table.setHorizontalHeaderLabels(columns)
@@ -105,10 +112,18 @@ class VraFilePickerDialog(QDialog):
             self.table.setItem(row, 0, file_item)
             self.table.setItem(row, 1, second_item)
             if self._show_status:
-                self.table.setItem(row, 2, QTableWidgetItem(label))
+                self.table.setItem(row, 2, QTableWidgetItem(self._status_text(label, path)))
 
         if rows:
             self.table.selectRow(0)
+
+    def _status_text(self, label: str, path: Path) -> str:
+        parts = [label] if self._show_source_label and label else []
+        if self._is_xml:
+            lock = record_locks.status(path)
+            if lock and not lock['expired']:
+                parts.append(f"Locked by {lock['holder']}")
+        return ' — '.join(parts)
 
     def _accept_selection(self, *_ignored):
         row = self.table.currentRow()

@@ -91,18 +91,15 @@ deliberately lighter:
 - **Undo.** The desktop app keeps an in-session undo stack. The web app has
   none — every change already lands in the shared Git history, so
   restoring a past revision from Audits is the equivalent.
-- **Concurrent-edit protection.** The web app holds an advisory lock on a
-  record while it's open, so two people signed in at once can't silently
-  overwrite each other. The desktop app has the same shared-folder risk any
-  file on a network drive does, unprotected.
 - **Signing in.** The web app requires it (an LDAP directory account, a
   local OS account, or both, depending on how it's set up). The desktop app
   has none — it relies on whatever access the operating system already
   grants to the folders themselves.
 
 Everything else — editing, submitting for review, approving/rejecting
-(including reopening a rejected record), Dublin Core/LIDO export, Import,
-and Audits — works the same folder-based way in both.
+(including reopening a rejected record), advisory per-record locking so
+two people can't silently overwrite each other, Dublin Core/LIDO export,
+Import, and Audits — works the same folder-based way in both.
 
 ## What's new
 

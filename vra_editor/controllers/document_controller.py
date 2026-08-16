@@ -3,11 +3,11 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, QTimer, Signal
 from lxml import etree
 
 from vra_editor.config import load_locations, load_media_extensions
-from vra_editor.core import audit_log, media_files, media_metadata, media_sync, record_transitions, review_notes, vra_structure
+from vra_editor.core import audit_log, media_files, media_metadata, media_sync, record_locks, record_transitions, review_notes, vra_structure
 from vra_editor.core.export import dublin_core, lido
 from vra_editor.core.record_transitions import LocationUnavailableError
 from vra_editor.core.schema_validator import DEFAULT_XSD_PATH, SchemaValidator
@@ -35,6 +35,7 @@ class DocumentController(QObject):
     archive_changed = Signal(str)  # emits the archive name
     xml_updated = Signal(str)  # emits the new XML text
     document_loaded = Signal(object)  # emits the VraXmlParser, once a file has been parsed
+    lock_lost = Signal()  # this record's advisory lock expired/was taken by someone else
 
     def __init__(self):
         super().__init__()  # QObject.__init__ must run for signals to work
@@ -54,6 +55,18 @@ class DocumentController(QObject):
         # part of refreshing the preview, but that's not a real edit).
         self.xml_updated.connect(self._mark_dirty)
 
+        # Advisory locking (core/record_locks.py) -- the same mechanism
+        # the web app already uses, so two people editing the same
+        # shared archive (desktop or web, in any combination) don't
+        # silently clobber each other. _lock_path/_lock_holder track
+        # what *this* controller currently holds, independently of
+        # _current_file (which a submit/approve/reject moves out from
+        # under it -- see _move_to_location).
+        self._lock_path: Optional[Path] = None
+        self._lock_holder: Optional[str] = None
+        self._heartbeat_timer = QTimer(self)
+        self._heartbeat_timer.timeout.connect(self._do_heartbeat)
+
     def _mark_dirty(self, _xml_text: str = ""):
         self._dirty = True
 
@@ -69,7 +82,54 @@ class DocumentController(QObject):
     # the change is actually made, not before.
     # ------------------------------------------------------------------
 
+    def try_open_file(self, path: str) -> tuple[bool, str]:
+        """Like load_file, but first acquires this record's advisory
+        lock (core/record_locks.py) -- the same mechanism the web app
+        already uses -- so two people can't silently clobber each
+        other's edits to the same shared record. Returns (False,
+        "<name>") without loading anything if someone else already
+        holds it; (True, "") on success. Acquires the *new* lock
+        before touching anything else, so a failed attempt never costs
+        the document (or lock) already open -- only load_file (called
+        here on success) releases that."""
+        holder_name = user_name() or ''
+        other_holder = record_locks.acquire(Path(path), holder_name)
+        if other_holder is not None:
+            return False, other_holder
+        self.load_file(path)
+        self._lock_path = Path(path)
+        self._lock_holder = holder_name
+        self._heartbeat_timer.start(record_locks.HEARTBEAT_INTERVAL_SECONDS * 1000)
+        return True, ""
+
+    def release_lock(self):
+        """Releases whatever record this controller currently holds
+        the lock on, if any -- idempotent, safe to call whether or not
+        a lock is actually held. Called from every path that stops
+        editing the locked record: load_file/create_new_record/clear
+        (replacing or leaving the open document) and _move_to_location
+        (the record moved away, so there's nothing left to protect at
+        its old path)."""
+        self._heartbeat_timer.stop()
+        if self._lock_path is not None:
+            record_locks.release(self._lock_path, self._lock_holder or '')
+        self._lock_path = None
+        self._lock_holder = None
+
+    def _do_heartbeat(self):
+        if self._lock_path is None:
+            return
+        if not record_locks.heartbeat(self._lock_path, self._lock_holder or ''):
+            # Lock expired (we went quiet too long) and someone else
+            # may have taken it -- advisory, so this doesn't block
+            # Save, just warns (see main_window's lock_lost handler).
+            self._heartbeat_timer.stop()
+            self._lock_path = None
+            self._lock_holder = None
+            self.lock_lost.emit()
+
     def load_file(self, path: str):
+        self.release_lock()
         xml_string = self.xml_doc.load(path)
         self._current_file = path
         self._current_element = None  # nothing selected yet in the freshly-loaded doc
@@ -85,6 +145,7 @@ class DocumentController(QObject):
         """Starts a brand-new, empty record of the given type. Not
         written to disk yet -- that happens on the first Save/Submit,
         same as any other edit -- dest_path is just where it will land."""
+        self.release_lock()  # a brand-new record can't be locked by anyone -- nothing to acquire
         xml_string = self.xml_doc.new_document(record_type, record_id)
         self._current_file = str(dest_path)
         self._current_element = None
@@ -102,6 +163,7 @@ class DocumentController(QObject):
         hiding the buttons that act on it while it stays loaded and
         visible underneath (see is_dirty for the guard that should
         run before this, if there's anything worth keeping)."""
+        self.release_lock()
         self.xml_doc = VraXmlParser()
         self._current_file = None
         self._current_element = None
@@ -738,6 +800,7 @@ class DocumentController(QObject):
         if not result.success:
             return False, result.message
 
+        self.release_lock()  # moved away -- nothing left to protect at the old path
         self._current_file = str(result.dest_path)
         self.file_loaded.emit(self._current_file)
         self._dirty = False

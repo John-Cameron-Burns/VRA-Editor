@@ -33,12 +33,23 @@ starting points:
 - **Create** — start a brand-new, blank record. You'll be asked for
   a record type (work, image, or collection) and a record ID. The
   record isn't written to disk until you Save or Submit it.
-- **Open** — pick an existing record from the *edit* folder to work
-  on.
+- **Open** — pick an existing record from the *edit* or *rejected*
+  folders to work on. Opening a record locks it (see below) so nobody
+  else can open the same one until you're done with it.
 - **Review** — pick a record waiting in the *pending* folder (one
   that's already been submitted) to approve or reject.
 - **Import** — merge newly-arrived source files from the *ingest*
   folder into *edit*, so they show up in Open's list.
+
+On a shared archive (a network drive, or the web companion app -- see
+below -- pointed at the same folders), opening a record for editing
+puts an advisory lock on it: if someone else already has it open,
+you'll be told who and asked to try again later, and its entry in the
+Open list shows "Locked by ...". This is advisory, not a hard
+guarantee -- it protects against clicking Open on the same record
+someone else already has, not against editing the file some other
+way -- and it clears itself automatically if the app that holds it
+closes, crashes, or goes quiet for a couple of minutes.
 
 This home screen also shows a diagram of the whole record lifecycle —
 Ingest, Edit, Pending, Reviewed, Released — labelled with the exact

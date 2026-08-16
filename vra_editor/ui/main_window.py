@@ -467,6 +467,7 @@ class MainWindow(QMainWindow):
         self.doc_controller.file_loaded.connect(self.status_bar.set_file)
         self.doc_controller.file_loaded.connect(self._on_file_loaded)
         self.doc_controller.archive_changed.connect(self.status_bar.set_archive)
+        self.doc_controller.lock_lost.connect(self._on_lock_lost)
         # If a signal doesn't map 1:1 onto a setter, connect to a small
         # slot instead, e.g.:
         # self.doc_controller.document_saved.connect(
@@ -545,6 +546,17 @@ class MainWindow(QMainWindow):
         if self.review_notes_panel.has_unresolved_notes():
             self.mode_bar.buttons['Review Notes'].setChecked(True)
         self.mode_strip.set_context(self.mode_bar.current_mode, path)
+
+    def _on_lock_lost(self):
+        """The advisory lock on the open record expired (this app went
+        quiet too long) and may now be held by someone else -- advisory
+        only, so this doesn't block anything, just warns; Save can
+        still be tried, it just might now race with whoever else has
+        it open."""
+        QMessageBox.warning(
+            self, "Lock lost",
+            "This record's lock was lost -- someone else may now hold it. Saving may conflict with their changes.",
+        )
 
     def _refresh_navigation(self):
         """Re-syncs the Simple view (both the section list and whichever
@@ -838,7 +850,13 @@ class MainWindow(QMainWindow):
 
         dlg = VraFilePickerDialog(directory=directory, title=dialog_title, parent=self)
         if dlg.exec() and dlg.selected_path is not None:
-            self.doc_controller.load_file(str(dlg.selected_path))
+            ok, holder = self.doc_controller.try_open_file(str(dlg.selected_path))
+            if not ok:
+                QMessageBox.warning(
+                    self, "Record locked",
+                    f"{dlg.selected_path.name} is currently being edited by {holder}.",
+                )
+                return False
             return True
         return False
 
@@ -1110,3 +1128,11 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Export failed", f"Couldn't write {path_str}: {e}")
             return
         QMessageBox.information(self, "Exported", f"Exported {format_name} record to {path_str}")
+
+    def closeEvent(self, event):
+        # Release the advisory lock on whatever record is still open --
+        # otherwise it'd sit there until its heartbeat TTL expires
+        # (see record_locks.LOCK_TTL_SECONDS), locking other people out
+        # of a record nobody's actually editing anymore.
+        self.doc_controller.release_lock()
+        super().closeEvent(event)

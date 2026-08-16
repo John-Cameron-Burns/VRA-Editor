@@ -10,6 +10,7 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 import pytest
 from PySide6.QtWidgets import QApplication
 
+from vra_editor.core import record_locks
 from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
 
 
@@ -18,18 +19,62 @@ def qapp():
     return QApplication.instance() or QApplication([])
 
 
+@pytest.fixture(autouse=True)
+def isolated_lock_store(monkeypatch, tmp_path):
+    """record_locks.status() (called from file_picker's Status column,
+    with the desktop's own default config_path=None -- see that
+    module's docstring) would otherwise read/create
+    ~/.vra-editor/cache/record_locks.db on whatever machine runs this
+    test. Redirect it to a throwaway per-test directory instead."""
+    monkeypatch.setattr(record_locks, 'get_cache_dir', lambda config_path=None: tmp_path / 'lock-cache')
+
+
 def _write_record(folder, name):
     folder.mkdir(parents=True, exist_ok=True)
     (folder / name).write_text('<work/>')
 
 
-def test_single_folder_has_no_status_column(qapp, tmp_path):
+def test_single_xml_folder_still_has_a_status_column_for_lock_hints(qapp, tmp_path):
     edit_dir = tmp_path / 'edit'
     _write_record(edit_dir, 'rec1.xml')
 
     dlg = VraFilePickerDialog(directory=edit_dir, file_filter='*.xml')
+    assert dlg.table.columnCount() == 3
+    assert dlg.table.rowCount() == 1
+    assert dlg.table.item(0, 2).text() == ''  # not locked -- blank, not a source label
+
+
+def test_non_xml_single_folder_has_no_status_column(qapp, tmp_path):
+    images_dir = tmp_path / 'images'
+    images_dir.mkdir()
+    (images_dir / 'photo.jpg').write_bytes(b'fake')
+
+    dlg = VraFilePickerDialog(directory=images_dir, file_filter='*.jpg')
     assert dlg.table.columnCount() == 2
     assert dlg.table.rowCount() == 1
+
+
+def test_locked_record_shows_locked_by_in_status_column(qapp, tmp_path):
+    edit_dir = tmp_path / 'edit'
+    record_path = edit_dir / 'rec1.xml'
+    _write_record(edit_dir, 'rec1.xml')
+    record_locks.acquire(record_path, 'jsmith')
+
+    dlg = VraFilePickerDialog(directory=edit_dir, file_filter='*.xml')
+    assert dlg.table.item(0, 2).text() == 'Locked by jsmith'
+
+
+def test_merged_sources_combine_label_and_lock_status(qapp, tmp_path):
+    edit_dir = tmp_path / 'edit'
+    rejected_dir = tmp_path / 'rejected'
+    _write_record(edit_dir, 'rec1.xml')
+    rejected_path = rejected_dir / 'rec2.xml'
+    _write_record(rejected_dir, 'rec2.xml')
+    record_locks.acquire(rejected_path, 'mdoe')
+
+    dlg = VraFilePickerDialog(directory={'Editable': edit_dir, 'Rejected': rejected_dir}, file_filter='*.xml')
+    status = {dlg.table.item(row, 0).text(): dlg.table.item(row, 2).text() for row in range(dlg.table.rowCount())}
+    assert status == {'rec1.xml': 'Editable', 'rec2.xml': 'Rejected — Locked by mdoe'}
 
 
 def test_merged_sources_get_a_status_column_and_labels(qapp, tmp_path):
