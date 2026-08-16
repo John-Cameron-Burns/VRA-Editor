@@ -16,7 +16,6 @@ from vra_editor.ui.dialogs.file_picker import VraFilePickerDialog
 from vra_editor.ui.dialogs.audit_dialog import AuditDialog
 from vra_editor.ui.dialogs.help_dialog import HelpDialog
 from vra_editor.ui.dialogs.import_progress_dialog import ImportProgressDialog
-from vra_editor.ui.dialogs.install_web_app_dialog import InstallWebAppDialog
 from vra_editor.ui.dialogs.media_sync_dialog import MediaSyncDialog
 from vra_editor.ui.dialogs.settings_dialog import SettingsDialog
 from vra_editor.ui.error_messages import friendly_validation_error
@@ -300,7 +299,7 @@ class MainWindow(QMainWindow):
         'Home', 'Open', 'Create', 'Review', 'Import',
         'Save', 'Undo', 'Submit', 'Approve', 'Reject', 'Cancel',
         'Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
-        'Settings', 'Autofill', 'Audits', 'Web App', 'Help', 'About',
+        'Settings', 'Autofill', 'Audits', 'Help', 'About',
     ]
 
     # Which visual cluster each button belongs to -- see ModeBar's
@@ -312,17 +311,17 @@ class MainWindow(QMainWindow):
         'Reject': 'action', 'Cancel': 'action',
         'Show XML': 'view', 'Review Notes': 'view', 'Advanced View': 'view', 'Sync Media': 'view',
         'Export': 'view',
-        'Settings': 'admin', 'Autofill': 'admin', 'Audits': 'admin', 'Web App': 'admin',
+        'Settings': 'admin', 'Autofill': 'admin', 'Audits': 'admin',
         'Help': 'admin', 'About': 'admin',
     }
 
     VARIANTS = dict(
-        initial=BASE_BUTTONS + ['Settings', 'Audits', 'Web App', 'Help', 'About'],
+        initial=BASE_BUTTONS + ['Settings', 'Audits', 'Help', 'About'],
         edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
-                              'Submit', 'Cancel', 'Audits', 'Web App', 'Help', 'About'],
+                              'Submit', 'Cancel', 'Audits', 'Help', 'About'],
         review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
-                                'Export', 'Reject', 'Cancel', 'Audits', 'Web App', 'Help', 'About'],
-        settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'Audits', 'Web App', 'Help', 'About'],
+                                'Export', 'Reject', 'Cancel', 'Audits', 'Help', 'About'],
+        settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'Audits', 'Help', 'About'],
     )
 
     BUTTON_TOOLTIPS = {
@@ -345,7 +344,6 @@ class MainWindow(QMainWindow):
         'Settings': "Configure archive folders, application data, and preferences.",
         'Autofill': "Fill in settings fields with their default values.",
         'Audits': "Browse revision history and restore an old version into a new file.",
-        'Web App': "Generate a script to install the web companion app on a Linux machine.",
         'Help': "Open the user manual.",
         'About': "Show version and license information.",
     }
@@ -613,7 +611,7 @@ class MainWindow(QMainWindow):
             self.mode_bar.buttons[name].setStyleSheet(PRIMARY_BUTTON_STYLE)
         self.mode_bar.buttons['Reject'].setStyleSheet(REJECT_BUTTON_STYLE)
         for name in ('Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
-                     'Settings', 'Autofill', 'Audits', 'Web App', 'Help', 'About'):
+                     'Settings', 'Autofill', 'Audits', 'Help', 'About'):
             self.mode_bar.buttons[name].setStyleSheet(SECONDARY_BUTTON_STYLE)
 
         # A toggle, not an action -- checkable so its pressed state shows
@@ -644,7 +642,6 @@ class MainWindow(QMainWindow):
         buttons['Review'].clicked.connect(self._on_review)
         buttons['Settings'].clicked.connect(self._on_settings)
         buttons['Audits'].clicked.connect(self._on_audits)
-        buttons['Web App'].clicked.connect(self._on_install_web_app)
         buttons['Help'].clicked.connect(self._on_help)
         buttons['About'].clicked.connect(self._on_about)
         buttons['Save'].clicked.connect(self._on_save)
@@ -823,10 +820,6 @@ class MainWindow(QMainWindow):
         dlg = AuditDialog(parent=self)
         dlg.restore_requested.connect(lambda revision, dest_path: self._on_restore_revision(dlg, revision, dest_path))
         dlg.exec()
-
-    def _on_install_web_app(self):
-        dlg = InstallWebAppDialog(parent=self)
-        dlg.exec()  # modal -- generates a script to disk, makes no changes to this app's own state
 
     def _on_restore_revision(self, dialog: AuditDialog, revision, dest_path: str):
         # Restoring replaces the currently-open document, exactly like
