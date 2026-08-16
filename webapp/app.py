@@ -5,7 +5,7 @@ from typing import Optional
 
 from flask import Flask, abort, send_from_directory
 
-from .config import load_web_config
+from .config import load_web_config, validate_auth_config
 from .routes.audit_routes import audit_bp
 from .routes.auth_routes import auth_bp
 from .routes.export_routes import export_bp
@@ -33,6 +33,9 @@ def create_app(config_path: Optional[Path] = None) -> Flask:
     isolated temp config.ini instead of the real
     ~/.vra-editor/config.ini."""
     app = Flask(__name__)
+    # Fail at process start, not on some user's first login attempt --
+    # today load_ldap_config only raised inside authenticate() itself.
+    validate_auth_config(config_path) if config_path else validate_auth_config()
     web_config = load_web_config(config_path) if config_path else load_web_config()
     app.config['SECRET_KEY'] = web_config['secret_key']
     app.config['VRA_CONFIG_PATH'] = config_path

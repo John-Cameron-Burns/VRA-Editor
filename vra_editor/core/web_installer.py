@@ -65,6 +65,7 @@ class InstallOptions:
     ldap_server: str = ''
     ldap_bind_pattern: str = ''
     ldap_use_ssl: bool = False
+    local_auth_enabled: bool = False
 
 
 @dataclass(frozen=True)
@@ -78,6 +79,7 @@ class WindowsInstallOptions:
     ldap_server: str = ''
     ldap_bind_pattern: str = ''
     ldap_use_ssl: bool = False
+    local_auth_enabled: bool = False
     # No service_user: the NSSM service runs as LocalSystem, deliberately --
     # see this module's own module docstring reasoning replicated in
     # generate_windows_install_script's docstring below (no credential
@@ -223,6 +225,7 @@ def generate_install_script(options: InstallOptions, source_dir: Optional[Path] 
     ldap_server = shlex.quote(options.ldap_server)
     ldap_bind_pattern = shlex.quote(options.ldap_bind_pattern)
     ldap_use_ssl = 'true' if options.ldap_use_ssl else 'false'
+    local_auth_enabled = 'true' if options.local_auth_enabled else 'false'
 
     proxy_summary = {
         'nginx': f'Reverse proxy: Nginx, listening on :80 for {options.server_name}',
@@ -252,11 +255,24 @@ SERVER_NAME={server_name}
 LDAP_SERVER={ldap_server}
 LDAP_BIND_PATTERN={ldap_bind_pattern}
 LDAP_USE_SSL={ldap_use_ssl}
+LOCAL_AUTH_ENABLED={local_auth_enabled}
 
 if [ "$EUID" -ne 0 ]; then
   echo "This script needs root -- run it with: sudo bash $0" >&2
   exit 1
 fi
+
+warn_if_local_auth_needs_root() {{
+  if [ "$LOCAL_AUTH_ENABLED" = "true" ] && [ "$SERVICE_USER" != "root" ]; then
+    echo "WARNING: Local-account login is enabled, but the service will run as" >&2
+    echo "         '$SERVICE_USER', not root. Checking another user's password via PAM" >&2
+    echo "         normally requires root (or membership in the 'shadow' group,"  >&2
+    echo "         depending on distro/PAM config) to read /etc/shadow. Local-account" >&2
+    echo "         logins will likely fail until this is fixed -- either run the" >&2
+    echo "         service as root, or add '$SERVICE_USER' to the 'shadow' group." >&2
+  fi
+}}
+warn_if_local_auth_needs_root
 
 echo "=== Checking dependencies ==="
 MISSING=""
@@ -288,23 +304,31 @@ python3 -m venv "$INSTALL_DIR/venv"
 
 echo "=== Configuring $CONFIG_PATH ==="
 SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-python3 - "$CONFIG_PATH" "$SECRET_KEY" "$LDAP_SERVER" "$LDAP_BIND_PATTERN" "$LDAP_USE_SSL" <<'PYEOF'
+python3 - "$CONFIG_PATH" "$SECRET_KEY" "$LDAP_SERVER" "$LDAP_BIND_PATTERN" "$LDAP_USE_SSL" "$LOCAL_AUTH_ENABLED" <<'PYEOF'
 import configparser
 import sys
 from pathlib import Path
 
 config_path = Path(sys.argv[1])
-secret_key, ldap_server, ldap_bind_pattern, ldap_use_ssl = sys.argv[2:6]
+secret_key, ldap_server, ldap_bind_pattern, ldap_use_ssl, local_auth_enabled = sys.argv[2:7]
 
 parser = configparser.ConfigParser()
 if config_path.exists():
     parser.read(config_path)
 
-parser['ldap'] = {{
-    'server': ldap_server,
-    'bind_pattern': ldap_bind_pattern,
-    'use_ssl': ldap_use_ssl,
-}}
+if ldap_server.strip():
+    parser['ldap'] = {{
+        'server': ldap_server,
+        'bind_pattern': ldap_bind_pattern,
+        'use_ssl': ldap_use_ssl,
+    }}
+elif parser.has_section('ldap'):
+    # Re-running the installer with LDAP now unticked -- remove the
+    # stale section instead of leaving a half-configured one behind.
+    parser.remove_section('ldap')
+
+parser['local_auth'] = {{'enabled': local_auth_enabled}}
+
 if not parser.has_section('web'):
     parser['web'] = {{}}
 if not parser['web'].get('secret_key', '').strip():
@@ -346,6 +370,7 @@ echo "Logs:           journalctl -u vra-editor-web -f"
 echo "Config file:    $CONFIG_PATH"
 echo
 echo "Note: TLS/certificates were not configured. Set those up on your reverse proxy separately."
+warn_if_local_auth_needs_root
 
 exit 0
 {_ARCHIVE_MARKER}
@@ -370,17 +395,25 @@ import sys
 from pathlib import Path
 
 config_path = Path(sys.argv[1])
-secret_key, ldap_server, ldap_bind_pattern, ldap_use_ssl = sys.argv[2:6]
+secret_key, ldap_server, ldap_bind_pattern, ldap_use_ssl, local_auth_enabled = sys.argv[2:7]
 
 parser = configparser.ConfigParser()
 if config_path.exists():
     parser.read(config_path)
 
-parser['ldap'] = {
-    'server': ldap_server,
-    'bind_pattern': ldap_bind_pattern,
-    'use_ssl': ldap_use_ssl,
-}
+if ldap_server.strip():
+    parser['ldap'] = {
+        'server': ldap_server,
+        'bind_pattern': ldap_bind_pattern,
+        'use_ssl': ldap_use_ssl,
+    }
+elif parser.has_section('ldap'):
+    # Re-running the installer with LDAP now unticked -- remove the
+    # stale section instead of leaving a half-configured one behind.
+    parser.remove_section('ldap')
+
+parser['local_auth'] = {'enabled': local_auth_enabled}
+
 if not parser.has_section('web'):
     parser['web'] = {}
 if not parser['web'].get('secret_key', '').strip():
@@ -420,6 +453,7 @@ function Install-VraEditorWeb {
     $LdapServer = %%LDAP_SERVER%%
     $LdapBindPattern = %%LDAP_BIND_PATTERN%%
     $LdapUseSsl = %%LDAP_USE_SSL%%
+    $LocalAuthEnabled = %%LOCAL_AUTH_ENABLED%%
     $ProxySummary = %%PROXY_SUMMARY%%
 
     $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -462,9 +496,13 @@ function Install-VraEditorWeb {
     $mergeScriptPath = [System.IO.Path]::GetTempFileName() + '.py'
     [System.IO.File]::WriteAllText($mergeScriptPath, $mergeScript, (New-Object System.Text.UTF8Encoding $false))
     $ldapUseSslArg = if ($LdapUseSsl) { 'true' } else { 'false' }
-    & "$InstallDir\venv\Scripts\python.exe" $mergeScriptPath $ConfigPath $secretKey $LdapServer $LdapBindPattern $ldapUseSslArg
+    $localAuthEnabledArg = if ($LocalAuthEnabled) { 'true' } else { 'false' }
+    & "$InstallDir\venv\Scripts\python.exe" $mergeScriptPath $ConfigPath $secretKey $LdapServer $LdapBindPattern $ldapUseSslArg $localAuthEnabledArg
     Remove-Item $mergeScriptPath
 
+    # Local-account login (if enabled) uses win32security.LogonUser, which
+    # LocalSystem can call for any local account without extra privilege
+    # grants -- unlike PAM on Linux, no service-account warning is needed here.
     Write-Host "=== Installing Windows service (NSSM) ==="
     $nssmExe = Join-Path $InstallDir 'nssm.exe'
     $pythonExe = Join-Path $InstallDir 'venv\Scripts\python.exe'
@@ -609,6 +647,7 @@ def generate_windows_install_script(options: WindowsInstallOptions, source_dir: 
         '%%LDAP_SERVER%%': _ps_quote(options.ldap_server),
         '%%LDAP_BIND_PATTERN%%': _ps_quote(options.ldap_bind_pattern),
         '%%LDAP_USE_SSL%%': ldap_use_ssl_literal,
+        '%%LOCAL_AUTH_ENABLED%%': '$true' if options.local_auth_enabled else '$false',
         '%%PROXY_DEPENDENCY_CHECK%%': proxy_check,
         '%%PROXY_SETUP%%': proxy_setup,
         # _ps_quote, not raw text -- this becomes $ProxySummary = ...,
