@@ -7,7 +7,7 @@ from PySide6.QtGui import QFontMetrics
 from PySide6.QtWidgets import (
     QDialog, QWidget, QFormLayout, QVBoxLayout, QHBoxLayout,
     QLineEdit, QCheckBox, QPushButton, QFileDialog, QLabel,
-    QDialogButtonBox, QGroupBox, QMessageBox,
+    QDialogButtonBox, QGroupBox, QMessageBox, QTabWidget,
 )
 
 from ...app_data import BOOTSTRAP_DIR
@@ -15,7 +15,7 @@ from ...config import (
     DEFAULT_CONFIG_PATH, LOCATION_KEYS, OPTION_TEXT_KEYS,
     to_bool,
 )
-from ...core import offline_staging
+from ...core import archive_signature, offline_staging
 from ...core.media_files import DEFAULT_MEDIA_EXTENSIONS
 from ...utils import strip_quotes
 from .install_web_app_dialog import InstallWebAppDialog
@@ -53,7 +53,12 @@ class SettingsDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Settings")
         self.setModal(True)
-        self.resize(480, 360)
+        # Tabbed rather than one long stack of groups -- with every
+        # section visible at once, this dialog outgrew a lot of screens
+        # entirely (no scroll area either, so Web Server -- the last
+        # group -- became unreachable). Only one tab's content
+        # contributes to the visible height at a time now.
+        self.resize(560, 440)
 
         self.config_path = config_path
         self._location_edits: dict[str, QLineEdit] = {}
@@ -72,12 +77,12 @@ class SettingsDialog(QDialog):
     def _build_ui(self):
         outer = QVBoxLayout(self)
 
-        outer.addWidget(self._build_locations_group())
-        outer.addWidget(self._build_app_data_group())
-        outer.addWidget(self._build_offline_group())
-        outer.addWidget(self._build_user_group())
-        outer.addWidget(self._build_options_group())
-        outer.addWidget(self._build_web_app_group())
+        tabs = QTabWidget()
+        tabs.addTab(self._build_locations_tab(), "Locations")
+        tabs.addTab(self._build_offline_tab(), "Offline Work")
+        tabs.addTab(self._build_user_options_tab(), "User && Options")
+        tabs.addTab(self._build_web_app_tab(), "Web Server")
+        outer.addWidget(tabs)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.Save | QDialogButtonBox.Cancel
@@ -85,6 +90,40 @@ class SettingsDialog(QDialog):
         buttons.accepted.connect(self._on_save)
         buttons.rejected.connect(self.reject)
         outer.addWidget(buttons)
+
+    def _build_locations_tab(self) -> QWidget:
+        # Clutter folder first, archive folders below it -- setting the
+        # former immediately tries to auto-fill the latter (see
+        # _auto_detect_sibling_locations), so it reads top-to-bottom as
+        # cause then effect.
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.addWidget(self._build_app_data_group())
+        layout.addWidget(self._build_locations_group())
+        layout.addStretch()
+        return tab
+
+    def _build_offline_tab(self) -> QWidget:
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        self._populate_offline_layout(layout)
+        layout.addStretch()
+        return tab
+
+    def _build_user_options_tab(self) -> QWidget:
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.addWidget(self._build_user_group())
+        layout.addWidget(self._build_options_group())
+        layout.addStretch()
+        return tab
+
+    def _build_web_app_tab(self) -> QWidget:
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        self._populate_web_app_layout(layout)
+        layout.addStretch()
+        return tab
 
     def _build_locations_group(self) -> QGroupBox:
         group = QGroupBox("Locations")
@@ -148,7 +187,8 @@ class SettingsDialog(QDialog):
         self.app_data_edit.setPlaceholderText(f"(default: {BOOTSTRAP_DIR})")
         browse_btn = QPushButton("Browse...")
         browse_btn.setToolTip("Choose where this app stores its own files.")
-        browse_btn.clicked.connect(lambda: self._browse_for(self.app_data_edit))
+        browse_btn.clicked.connect(self._on_browse_app_data)
+        self.app_data_edit.editingFinished.connect(self._auto_detect_sibling_locations)
         row_layout.addWidget(self.app_data_edit)
         row_layout.addWidget(browse_btn)
 
@@ -156,7 +196,10 @@ class SettingsDialog(QDialog):
         note = QLabel(
             "Where this app keeps its own files -- the edit/review version "
             "history and the vocabulary-lookup cache -- separate from the "
-            "archive itself. Leave blank to use the default above."
+            "archive itself. Leave blank to use the default above. Setting "
+            "this to an existing archive's folder automatically fills in any "
+            "of the folders below that are still blank and found nearby -- "
+            "as siblings or as children of this folder."
         )
         note.setWordWrap(True)
         note.setStyleSheet("color: #666;")
@@ -164,10 +207,55 @@ class SettingsDialog(QDialog):
 
         return group
 
-    def _build_offline_group(self) -> QGroupBox:
-        group = QGroupBox("Offline Work")
-        layout = QVBoxLayout(group)
+    def _on_browse_app_data(self):
+        self._browse_for(self.app_data_edit)
+        self._auto_detect_sibling_locations()
 
+    def _auto_detect_sibling_locations(self):
+        """Fills in any still-blank archive-folder field whose name
+        (edit/ingest/pending/rejected/reviewed/released) is found as a
+        sibling or a child of the clutter folder just set -- sibling
+        checked first, so a flat archive layout wins over a candidate
+        nested inside the clutter folder itself. Never overwrites a
+        field that already has something in it.
+
+        A same-named folder alone isn't trusted blindly: if either the
+        clutter folder or an earlier-matched candidate already carries
+        an archive_signature, later candidates must carry the same one
+        to be accepted -- otherwise a coincidentally-named folder from
+        an unrelated archive could get silently wired in. With no
+        signature anywhere yet (a fresh archive, nothing saved through
+        this feature before), falls back to a plain name match."""
+        app_data_text = self.app_data_edit.text().strip()
+        if not app_data_text:
+            return
+        app_data_path = Path(app_data_text)
+        if not app_data_path.is_dir():
+            return
+
+        inferred_id = archive_signature.read_signature(app_data_path)
+
+        for base in (app_data_path.parent, app_data_path):
+            try:
+                entries = {entry.name.lower(): entry for entry in base.iterdir() if entry.is_dir()}
+            except OSError:
+                continue
+            for key in LOCATION_KEYS:
+                edit = self._location_edits[key]
+                if edit.text().strip():
+                    continue
+                candidate = entries.get(key)
+                if candidate is None:
+                    continue
+                candidate_id = archive_signature.read_signature(candidate)
+                if inferred_id is not None:
+                    if candidate_id != inferred_id:
+                        continue
+                elif candidate_id is not None:
+                    inferred_id = candidate_id
+                edit.setText(str(candidate))
+
+    def _populate_offline_layout(self, layout: QVBoxLayout):
         note = QLabel(
             "For working with no network at all (e.g. a field trip): copies "
             "the Edit folder above to a local folder and points Edit at it, "
@@ -192,8 +280,6 @@ class SettingsDialog(QDialog):
         button_row.addWidget(reconcile_button)
         button_row.addStretch()
         layout.addLayout(button_row)
-
-        return group
 
     def _on_start_staging(self):
         primary = self._location_edits['edit'].text().strip()
@@ -301,10 +387,7 @@ class SettingsDialog(QDialog):
 
         return group
 
-    def _build_web_app_group(self) -> QGroupBox:
-        group = QGroupBox("Web Server")
-        layout = QVBoxLayout(group)
-
+    def _populate_web_app_layout(self, layout: QVBoxLayout):
         note = QLabel(
             "Generates a script that deploys this app's browser-based companion "
             "as a real background service on this machine (Nginx/Apache on "
@@ -322,8 +405,6 @@ class SettingsDialog(QDialog):
         button_row.addStretch()
         layout.addLayout(button_row)
 
-        return group
-
     def _on_install_web_app(self):
         dlg = InstallWebAppDialog(parent=self)
         dlg.exec()  # modal -- generates a script to disk, makes no changes to this app's own state
@@ -333,6 +414,28 @@ class SettingsDialog(QDialog):
         chosen = QFileDialog.getExistingDirectory(self, "Select folder", start_dir)
         if chosen:
             line_edit.setText(chosen)
+
+    def _write_archive_signatures(self, location_paths: dict):
+        """Drops/refreshes the hidden archive-id marker (see
+        core/archive_signature.py) into every configured, existing
+        folder here -- clutter folder included -- so a later Settings
+        session pointing its clutter folder somewhere nearby can verify
+        these really belong together, not just share a folder name.
+        Reuses whichever ID any of these folders already carries
+        (so re-saving Settings doesn't churn it); mints a fresh one
+        only if none of them has one yet."""
+        existing_dirs = [Path(p) for p in location_paths.values() if p and Path(p).is_dir()]
+        if not existing_dirs:
+            return
+        archive_id = None
+        for folder in existing_dirs:
+            archive_id = archive_signature.read_signature(folder)
+            if archive_id is not None:
+                break
+        if archive_id is None:
+            archive_id = archive_signature.new_archive_id()
+        for folder in existing_dirs:
+            archive_signature.write_signature(folder, archive_id)
 
     # ------------------------------------------------------------------
     # Load / save
@@ -356,6 +459,11 @@ class SettingsDialog(QDialog):
         for key, edit in self._option_edits.items():
             edit.setText(options.get(key, ''))
 
+        # Harmless no-op for a fully-populated config (every candidate
+        # field is already non-blank) -- worth running anyway for a
+        # config with real gaps, e.g. after a partial hand-edit.
+        self._auto_detect_sibling_locations()
+
     def _on_save(self):
         parser = configparser.ConfigParser()
         parser['locations'] = {
@@ -376,6 +484,8 @@ class SettingsDialog(QDialog):
                 Path(path).mkdir(parents=True, exist_ok=True)
             except OSError as exc:
                 QMessageBox.critical(self, "Create dir failed", f"Could not create {path}:\n{exc}")
+
+        self._write_archive_signatures(parser['locations'])
 
         parser['user'] = {
             'FullName': self.fullname_edit.text().strip(),
