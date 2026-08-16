@@ -130,6 +130,84 @@ def test_ldap_omitted_from_config_merge_when_ldap_server_blank(fixture_bundle):
     assert "parser.remove_section('ldap')" in script
 
 
+def test_locations_reach_the_config_merge_step(fixture_bundle):
+    script = generate_install_script(
+        _default_options(
+            location_edit='/mnt/archive/edit', location_ingest='/mnt/archive/ingest',
+            location_app_data='/mnt/archive/clutter',
+        ),
+        source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert 'LOC_EDIT=/mnt/archive/edit' in script
+    assert 'LOC_INGEST=/mnt/archive/ingest' in script
+    assert 'LOC_APP_DATA=/mnt/archive/clutter' in script
+    assert "location_values = {" in script
+    assert "'edit': loc_edit" in script
+    assert "'app_data': loc_app_data" in script
+
+
+def test_locations_blank_by_default(fixture_bundle):
+    script = generate_install_script(_default_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert "LOC_EDIT=''" in script
+    assert "LOC_APP_DATA=''" in script
+
+
+@requires_bash
+def test_locations_real_merge_preserves_existing_and_overwrites_filled(tmp_path, fixture_bundle):
+    """Runs the ACTUAL embedded config-merge Python script against a
+    real subprocess (not a static text check) to prove the "blank
+    field leaves the existing value alone, a filled one overwrites it"
+    semantics genuinely hold -- the whole point of not just always
+    writing every key, since an operator pointing this at an existing,
+    already-configured config.ini and leaving most fields blank must
+    not have that config's locations wiped out."""
+    config_path = tmp_path / 'config.ini'
+    config_path.write_text(
+        "[locations]\n"
+        "edit = /old/edit\n"
+        "ingest = /old/ingest\n"
+        "pending = /old/pending\n"
+    )
+
+    script = generate_install_script(
+        _default_options(
+            config_path=str(config_path),
+            location_edit='/new/edit',  # overwrite this one
+            # ingest/pending left blank -- must survive untouched
+            location_reviewed='/new/reviewed',  # a brand new key
+        ),
+        source_dir=fixture_bundle,
+    )
+    script_path = tmp_path / 'install.sh'
+    script_path.write_bytes(script)
+
+    # Extract just the config-merge step (between the "Configuring"
+    # echo and the matching PYEOF) and run it directly, skipping
+    # everything before it (root check, dependency check, extraction)
+    # that isn't relevant to this and would need a real root/target dir.
+    text = script.decode('utf-8')
+    start = text.index('echo "=== Configuring')
+    end = text.index('PYEOF\n', start) + len('PYEOF\n')
+    snippet = text[start:end]
+    merge_script_path = tmp_path / 'merge_check.sh'
+    merge_script_path.write_text(
+        f'#!/bin/bash\nCONFIG_PATH={config_path}\n'
+        f'SECRET_KEY=x\nLDAP_SERVER=\'\'\nLDAP_BIND_PATTERN=\'\'\nLDAP_USE_SSL=false\n'
+        f'LOCAL_AUTH_ENABLED=false\n'
+        f"LOC_EDIT='/new/edit'\nLOC_INGEST=''\nLOC_PENDING=''\nLOC_REJECTED=''\n"
+        f"LOC_REVIEWED='/new/reviewed'\nLOC_RELEASED=''\nLOC_APP_DATA=''\n"
+        + snippet
+    )
+    result = subprocess.run(['bash', str(merge_script_path)], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+
+    written = config_path.read_text()
+    assert 'edit = /new/edit' in written        # overwritten
+    assert 'ingest = /old/ingest' in written     # preserved (left blank)
+    assert 'pending = /old/pending' in written   # preserved (left blank)
+    assert 'reviewed = /new/reviewed' in written  # newly added
+
+
 def test_linux_warns_when_local_auth_enabled_and_service_user_not_root(fixture_bundle):
     script = generate_install_script(
         _default_options(local_auth_enabled=True, service_user='jsmith'), source_dir=fixture_bundle,
@@ -325,6 +403,21 @@ def test_windows_elevation_check_present(fixture_bundle, fake_nssm):
     assert 'WindowsBuiltinRole]::Administrator' in script
 
 
+def test_windows_stops_existing_service_before_extracting(fixture_bundle, fake_nssm):
+    """Regression test: re-running the installer against an existing
+    deployment used to fail with 'Access to the path ... nssm.exe is
+    denied' because Expand-Archive can't overwrite a file NSSM still
+    has open while the service is running. The script must stop/remove
+    any prior VraEditorWeb service before extraction, using sc.exe
+    (not the newly-extracted nssm.exe) since an earlier install may
+    have lived at a different directory than this run's."""
+    script = generate_windows_install_script(_default_windows_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert "Get-Service -Name 'VraEditorWeb'" in script
+    assert 'Stop-Service' in script
+    assert 'sc.exe delete VraEditorWeb' in script
+    assert script.index('VraEditorWeb service') < script.index('Extracting web app to')
+
+
 @pytest.mark.parametrize('proxy,expect_present,expect_absent', [
     ('iis', ['New-Website', 'HostHeader', 'ApplicationRequestRouting', 'RewriteModule', 'web.config',
              'action type="Rewrite" url="http://127.0.0.1:8000/{R:1}"'],
@@ -370,6 +463,26 @@ def test_windows_ldap_omitted_from_config_merge_when_ldap_server_blank(fixture_b
     ).decode('utf-8')
     assert "$LdapServer = ''" in script
     assert "parser.remove_section('ldap')" in script
+
+
+def test_windows_locations_reach_the_config_merge_step(fixture_bundle, fake_nssm):
+    script = generate_windows_install_script(
+        _default_windows_options(
+            location_edit=r'\\fileserver\archive\edit',
+            location_app_data=r'\\fileserver\archive\clutter',
+        ),
+        source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert '$LocEdit' in script
+    assert 'fileserver' in script
+    assert "location_values = {" in script
+    assert "'app_data': loc_app_data" in script
+
+
+def test_windows_locations_blank_by_default(fixture_bundle, fake_nssm):
+    script = generate_windows_install_script(_default_windows_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert "$LocEdit = ''" in script
+    assert "$LocAppData = ''" in script
 
 
 def test_windows_no_service_user_warning_anywhere(fixture_bundle, fake_nssm):

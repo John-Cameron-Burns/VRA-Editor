@@ -317,8 +317,16 @@ class MainWindow(QMainWindow):
 
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'Audits', 'Help', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
-                              'Submit', 'Cancel', 'Audits', 'Help', 'About'],
+        # Open/Create/Review/Import dropped here (unlike the other
+        # variants) -- edit mode's own row is already the busiest
+        # (Save/Undo/Show XML/Review Notes/Advanced View/Sync Media/
+        # Export/Submit/Cancel plus admin), and these four are exactly
+        # the "leave the current record" actions Cancel already covers
+        # -- keeping them too was pushing buttons on the right (Submit
+        # among them) off-screen on smaller windows. Home stays as the
+        # one way out.
+        edit=['Home'] + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
+                          'Submit', 'Cancel', 'Audits', 'Help', 'About'],
         review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
                                 'Export', 'Reject', 'Cancel', 'Audits', 'Help', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'Audits', 'Help', 'About'],

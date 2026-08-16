@@ -66,6 +66,19 @@ class InstallOptions:
     ldap_bind_pattern: str = ''
     ldap_use_ssl: bool = False
     local_auth_enabled: bool = False
+    # [locations] -- all optional. Blank ones are left alone rather than
+    # written as empty, so pointing config_path at an existing, already-
+    # configured config.ini and leaving these blank doesn't wipe it out;
+    # see the config-merge step. location_app_data is the "clutter"
+    # folder -- sharing it with a desktop install's own is what unifies
+    # the git-backed revision history behind Audits across both.
+    location_edit: str = ''
+    location_ingest: str = ''
+    location_pending: str = ''
+    location_rejected: str = ''
+    location_reviewed: str = ''
+    location_released: str = ''
+    location_app_data: str = ''
 
 
 @dataclass(frozen=True)
@@ -84,6 +97,17 @@ class WindowsInstallOptions:
     # see this module's own module docstring reasoning replicated in
     # generate_windows_install_script's docstring below (no credential
     # prompts, no password ever embedded in the generated script).
+    # [locations] -- see InstallOptions's own comment; same semantics.
+    # LocalSystem has no mapped network drives of its own (those are a
+    # per-interactive-session thing), so a network-shared archive needs
+    # a UNC path here (\\server\share\edit), never a drive letter.
+    location_edit: str = ''
+    location_ingest: str = ''
+    location_pending: str = ''
+    location_rejected: str = ''
+    location_reviewed: str = ''
+    location_released: str = ''
+    location_app_data: str = ''
 
 
 class BundleMissingError(Exception):
@@ -226,6 +250,13 @@ def generate_install_script(options: InstallOptions, source_dir: Optional[Path] 
     ldap_bind_pattern = shlex.quote(options.ldap_bind_pattern)
     ldap_use_ssl = 'true' if options.ldap_use_ssl else 'false'
     local_auth_enabled = 'true' if options.local_auth_enabled else 'false'
+    loc_edit = shlex.quote(options.location_edit)
+    loc_ingest = shlex.quote(options.location_ingest)
+    loc_pending = shlex.quote(options.location_pending)
+    loc_rejected = shlex.quote(options.location_rejected)
+    loc_reviewed = shlex.quote(options.location_reviewed)
+    loc_released = shlex.quote(options.location_released)
+    loc_app_data = shlex.quote(options.location_app_data)
 
     proxy_summary = {
         'nginx': f'Reverse proxy: Nginx, listening on :80 for {options.server_name}',
@@ -256,6 +287,13 @@ LDAP_SERVER={ldap_server}
 LDAP_BIND_PATTERN={ldap_bind_pattern}
 LDAP_USE_SSL={ldap_use_ssl}
 LOCAL_AUTH_ENABLED={local_auth_enabled}
+LOC_EDIT={loc_edit}
+LOC_INGEST={loc_ingest}
+LOC_PENDING={loc_pending}
+LOC_REJECTED={loc_rejected}
+LOC_REVIEWED={loc_reviewed}
+LOC_RELEASED={loc_released}
+LOC_APP_DATA={loc_app_data}
 
 if [ "$EUID" -ne 0 ]; then
   echo "This script needs root -- run it with: sudo bash $0" >&2
@@ -304,13 +342,15 @@ python3 -m venv "$INSTALL_DIR/venv"
 
 echo "=== Configuring $CONFIG_PATH ==="
 SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-python3 - "$CONFIG_PATH" "$SECRET_KEY" "$LDAP_SERVER" "$LDAP_BIND_PATTERN" "$LDAP_USE_SSL" "$LOCAL_AUTH_ENABLED" <<'PYEOF'
+python3 - "$CONFIG_PATH" "$SECRET_KEY" "$LDAP_SERVER" "$LDAP_BIND_PATTERN" "$LDAP_USE_SSL" "$LOCAL_AUTH_ENABLED" \
+    "$LOC_EDIT" "$LOC_INGEST" "$LOC_PENDING" "$LOC_REJECTED" "$LOC_REVIEWED" "$LOC_RELEASED" "$LOC_APP_DATA" <<'PYEOF'
 import configparser
 import sys
 from pathlib import Path
 
 config_path = Path(sys.argv[1])
 secret_key, ldap_server, ldap_bind_pattern, ldap_use_ssl, local_auth_enabled = sys.argv[2:7]
+loc_edit, loc_ingest, loc_pending, loc_rejected, loc_reviewed, loc_released, loc_app_data = sys.argv[7:14]
 
 parser = configparser.ConfigParser()
 if config_path.exists():
@@ -328,6 +368,22 @@ elif parser.has_section('ldap'):
     parser.remove_section('ldap')
 
 parser['local_auth'] = {{'enabled': local_auth_enabled}}
+
+# [locations] -- a blank field here means "leave whatever's already in
+# the config alone" (not "clear it"), so pointing this install at an
+# existing, already-configured config.ini and leaving these blank
+# doesn't wipe out its locations; only a field the operator actually
+# filled in overwrites the corresponding key.
+location_values = {{
+    'edit': loc_edit, 'ingest': loc_ingest, 'pending': loc_pending,
+    'rejected': loc_rejected, 'reviewed': loc_reviewed, 'released': loc_released,
+    'app_data': loc_app_data,
+}}
+if not parser.has_section('locations'):
+    parser['locations'] = {{}}
+for key, value in location_values.items():
+    if value.strip():
+        parser['locations'][key] = value
 
 if not parser.has_section('web'):
     parser['web'] = {{}}
@@ -396,6 +452,7 @@ from pathlib import Path
 
 config_path = Path(sys.argv[1])
 secret_key, ldap_server, ldap_bind_pattern, ldap_use_ssl, local_auth_enabled = sys.argv[2:7]
+loc_edit, loc_ingest, loc_pending, loc_rejected, loc_reviewed, loc_released, loc_app_data = sys.argv[7:14]
 
 parser = configparser.ConfigParser()
 if config_path.exists():
@@ -413,6 +470,22 @@ elif parser.has_section('ldap'):
     parser.remove_section('ldap')
 
 parser['local_auth'] = {'enabled': local_auth_enabled}
+
+# [locations] -- a blank field here means "leave whatever's already in
+# the config alone" (not "clear it"), so pointing this install at an
+# existing, already-configured config.ini and leaving these blank
+# doesn't wipe out its locations; only a field the operator actually
+# filled in overwrites the corresponding key.
+location_values = {
+    'edit': loc_edit, 'ingest': loc_ingest, 'pending': loc_pending,
+    'rejected': loc_rejected, 'reviewed': loc_reviewed, 'released': loc_released,
+    'app_data': loc_app_data,
+}
+if not parser.has_section('locations'):
+    parser['locations'] = {}
+for key, value in location_values.items():
+    if value.strip():
+        parser['locations'][key] = value
 
 if not parser.has_section('web'):
     parser['web'] = {}
@@ -454,12 +527,37 @@ function Install-VraEditorWeb {
     $LdapBindPattern = %%LDAP_BIND_PATTERN%%
     $LdapUseSsl = %%LDAP_USE_SSL%%
     $LocalAuthEnabled = %%LOCAL_AUTH_ENABLED%%
+    $LocEdit = %%LOC_EDIT%%
+    $LocIngest = %%LOC_INGEST%%
+    $LocPending = %%LOC_PENDING%%
+    $LocRejected = %%LOC_REJECTED%%
+    $LocReviewed = %%LOC_REVIEWED%%
+    $LocReleased = %%LOC_RELEASED%%
+    $LocAppData = %%LOC_APP_DATA%%
     $ProxySummary = %%PROXY_SUMMARY%%
 
     $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
         Write-Error "This script needs to be run as Administrator."
         exit 1
+    }
+
+    # Re-running this script against an existing install is a real,
+    # expected case (picking up a new build, changing a setting) -- but
+    # NSSM keeps its own nssm.exe open for as long as the service is
+    # running, and Windows won't let Expand-Archive overwrite a file
+    # that's still in use. Stop and remove any prior VraEditorWeb
+    # service first so extraction below can't hit that. sc.exe (not
+    # the bundled nssm.exe) does the removal, since an old install
+    # might be at a different $InstallDir than this run's -- the
+    # service name is the only thing guaranteed constant between runs.
+    $existingService = Get-Service -Name 'VraEditorWeb' -ErrorAction SilentlyContinue
+    if ($existingService) {
+        Write-Host "=== Found an existing VraEditorWeb service -- stopping and removing it first ==="
+        Stop-Service -Name 'VraEditorWeb' -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+        sc.exe delete VraEditorWeb | Out-Null
+        Start-Sleep -Seconds 1
     }
 
     Write-Host "=== Checking dependencies ==="
@@ -497,7 +595,8 @@ function Install-VraEditorWeb {
     [System.IO.File]::WriteAllText($mergeScriptPath, $mergeScript, (New-Object System.Text.UTF8Encoding $false))
     $ldapUseSslArg = if ($LdapUseSsl) { 'true' } else { 'false' }
     $localAuthEnabledArg = if ($LocalAuthEnabled) { 'true' } else { 'false' }
-    & "$InstallDir\venv\Scripts\python.exe" $mergeScriptPath $ConfigPath $secretKey $LdapServer $LdapBindPattern $ldapUseSslArg $localAuthEnabledArg
+    & "$InstallDir\venv\Scripts\python.exe" $mergeScriptPath $ConfigPath $secretKey $LdapServer $LdapBindPattern $ldapUseSslArg $localAuthEnabledArg `
+        $LocEdit $LocIngest $LocPending $LocRejected $LocReviewed $LocReleased $LocAppData
     Remove-Item $mergeScriptPath
 
     # Local-account login (if enabled) uses win32security.LogonUser, which
@@ -648,6 +747,13 @@ def generate_windows_install_script(options: WindowsInstallOptions, source_dir: 
         '%%LDAP_BIND_PATTERN%%': _ps_quote(options.ldap_bind_pattern),
         '%%LDAP_USE_SSL%%': ldap_use_ssl_literal,
         '%%LOCAL_AUTH_ENABLED%%': '$true' if options.local_auth_enabled else '$false',
+        '%%LOC_EDIT%%': _ps_quote(options.location_edit),
+        '%%LOC_INGEST%%': _ps_quote(options.location_ingest),
+        '%%LOC_PENDING%%': _ps_quote(options.location_pending),
+        '%%LOC_REJECTED%%': _ps_quote(options.location_rejected),
+        '%%LOC_REVIEWED%%': _ps_quote(options.location_reviewed),
+        '%%LOC_RELEASED%%': _ps_quote(options.location_released),
+        '%%LOC_APP_DATA%%': _ps_quote(options.location_app_data),
         '%%PROXY_DEPENDENCY_CHECK%%': proxy_check,
         '%%PROXY_SETUP%%': proxy_setup,
         # _ps_quote, not raw text -- this becomes $ProxySummary = ...,

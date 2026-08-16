@@ -19,6 +19,7 @@ screen, that's worth reporting.
 - The Advanced view
 - Audits: browsing and restoring history
 - Working offline
+- Installing the web companion
 - Settings
 - Tips and troubleshooting
 
@@ -235,28 +236,78 @@ conflict instead of being guessed at: you choose whether to keep your
 offline edit, keep what's on primary, or leave it for later. Once
 you're done, it offers to point Edit back at the primary folder.
 
+## Installing the web companion
+
+*This is a one-time, occasional-admin task — most users of this app
+never need to touch it.*
+
+Settings' **Web Server** tab can set up a browser-based companion to
+this app, so people can review, edit, import, and export records from
+a web browser, signed in with either an LDAP directory account or a
+local account on whichever machine hosts it. Clicking **Install as
+Web Server...** opens a dialog to choose the target machine's
+operating system, where it installs to, which port it listens on, a
+reverse proxy in front of it (or none), and which login method(s) to
+allow.
+
+**Generate Install Script...** doesn't install anything itself — it
+writes a single script file for you to review and then run yourself,
+on whichever machine should actually host it (which doesn't have to
+be this one). Read it before running it, same as you would any script
+from anywhere — it makes real, system-level changes: installing a
+background service and, if you chose one, a reverse-proxy site.
+
+### Running the generated script
+
+**Linux:** copy the `.sh` file to the target machine and run:
+
+    sudo bash install-vra-web.sh
+
+**Windows:** copy the `.ps1` file to the target machine, then open an
+**elevated** PowerShell prompt — click **Start**, type "PowerShell",
+right-click **Windows PowerShell**, and choose **Run as
+administrator**. `cd` to wherever you saved the script, then run it
+with this exact command (not just the filename by itself):
+
+    powershell -ExecutionPolicy Bypass -File .\install-vra-web.ps1
+
+If you instead just type the script's name and see *"running scripts
+is disabled on this system"* — that's expected, and it's not about
+whether you're an administrator. Windows blocks `.ps1` script files
+from running at all by default, for anyone, admin or not; "Run as
+administrator" is a completely separate permission from whether
+PowerShell allows a script to run in the first place. The
+`-ExecutionPolicy Bypass` above skips that check for this one run
+only — it doesn't change any permanent setting on the machine, so
+you'll type the command the same way each time you run a script like
+this.
+
 ## Settings
 
-Five groups:
+Four tabs:
 
-- **Locations** — the folders the app reads from and writes to: Edit,
-  Ingest, Pending, Rejected, Reviewed, and Released. The first five
-  are moved between automatically by Import/Submit/Approve/Reject;
-  *Released* has no button of its own anywhere in the app — it's
-  wherever you archive a reviewed record off to by hand once it's
-  actually ready to publish.
-- **Application Data** ("Clutter folder") — where the app keeps its
-  own files (the shared version history behind Audits, and the
-  vocabulary-search cache) separate from the archive itself. Leave
-  blank to use the sensible default shown.
+- **Locations** — the *Clutter folder* first, then the folders the
+  app reads from and writes to: Edit, Ingest, Pending, Rejected,
+  Reviewed, and Released. The first five of those are moved between
+  automatically by Import/Submit/Approve/Reject; *Released* has no
+  button of its own anywhere in the app — it's wherever you archive a
+  reviewed record off to by hand once it's actually ready to publish.
+  *Clutter folder* is where the app keeps its own files (the shared
+  version history behind Audits, and the vocabulary-search cache)
+  separate from the archive itself — leave it blank to use the
+  sensible default shown. Pointing it at (or inside) an existing
+  archive's own folder automatically fills in whichever of the
+  folders above are still blank and found nearby, as siblings or as
+  children of it.
 - **Offline Work** — see **Working offline** above.
-- **User** — your full name, used to label your own Saves/Submits/
-  Approvals in Audits.
-- **Options** — a handful of less-common preferences, most usefully
-  **media_extensions**: which file extensions count as a record's
-  linked media file for Sync Media and for Submit/Approve/Reject
-  carrying it along. Leave blank for a broad, sensible default
-  (shown as a placeholder in the field itself).
+- **User & Options** — your full name (used to label your own Saves/
+  Submits/Approvals in Audits), plus a handful of less-common
+  preferences, most usefully **media_extensions**: which file
+  extensions count as a record's linked media file for Sync Media and
+  for Submit/Approve/Reject carrying it along. Leave blank for a
+  broad, sensible default (shown as a placeholder in the field
+  itself).
+- **Web Server** — see **Installing the web companion** above.
 
 Changes take effect the next time a folder is used — for instance,
 the next time you click Open.
