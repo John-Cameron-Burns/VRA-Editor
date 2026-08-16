@@ -7,31 +7,17 @@ from PySide6.QtCore import QObject, Signal
 from lxml import etree
 
 from vra_editor.config import load_locations, load_media_extensions
-from vra_editor.core import audit_log, media_files, media_metadata, review_notes, vra_structure
-from vra_editor.core.schema_validator import SchemaValidator
+from vra_editor.core import audit_log, media_files, media_metadata, media_sync, record_transitions, review_notes, vra_structure
+from vra_editor.core.export import dublin_core, lido
+from vra_editor.core.record_transitions import LocationUnavailableError
+from vra_editor.core.schema_validator import DEFAULT_XSD_PATH, SchemaValidator
 from vra_editor.core.xml_parser import VRA_NS, VraXmlParser
 from vra_editor.utils import user_name
 
-RESOURCES_DIR = Path(__file__).resolve().parent.parent / "resources"
-# vra_core4.xsd is explicitly the *unrestricted* variant ("all attributes are
-# uncontrolled", per its own header) -- every sample record's own
-# xsi:schemaLocation declares conformance to the *strict* schema instead,
-# which redefines vra_core4_strict.xsd's controlled-vocabulary attributes
-# (title type, relation type, ...) as real enumerations. Validating against
-# the unrestricted one let invalid attribute values silently pass.
-DEFAULT_XSD_PATH = RESOURCES_DIR / "vra_core4_strict.xsd"
-
-
-class LocationUnavailableError(Exception):
-    """Raised by save_file/_move_to_location when the destination folder
-    itself can't be written to (e.g. a network share that's offline) --
-    distinct from the existing (bool, message) contract those methods
-    use for schema-validation failures, since main_window.py's
-    _on_save/_on_submit route that message through
-    friendly_validation_error(), which is XSD-error-shaped-text-specific
-    and would otherwise mangle a plain "can't reach the folder" message
-    into a misleading generic sentence."""
-    pass
+# LocationUnavailableError re-exported from core/record_transitions.py (also
+# raised directly by save_file below) -- kept importable from here so
+# main_window.py's existing `from ...document_controller import
+# DocumentController, LocationUnavailableError` doesn't need to change.
 
 
 class DocumentController(QObject):
@@ -233,138 +219,16 @@ class DocumentController(QObject):
     # orchestrates writing the chosen results into the document or file.
     # ------------------------------------------------------------------
 
-    # AAT unit terms for the auto-populated pixel/dpi measurements, in the
-    # vocab/refid/href form used throughout this archive's own sample data.
-    _AAT_PIXELS = {
-        'vocab': 'AAT', 'refid': '300266190',
-        'href': 'http://vocab.getty.edu/page/aat/300266190',
-    }
-    _AAT_DPI = {
-        'vocab': 'AAT', 'refid': '300410385',
-        'href': 'http://vocab.getty.edu/page/aat/300410385',
-    }
-
-    # Fields kept in sync between record and file, keyed by the same name
-    # used throughout compute_media_sync/apply_media_sync's selections dict
-    # -- see _record_field_value/_file_field_value for how each side reads
-    # its current value, and _fill_record_field/_file_fields_to_write for
-    # how a chosen direction actually gets written.
-    _SYNC_FIELDS = ('title', 'description', 'rights', 'agent', 'subject', 'date', 'location')
-
-    # Fields with a real "write into the file" implementation (see
-    # _file_fields_to_write) -- location is deliberately not one of them:
-    # there's no GPS-EXIF writer, only a GPS reader (see
-    # media_metadata.read_image_info), so a record's location can only
-    # ever flow file -> record, never the other way. compute_media_sync
-    # downgrades what would otherwise be a 'fill_file' classification for
-    # location to 'empty' (nothing actionable), and MediaSyncDialog hides
-    # the "use record value" choice on a location conflict, for the same
-    # reason.
-    _FILE_WRITABLE_FIELDS = ('title', 'description', 'rights', 'agent', 'subject', 'date')
-
     def compute_media_sync(self, path) -> dict:
         """Read-only comparison between the current record and an image
         file the cataloguer just picked (there's no persisted link to
         read this from -- see the module docstring in media_metadata.py
-        and the "purist" design this replaced). Returns:
-
-          {'measurements': {'width': int, 'height': int,
-                             'resolution': Optional[int], 'file_size': int},
-           'fields': {field_name: {'record': value, 'file': value,
-                                    'status': 'fill_record'|'fill_file'|
-                                              'conflict'|'in_sync'|'empty'}}}
-
-        measurements are always "file replaces record" (dimensions/size are
-        physical facts about the file, not an editorial choice) so they're
-        reported separately, not classified like the other fields.
-
-        fields covers title/description/rights/agent/subject/date/location,
-        each classified by comparing the record's current value against
-        the file's IPTC/EXIF value -- see apply_media_sync for what each
-        status means and _record_field_value/_file_field_value for how
-        each side is actually read."""
-        path = Path(path)
-        info = media_metadata.read_image_info(path)
-        iptc_fields = media_metadata.read_iptc(path)
-
-        measurements = {
-            'width': info.width,
-            'height': info.height,
-            'resolution': int(info.dpi) if info.dpi is not None else None,
-            'file_size': info.file_size,
-        }
-
-        root = self.xml_doc.xml_root
-        fields = {}
-        for name in self._SYNC_FIELDS:
-            record_value = self._record_field_value(root, name)
-            file_value = self._file_field_value(name, info, iptc_fields)
-            status = self._classify_sync_field(record_value, file_value)
-            if status == 'fill_file' and name not in self._FILE_WRITABLE_FIELDS:
-                status = 'empty'
-            fields[name] = {'record': record_value, 'file': file_value, 'status': status}
-
-        return {'measurements': measurements, 'fields': fields}
-
-    @staticmethod
-    def _classify_sync_field(record_value, file_value) -> str:
-        if not record_value and not file_value:
-            return 'empty'
-        if record_value and not file_value:
-            return 'fill_file'
-        if file_value and not record_value:
-            return 'fill_record'
-        return 'in_sync' if record_value == file_value else 'conflict'
-
-    def _record_field_value(self, root, name: str):
-        """The record's current value for a sync field, in the same
-        shape _file_field_value returns for it (str for scalars, list[str]
-        for agent/subject, a '{lat}, {lon}' string for location) so the
-        two are directly comparable in compute_media_sync."""
-        if root is None:
-            return '' if name not in ('agent', 'subject') else []
-        if name == 'title':
-            return self._first_text(root, 'title')
-        if name == 'description':
-            return self._first_text(root, 'description')
-        if name == 'rights':
-            elem = root.find(f'.//{{{VRA_NS}}}rights/{{{VRA_NS}}}text')
-            return (elem.text or '').strip() if elem is not None else ''
-        if name == 'agent':
-            return self._all_sub_text(root, 'agent', 'name')
-        if name == 'subject':
-            return self._all_sub_text(root, 'subject', 'term')
-        if name == 'date':
-            return self._creation_date_text(root)
-        if name == 'location':
-            for location in root.iter(f'{{{VRA_NS}}}location'):
-                if location.get('type') != 'creation':
-                    continue
-                name_elem = location.find(f'{{{VRA_NS}}}name')
-                if name_elem is not None and name_elem.get('type') == 'geographic':
-                    return (name_elem.text or '').strip()
-            return ''
-        raise ValueError(name)
-
-    @staticmethod
-    def _file_field_value(name: str, info, iptc_fields: dict):
-        if name == 'title':
-            return iptc_fields.get('Iptc.Application2.ObjectName', '').strip()
-        if name == 'description':
-            return iptc_fields.get('Iptc.Application2.Caption', '').strip()
-        if name == 'rights':
-            return iptc_fields.get('Iptc.Application2.Copyright', '').strip()
-        if name == 'agent':
-            return [n.strip() for n in iptc_fields.get('Iptc.Application2.Byline', []) if n.strip()]
-        if name == 'subject':
-            return [k.strip() for k in iptc_fields.get('Iptc.Application2.Keywords', []) if k.strip()]
-        if name == 'date':
-            return info.date or ''
-        if name == 'location':
-            if info.gps_lat is None or info.gps_lon is None:
-                return ''
-            return f'{info.gps_lat:.6f}, {info.gps_lon:.6f}'
-        raise ValueError(name)
+        and the "purist" design this replaced). See
+        core/media_sync.py's compute_media_sync for the return shape
+        and field-classification details -- this is now a thin wrapper
+        around it (the same logic the web backend's media-sync compare
+        endpoint also calls, since it has no DocumentController)."""
+        return media_sync.compute_media_sync(self.xml_doc.xml_root, Path(path))
 
     def apply_media_sync(self, path, selections: dict) -> None:
         """Applies a media sync: selections is {field_name: 'record'|'file'}
@@ -402,22 +266,12 @@ class DocumentController(QObject):
 
         self._snapshot_before_structural_change()
 
-        measurements_set = self._ensure_set(record_elem, record_specs, 'measurementsSet')
-        measurements_type = self._type_name_of(record_specs, 'measurementsSet')
-        self._replace_measurement(measurements_set, measurements_type, 'width',
-                                   str(info.width), {'unit': 'px', **self._AAT_PIXELS})
-        self._replace_measurement(measurements_set, measurements_type, 'height',
-                                   str(info.height), {'unit': 'px', **self._AAT_PIXELS})
-        if info.dpi is not None:
-            self._replace_measurement(measurements_set, measurements_type, 'resolution',
-                                       str(int(info.dpi)), {'unit': 'dpi', **self._AAT_DPI})
-        self._replace_measurement(measurements_set, measurements_type, 'fileSize',
-                                   str(info.file_size), {'unit': 'bytes'})
+        media_sync.write_measurements(self.xml_doc, record_elem, record_specs, info)
 
         record_fields_to_write = {}
         for name, direction in selections.items():
             if direction == 'record':
-                self._fill_record_field(record_elem, record_specs, name, info, iptc_fields)
+                media_sync.fill_record_field(self.xml_doc, record_elem, record_specs, name, info, iptc_fields)
             elif direction == 'file':
                 record_fields_to_write[name] = True
 
@@ -429,95 +283,6 @@ class DocumentController(QObject):
         self._xml_text = self._rebuild_xml()
         self.xml_updated.emit(self._xml_text)
         self.document_loaded.emit(self.xml_doc)
-
-    def _fill_record_field(self, record_elem, record_specs, name: str, info, iptc_fields: dict):
-        """Writes one field's file-side value into the record -- the
-        'record' half of apply_media_sync's per-field selections, and
-        (for location/date) the same shape link_media_file's old
-        _populate_from_media used, now driven by an explicit selection
-        instead of an implicit gap-check."""
-        if name == 'title':
-            title = iptc_fields.get('Iptc.Application2.ObjectName', '').strip()
-            if not title:
-                return
-            title_set = self._ensure_set(record_elem, record_specs, 'titleSet')
-            title_type = self._type_name_of(record_specs, 'titleSet')
-            for existing in title_set.findall(f'{{{VRA_NS}}}title'):
-                self.xml_doc.remove_element(existing)
-            # 'main' reads naturally but isn't actually one of
-            # titleTypeType's enumerated values (see vra_core4_strict.xsd)
-            # -- 'descriptive' is the closest fit for a plain imported
-            # title with no more specific classification available.
-            self._add_set_item(title_set, title_type, 'title', title, {'type': 'descriptive'})
-        elif name == 'description':
-            description = iptc_fields.get('Iptc.Application2.Caption', '').strip()
-            if not description:
-                return
-            description_set = self._ensure_set(record_elem, record_specs, 'descriptionSet')
-            description_type = self._type_name_of(record_specs, 'descriptionSet')
-            for existing in description_set.findall(f'{{{VRA_NS}}}description'):
-                self.xml_doc.remove_element(existing)
-            self._add_set_item(description_set, description_type, 'description', description)
-        elif name == 'rights':
-            rights = iptc_fields.get('Iptc.Application2.Copyright', '').strip()
-            if not rights:
-                return
-            rights_set = self._ensure_set(record_elem, record_specs, 'rightsSet')
-            rights_type = self._type_name_of(record_specs, 'rightsSet')
-            for existing in rights_set.findall(f'{{{VRA_NS}}}rights'):
-                self.xml_doc.remove_element(existing)
-            rights_elem = self._add_set_item(rights_set, rights_type, 'rights')
-            self._add_set_item(rights_elem, 'rightsType', 'text', rights)
-        elif name == 'agent':
-            names = [n.strip() for n in iptc_fields.get('Iptc.Application2.Byline', []) if n.strip()]
-            if not names:
-                return
-            agent_set = self._ensure_set(record_elem, record_specs, 'agentSet')
-            agent_type = self._type_name_of(record_specs, 'agentSet')
-            for existing in agent_set.findall(f'{{{VRA_NS}}}agent'):
-                self.xml_doc.remove_element(existing)
-            for person_name in names:
-                agent_elem = self._add_set_item(agent_set, agent_type, 'agent')
-                self._add_set_item(agent_elem, 'agentType', 'name', person_name)
-        elif name == 'subject':
-            keywords = [k.strip() for k in iptc_fields.get('Iptc.Application2.Keywords', []) if k.strip()]
-            if not keywords:
-                return
-            subject_set = self._ensure_set(record_elem, record_specs, 'subjectSet')
-            subject_type = self._type_name_of(record_specs, 'subjectSet')
-            for existing in subject_set.findall(f'{{{VRA_NS}}}subject'):
-                self.xml_doc.remove_element(existing)
-            for keyword in keywords:
-                subject_elem = self._add_set_item(subject_set, subject_type, 'subject')
-                self._add_set_item(subject_elem, 'subjectType', 'term', keyword)
-        elif name == 'date':
-            if info.date is None:
-                return
-            date_set = self._ensure_set(record_elem, record_specs, 'dateSet')
-            date_type = self._type_name_of(record_specs, 'dateSet')
-            for existing in date_set.findall(f'{{{VRA_NS}}}date'):
-                if existing.get('type') == 'creation':
-                    self.xml_doc.remove_element(existing)
-            date_elem = self._add_set_item(date_set, date_type, 'date', attrs={'type': 'creation'})
-            self._add_set_item(date_elem, 'dateType', 'earliestDate', info.date)
-            self._add_set_item(date_elem, 'dateType', 'latestDate', info.date)
-        elif name == 'location':
-            if info.gps_lat is None or info.gps_lon is None:
-                return
-            location_set = self._ensure_set(record_elem, record_specs, 'locationSet')
-            location_type = self._type_name_of(record_specs, 'locationSet')
-            for existing in location_set.findall(f'{{{VRA_NS}}}location'):
-                if existing.get('type') == 'creation':
-                    self.xml_doc.remove_element(existing)
-            location_elem = self._add_set_item(location_set, location_type, 'location',
-                                                attrs={'type': 'creation'})
-            # Raw EXIF coordinates aren't a verified gazetteer lookup, so
-            # deliberately no vocab= here -- unlike this archive's usual
-            # vocab="GNS" convention for actual GNS-confirmed places.
-            self._add_set_item(location_elem, 'locationType', 'name',
-                                f'{info.gps_lat:.6f}, {info.gps_lon:.6f}', {'type': 'geographic'})
-        else:
-            raise ValueError(name)
 
     def _file_fields_to_write(self, selected_names: dict) -> tuple:
         """Builds the (Iptc.Application2.* dict, Exif.* dict) pair for
@@ -584,14 +349,6 @@ class DocumentController(QObject):
             return dest_path
         shutil.copy2(str(path), str(dest_path))
         return dest_path
-
-    def _replace_measurement(self, measurements_set, measurements_type, measurement_type: str,
-                              text: str, attrs: dict):
-        for existing in measurements_set.findall(f'{{{VRA_NS}}}measurements'):
-            if existing.get('type') == measurement_type:
-                self.xml_doc.remove_element(existing)
-        self._add_set_item(measurements_set, measurements_type, 'measurements',
-                            text, {'type': measurement_type, **attrs})
 
     @staticmethod
     def _type_name_of(specs, tag: str) -> Optional[str]:
@@ -783,6 +540,32 @@ class DocumentController(QObject):
         media_metadata.write_exif(path, self.build_exif_fields() if exif_fields is None else exif_fields)
 
     # ------------------------------------------------------------------
+    # Export -- crosswalks to other metadata schemas (see core/export/).
+    # ------------------------------------------------------------------
+
+    def export_dublin_core_xml(self) -> Optional[str]:
+        """The open record as Simple Dublin Core (oai_dc XML), or None
+        if there's no document loaded. See core/export/dublin_core.py
+        for the crosswalk itself."""
+        if self.xml_doc.xml_root is None:
+            return None
+        records = self.xml_doc.build_tree()
+        if not records:
+            return None
+        return dublin_core.to_oai_dc_xml(records[0].element)
+
+    def export_lido_xml(self) -> Optional[str]:
+        """The open record as LIDO v1.1 XML, or None if there's no
+        document loaded. See core/export/lido.py for the crosswalk
+        itself."""
+        if self.xml_doc.xml_root is None:
+            return None
+        records = self.xml_doc.build_tree()
+        if not records:
+            return None
+        return lido.to_lido_xml(records[0].element)
+
+    # ------------------------------------------------------------------
     # Review notes -- a reviewer's todo list for the editor, stored as an
     # XML comment rather than document content (see core/review_notes.py).
     # ------------------------------------------------------------------
@@ -925,15 +708,13 @@ class DocumentController(QObject):
         return True, f"Saved to {self._current_file}"
 
     def _move_to_location(self, location_key: str, validate: bool) -> tuple[bool, str]:
-        """Shared shape for submit/approve/reject: writes the current
-        in-memory document (any edits made along the way included) to
-        location_key's configured folder, preserving whatever subfolder
-        path the record currently has relative to its own location (see
-        _relative_record_path) -- edit/collectionA/foo.xml submits to
-        pending/collectionA/foo.xml, not a flattened pending/foo.xml --
-        then removes it from wherever it was. Returns (success,
-        message) -- the validation error or a missing-location message
-        on failure, or the new path on success.
+        """Shared shape for submit/approve/reject: thin wrapper around
+        core/record_transitions.move_to_location (the actual file-move/
+        validate/sibling-media logic, extracted there since none of it
+        touches Qt) that additionally tracks this controller's own
+        "currently open file" state and emits its signal. Returns
+        (success, message) -- the validation error or a missing-location
+        message on failure, or the new path on success.
 
         validate gates whether this transition requires a schema-valid
         document first. Submit does -- it's the actual gate keeping
@@ -950,58 +731,17 @@ class DocumentController(QObject):
         if self.xml_doc.xml_root is None or self._current_file is None:
             return False, "No document loaded."
 
-        xml_bytes = etree.tostring(
-            self.xml_doc.xml_root, pretty_print=True,
-            xml_declaration=True, encoding='UTF-8',
+        result = record_transitions.move_to_location(
+            self.xml_doc.xml_root, location_key, load_locations(),
+            Path(self._current_file), self._validator, validate, load_media_extensions(),
         )
-        if validate:
-            valid, message = self._validator.validate(xml_bytes)
-            if not valid:
-                return False, message
+        if not result.success:
+            return False, result.message
 
-        dest_dir = load_locations().get(location_key)
-        if dest_dir is None:
-            return False, f"No '{location_key}' folder configured in vra-config.ini."
-
-        src_path = Path(self._current_file).resolve()
-        dest_path = (dest_dir / self._relative_record_path(src_path)).resolve()
-        try:
-            dest_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(dest_path, 'wb') as f:
-                f.write(xml_bytes)
-
-            if src_path != dest_path and src_path.exists():
-                src_path.unlink()
-
-            # A sibling media file (same base name, e.g. foo.tif next to
-            # foo.xml) rides along on every submit/approve/reject, so the
-            # pair never gets split across folders -- see core/media_files.py.
-            media_files.move_sibling_media(src_path, dest_path, load_media_extensions())
-        except OSError as e:
-            raise LocationUnavailableError(
-                f"Couldn't move this record to '{location_key}' -- {dest_dir} isn't reachable right now ({e})."
-            ) from e
-
-        self._current_file = str(dest_path)
+        self._current_file = str(result.dest_path)
         self.file_loaded.emit(self._current_file)
         self._dirty = False
-        return True, str(dest_path)
-
-    @staticmethod
-    def _relative_record_path(src_path: Path) -> Path:
-        """src_path's path relative to whichever configured location
-        (edit/ingest/pending/rejected/reviewed/released) it currently
-        sits under, so a submit/approve/reject move can reproduce that
-        same subfolder structure at the destination instead of
-        flattening it to just the filename. Falls back to the bare
-        filename if src_path isn't under any configured location --
-        shouldn't normally happen, but better than raising over it."""
-        for root in load_locations().values():
-            try:
-                return src_path.relative_to(root.resolve())
-            except ValueError:
-                continue
-        return Path(src_path.name)
+        return True, str(result.dest_path)
 
     def submit_file(self) -> tuple[bool, str]:
         """Moves the current record from 'edit' into 'pending', for review."""

@@ -16,6 +16,7 @@ combine the two rather than ingest.py importing this directly.
 import hashlib
 import sqlite3
 from pathlib import Path
+from typing import Optional
 
 from ..app_data import get_cache_dir
 
@@ -23,12 +24,12 @@ _DB_FILENAME = "ingest_ignored.db"
 _HASH_CHUNK_SIZE = 1024 * 1024
 
 
-def _db_path() -> Path:
-    return get_cache_dir() / _DB_FILENAME
+def _db_path(config_path: Optional[Path] = None) -> Path:
+    return get_cache_dir(config_path) / _DB_FILENAME
 
 
-def _connect() -> sqlite3.Connection:
-    path = _db_path()
+def _connect(config_path: Optional[Path] = None) -> sqlite3.Connection:
+    path = _db_path(config_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(path))
     conn.execute(
@@ -46,16 +47,16 @@ def _content_hash(path) -> str:
     return digest.hexdigest()
 
 
-def is_ignored(path) -> bool:
-    with _connect() as conn:
+def is_ignored(path, config_path: Optional[Path] = None) -> bool:
+    with _connect(config_path) as conn:
         row = conn.execute(
             "SELECT 1 FROM ignored_media WHERE content_hash = ?", (_content_hash(path),),
         ).fetchone()
     return row is not None
 
 
-def mark_ignored(path) -> None:
-    with _connect() as conn:
+def mark_ignored(path, config_path: Optional[Path] = None) -> None:
+    with _connect(config_path) as conn:
         conn.execute(
             "INSERT OR REPLACE INTO ignored_media (content_hash, last_seen_name) VALUES (?, ?)",
             (_content_hash(path), Path(path).name),

@@ -33,6 +33,7 @@ the dataclass.
 import re
 import sqlite3
 from pathlib import Path
+from typing import Optional
 
 from ..app_data import get_cache_dir
 
@@ -40,12 +41,12 @@ _DB_FILENAME = "vocab_cache.db"
 _TOKEN_RE = re.compile(r"\w+", re.UNICODE)
 
 
-def _db_path() -> Path:
-    return get_cache_dir() / _DB_FILENAME
+def _db_path(config_path: Optional[Path] = None) -> Path:
+    return get_cache_dir(config_path) / _DB_FILENAME
 
 
-def _connect() -> sqlite3.Connection:
-    path = _db_path()
+def _connect(config_path: Optional[Path] = None) -> sqlite3.Connection:
+    path = _db_path(config_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(path))
     conn.execute(
@@ -73,7 +74,7 @@ def _match_expr(query: str) -> str:
     return " ".join(f'"{tok}"*' for tok in tokens)
 
 
-def search_local(vocab: str, query: str) -> list:
+def search_local(vocab: str, query: str, config_path: Optional[Path] = None) -> list:
     """Every previously-cached entry for `vocab` whose label matches
     query's tokens, best match first. These represent precedent --
     entries already in use for a similar concept -- and are meant to
@@ -81,7 +82,7 @@ def search_local(vocab: str, query: str) -> list:
     match_expr = _match_expr(query)
     if not match_expr:
         return []
-    with _connect() as conn:
+    with _connect(config_path) as conn:
         rows = conn.execute(
             "SELECT label, vocab, refid, href FROM vocab_entries "
             "WHERE vocab = ? AND vocab_entries MATCH ? ORDER BY rank",
@@ -90,20 +91,20 @@ def search_local(vocab: str, query: str) -> list:
     return [{"label": r[0], "vocab": r[1], "refid": r[2], "href": r[3]} for r in rows]
 
 
-def already_fetched(vocab: str, query: str) -> bool:
+def already_fetched(vocab: str, query: str, config_path: Optional[Path] = None) -> bool:
     """True if this exact (vocab, query) has already gone to the
     network before -- distinct from search_local finding matches,
     since a genuinely new query should still be fetched even when
     related entries already exist locally."""
     key = query.strip().lower()
-    with _connect() as conn:
+    with _connect(config_path) as conn:
         row = conn.execute(
             "SELECT 1 FROM queries_seen WHERE vocab = ? AND query = ?", (vocab, key),
         ).fetchone()
     return row is not None
 
 
-def get_exact(vocab: str, query: str) -> list:
+def get_exact(vocab: str, query: str, config_path: Optional[Path] = None) -> list:
     """Reconstructs exactly what an earlier fetch of this (vocab,
     query) returned, via query_results -- not by re-running
     search_local's fuzzy label match, which can miss entries a suggest
@@ -111,7 +112,7 @@ def get_exact(vocab: str, query: str) -> list:
     doesn't index. Labels come from vocab_entries, i.e. whichever
     fetch recorded that entry first (see merge_entries)."""
     key = query.strip().lower()
-    with _connect() as conn:
+    with _connect(config_path) as conn:
         rows = conn.execute(
             "SELECT e.label, e.vocab, e.refid, e.href FROM query_results q "
             "JOIN vocab_entries e ON e.vocab = q.vocab AND e.refid = q.refid "
@@ -121,7 +122,7 @@ def get_exact(vocab: str, query: str) -> list:
     return [{"label": r[0], "vocab": r[1], "refid": r[2], "href": r[3]} for r in rows]
 
 
-def record_fetch(vocab: str, query: str, entries: list) -> None:
+def record_fetch(vocab: str, query: str, entries: list, config_path: Optional[Path] = None) -> None:
     """Records a completed network fetch: which entries it returned
     (query_results, for faithful replay of this exact query later),
     merged into the entry index (vocab_entries -- first-recorded label
@@ -129,7 +130,7 @@ def record_fetch(vocab: str, query: str, entries: list) -> None:
     answerable without the network (queries_seen), even if entries was
     empty."""
     key = query.strip().lower()
-    with _connect() as conn:
+    with _connect(config_path) as conn:
         conn.execute(
             "INSERT OR IGNORE INTO queries_seen (vocab, query) VALUES (?, ?)", (vocab, key),
         )

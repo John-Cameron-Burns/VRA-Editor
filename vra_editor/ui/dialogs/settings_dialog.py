@@ -18,6 +18,7 @@ from ...config import (
 from ...core import offline_staging
 from ...core.media_files import DEFAULT_MEDIA_EXTENSIONS
 from ...utils import strip_quotes
+from .install_web_app_dialog import InstallWebAppDialog
 from .offline_reconcile_dialog import OfflineReconcileDialog
 
 # Not an archive workflow stage like the LOCATION_KEYS -- shown in its own
@@ -76,6 +77,7 @@ class SettingsDialog(QDialog):
         outer.addWidget(self._build_offline_group())
         outer.addWidget(self._build_user_group())
         outer.addWidget(self._build_options_group())
+        outer.addWidget(self._build_web_app_group())
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.Save | QDialogButtonBox.Cancel
@@ -298,6 +300,33 @@ class SettingsDialog(QDialog):
             form.addRow(f"{key}:", edit)
 
         return group
+
+    def _build_web_app_group(self) -> QGroupBox:
+        group = QGroupBox("Web Server")
+        layout = QVBoxLayout(group)
+
+        note = QLabel(
+            "Generates a script that deploys this app's browser-based companion "
+            "as a real background service on this machine (Nginx/Apache on "
+            "Linux, IIS on Windows) -- a one-time, rarely-needed setup step."
+        )
+        note.setWordWrap(True)
+        note.setStyleSheet("color: #666;")
+        layout.addWidget(note)
+
+        button_row = QHBoxLayout()
+        install_button = QPushButton("Install as Web Server...")
+        install_button.setToolTip("Install as web-server on this machine")
+        install_button.clicked.connect(self._on_install_web_app)
+        button_row.addWidget(install_button)
+        button_row.addStretch()
+        layout.addLayout(button_row)
+
+        return group
+
+    def _on_install_web_app(self):
+        dlg = InstallWebAppDialog(parent=self)
+        dlg.exec()  # modal -- generates a script to disk, makes no changes to this app's own state
 
     def _browse_for(self, line_edit: QLineEdit):
         start_dir = line_edit.text() or str(Path.home())

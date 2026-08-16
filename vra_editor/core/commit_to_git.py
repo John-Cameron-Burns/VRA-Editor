@@ -23,23 +23,34 @@ _GITFILE_NAME = ".git"
 _FALLBACK_ROOT = BOOTSTRAP_DIR / "fallback_git"
 
 
+def format_author_identity(name: str) -> bytes:
+    """Encodes name in the 'Name <email>' form dulwich requires. There's
+    no real email to give it, so a synthetic localhost address stands
+    in -- only the name half is meaningful here. Shared by
+    git_author_identity() (OS login name) and callers that already
+    know who's acting from somewhere other than the OS (e.g. a web
+    session authenticated against LDAP)."""
+    return f"{name} <{name}@localhost>".encode()
+
+
 def git_author_identity() -> bytes:
-    """OS login username, in the 'Name <email>' form dulwich requires.
-    There's no real email to give it, so a synthetic localhost address
-    stands in -- only the name half is meaningful here."""
-    uname = getpass.getuser()
-    return f"{uname} <{uname}@localhost>".encode()
+    """OS login username, in the 'Name <email>' form dulwich requires."""
+    return format_author_identity(getpass.getuser())
 
 
-def _archive_repo_root(file_path: Path):
+def _archive_repo_root(file_path: Path, config_path: Optional[Path] = None):
     """The working-tree root for the archive's version history:
       - the common parent of 'edit' and 'reviewed', if they share one
         (so both locations' history lives in a single repo), else
       - whichever of 'edit'/'reviewed' actually contains file_path.
-    None if neither applies."""
+    None if neither applies.
+
+    config_path overrides which vra-config.ini's [locations] this
+    reads -- see add_file_to_repo."""
+    locations_source = load_locations(config_path) if config_path else load_locations()
     locations = {
         key: Path(value).resolve()
-        for key, value in load_locations().items()
+        for key, value in locations_source.items()
         if key in ('edit', 'reviewed')
     }
     parents = {loc.parent for loc in locations.values()}
@@ -59,19 +70,22 @@ def _set_core_worktree(control_dir: Path, work_tree: Path) -> None:
     config.write_to_path(str(config_path))
 
 
-def _open_or_init_repo(work_tree: Path) -> Repo:
+def _open_or_init_repo(work_tree: Path, config_path: Optional[Path] = None) -> Repo:
     """Opens the archive's git history, kept under this app's own
     GIT_DIR (see app_data.py) rather than inside the archive itself --
     the same 'separate git dir' layout `git init --separate-git-dir`
     produces (verified readable by the real git CLI too), so the
     archive folder only ever gets a small .git *pointer file*, never
     real git metadata of its own.
+
+    config_path overrides which vra-config.ini's [locations] app_data
+    entry GIT_DIR is resolved from -- see add_file_to_repo.
     """
     gitfile = work_tree / _GITFILE_NAME
     if gitfile.is_file():
         return Repo(str(work_tree))
 
-    git_dir = get_git_dir()
+    git_dir = get_git_dir(config_path)
     legacy_git_dir = work_tree / _GITFILE_NAME  # same name, but a directory under the old layout
     git_dir.parent.mkdir(parents=True, exist_ok=True)
 
@@ -114,14 +128,20 @@ def _fallback_root(repo_path: Path) -> Path:
     return _FALLBACK_ROOT / key
 
 
-def _commit_to_fallback(repo_path: Path, file_path: Path, message: str) -> Optional[str]:
+def _commit_to_fallback(repo_path: Path, file_path: Path, message: str,
+                         author: Optional[bytes] = None) -> Optional[str]:
     """Records file_path's current content into the fallback repo,
     mirroring its path relative to repo_path -- a fully self-contained
     repo (its own working tree, not the real archive), since the real
     archive's own .git pointer can only point at one git-dir at a time
     (see _open_or_init_repo) and swapping that back and forth would
     risk leaving it pointed at the wrong one. _replay_fallback() is what
-    later turns this into real primary-repo history."""
+    later turns this into real primary-repo history.
+
+    author is threaded through (see add_file_to_repo) so a fallback
+    commit is still attributed to whoever actually made the edit, not
+    silently reassigned to the OS user running this process, once the
+    commit is later replayed into the primary repo."""
     fallback_root = _fallback_root(repo_path)
     try:
         fallback_root.mkdir(parents=True, exist_ok=True)
@@ -135,7 +155,7 @@ def _commit_to_fallback(repo_path: Path, file_path: Path, message: str) -> Optio
 
         repo = Repo(str(fallback_root))
         try:
-            _commit(repo, staged_path, message)
+            _commit(repo, staged_path, message, author=author)
         finally:
             repo.close()
         return 'fallback'
@@ -212,12 +232,28 @@ def _replay_fallback(repo_path: Path, primary_repo: Repo) -> None:
         logging.warning(f"Only replayed {replayed}/{total} fallback commit(s) for {repo_path} -- will retry later")
 
 
-def add_file_to_repo(tgt, message) -> Optional[str]:
+def add_file_to_repo(tgt, message, author: Optional[bytes] = None,
+                      config_path: Optional[Path] = None) -> Optional[str]:
     """Commits `tgt` (an absolute path to a file under the 'edit' or
     'reviewed' location) to a shared dulwich repo, so edits and
     approvals share one audit trail. The repo's actual git metadata
     lives under this app's own clutter folder (app_data.GIT_DIR), not
     inside the archive.
+
+    author overrides who the commit is attributed to (see
+    format_author_identity) -- omit it to attribute to the OS user
+    running this process (git_author_identity(), the desktop app's
+    only caller), or pass one explicitly for a caller that already
+    knows who's acting from somewhere else, e.g. a web session
+    authenticated against LDAP.
+
+    config_path overrides which vra-config.ini's [locations] this
+    resolves the repo root and GIT_DIR from -- the desktop app never
+    passes this (it only ever has the one, OS-default config.ini), but
+    a caller reading a different config.ini (the web backend, or a
+    test) needs its git history to follow that same config, not
+    silently fall back to the OS default and fail to find a repo root
+    for a file that's only under *its* configured locations.
 
     If that clutter folder is unreachable (e.g. a network share that's
     offline), the commit is recorded to an always-local fallback repo
@@ -235,17 +271,17 @@ def add_file_to_repo(tgt, message) -> Optional[str]:
     total-failure case -- None -- where nothing was recorded anywhere.
     """
     file_path = Path(tgt).resolve()
-    repo_path = _archive_repo_root(file_path)
+    repo_path = _archive_repo_root(file_path, config_path)
 
     if repo_path is None:
         logging.error(f"Could not determine a version-control repo location for {file_path}")
         return None
 
     try:
-        repo = _open_or_init_repo(repo_path)
+        repo = _open_or_init_repo(repo_path, config_path)
         try:
             _replay_fallback(repo_path, repo)
-            _commit(repo, file_path, message)
+            _commit(repo, file_path, message, author=author)
             return 'primary'
         finally:
             repo.close()
@@ -254,4 +290,4 @@ def add_file_to_repo(tgt, message) -> Optional[str]:
             f"Primary version-control repo unavailable ({e}) -- "
             f"recording {file_path} to the local fallback instead"
         )
-        return _commit_to_fallback(repo_path, file_path, message)
+        return _commit_to_fallback(repo_path, file_path, message, author=author)

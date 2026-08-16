@@ -17,6 +17,10 @@
 # libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xinerama0
 # libxcb-glx0
 #
+# Also needs frontend/dist/ built (node + npm) -- VRA_Editor.spec
+# bundles it as part of the "Install web companion" feature's payload
+# (see core/web_installer.py) and refuses to run without it.
+#
 # If VRA Editor is already running, PyInstaller's cleanup step will
 # fail with a "file in use"-style error -- close it first if that
 # happens; this script won't force-kill it for you (could discard
@@ -37,6 +41,10 @@ echo
 echo "=== Installing dependencies ==="
 .venv/bin/python -m pip install --upgrade pip -q
 .venv/bin/python -m pip install -r requirements.txt pyinstaller -q
+
+echo
+echo "=== Building the web companion frontend ==="
+(cd frontend && npm ci && npm run build)
 
 echo
 echo "=== Building with PyInstaller ==="

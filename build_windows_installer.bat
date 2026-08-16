@@ -12,6 +12,10 @@ REM If VRA Editor.exe is already running, PyInstaller's cleanup step will
 REM fail with a "file in use" error -- close it first if that happens;
 REM this script won't force-kill it for you (could discard unsaved edits
 REM in an open record).
+REM
+REM Also needs node + npm on PATH -- VRA_Editor.spec bundles
+REM frontend\dist\ as part of the "Install web companion" feature's
+REM payload (see core\web_installer.py) and refuses to run without it.
 
 setlocal
 
@@ -33,6 +37,15 @@ echo === Installing dependencies ===
 if errorlevel 1 goto :error
 ".venv\Scripts\python.exe" -m pip install -r requirements.txt pyinstaller
 if errorlevel 1 goto :error
+
+echo.
+echo === Building the web companion frontend ===
+pushd frontend
+call npm ci
+if errorlevel 1 (popd & goto :error)
+call npm run build
+if errorlevel 1 (popd & goto :error)
+popd
 
 echo.
 echo === Building with PyInstaller ===

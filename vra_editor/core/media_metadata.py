@@ -31,9 +31,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-import pyexiv2
 from PIL import Image
-from PySide6.QtGui import QImage
+
+# pyexiv2 (IPTC read/write) and PySide6 (the preview QImage) are each
+# imported lazily, inside only the one or two functions that actually
+# need them, rather than up here -- read_image_info (Pillow/EXIF only)
+# has to stay importable and callable in an environment with neither
+# installed (the web backend's media-sync compare endpoint, which has
+# no Qt at all and treats pyexiv2 as optional -- see
+# webapp/routes/media_routes.py's own feature-detection).
 
 _GPS_IFD_TAG = 0x8825
 _EXIF_IFD_TAG = 0x8769
@@ -97,10 +103,13 @@ def read_image_info(path) -> ImageInfo:
                       file_size=file_size)
 
 
-def load_preview_image(path) -> QImage:
+def load_preview_image(path):
     """Decodes via Pillow and hands Qt raw pixel bytes, rather than
     QPixmap(path)/QImage(path) -- Qt's own bundled TIFF plugin can't open
-    JPEG-compressed TIFFs, which real archival scans commonly are."""
+    JPEG-compressed TIFFs, which real archival scans commonly are.
+    Returns a QImage -- desktop-only, hence the deferred import (see
+    this module's own docstring)."""
+    from PySide6.QtGui import QImage
     with Image.open(path) as im:
         rgb = im.convert('RGB')
         data = rgb.tobytes('raw', 'RGB')
@@ -113,7 +122,9 @@ def read_iptc(path) -> dict:
     key: value} shape build_iptc_fields/write_iptc use -- scalar fields
     (ObjectName, Caption, ...) come back as str, repeatable ones
     (Byline, Keywords) as list[str]. Empty dict if the file has no IPTC
-    block at all."""
+    block at all. Raises ImportError if pyexiv2 isn't installed -- see
+    this module's own docstring on why that import is deferred to here."""
+    import pyexiv2
     img = pyexiv2.Image(str(path))
     try:
         return img.read_iptc()
@@ -125,7 +136,8 @@ def write_iptc(path, iptc_fields: dict) -> None:
     """iptc_fields is {Iptc.Application2.* key: value}, already built by
     the caller (DocumentController, which knows the VRA-to-IPTC field
     mapping) -- this function has no VRA-specific knowledge, just writes
-    whatever it's given."""
+    whatever it's given. Raises ImportError if pyexiv2 isn't installed."""
+    import pyexiv2
     img = pyexiv2.Image(str(path))
     try:
         img.modify_iptc(iptc_fields)
@@ -168,9 +180,11 @@ def build_exif_date_field(date_str: str) -> dict:
 def write_exif(path, exif_fields: dict) -> None:
     """exif_fields is {Exif.* key: value} -- see build_exif_date_field.
     A no-op if exif_fields is empty, so callers don't need to guard
-    against an unparseable date themselves."""
+    against an unparseable date themselves. Raises ImportError if
+    pyexiv2 isn't installed."""
     if not exif_fields:
         return
+    import pyexiv2
     img = pyexiv2.Image(str(path))
     try:
         img.modify_exif(exif_fields)

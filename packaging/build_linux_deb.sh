@@ -22,6 +22,10 @@
 # in packaging/debian/control, so `apt install ./file.deb` (not plain
 # dpkg -i) pulls them in automatically on a machine that lacks them.
 #
+# Also needs node + npm on PATH -- VRA_Editor.spec bundles
+# frontend/dist/ as part of the "Install web companion" feature's
+# payload (see core/web_installer.py) and refuses to run without it.
+#
 # If VRA Editor is already running, PyInstaller's cleanup of dist/ will
 # fail with a "file in use" style error -- this script doesn't try to
 # detect or kill that for you, since force-closing it could discard an
@@ -41,6 +45,10 @@ echo
 echo "=== Installing/updating dependencies ==="
 .venv/bin/python -m pip install --upgrade pip -q
 .venv/bin/python -m pip install -r requirements.txt pyinstaller -q
+
+echo
+echo "=== Building the web companion frontend ==="
+(cd frontend && npm ci && npm run build)
 
 echo
 echo "=== Building with PyInstaller ==="
