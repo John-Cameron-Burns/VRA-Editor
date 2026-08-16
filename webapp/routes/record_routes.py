@@ -251,6 +251,51 @@ def flush_edits(key, rel_path):
     return jsonify({'ok': True})
 
 
+@record_bp.post('/<key>/<path:rel_path>/xml')
+@login_required
+def record_xml(key, rel_path):
+    """Returns the record's current raw XML as text, for the 'Show
+    XML' panel -- the read-only counterpart to desktop's own Show XML
+    toggle. Flushes pending field edits first (same unvalidated write
+    flush_edits above uses), so what's shown reflects in-progress
+    changes rather than just the last Save.
+
+    Body: same {"edits": [...]} shape as flush-edits.
+    """
+    config_path = config_path_for_request()
+    resolved = resolve_record_path(key, rel_path, config_path)
+    if resolved is None or not resolved[1].exists():
+        return jsonify({'error': 'Not found'}), 404
+    _folder, record_path = resolved
+
+    username = current_username()
+    if not owns_lock(record_path, username, config_path):
+        return jsonify({'error': 'You must have this record open (and its lock) to view its XML'}), 409
+
+    data = request.get_json(silent=True) or {}
+
+    parser = VraXmlParser()
+    parser.load(str(record_path))
+    records = parser.build_tree()
+    if not records:
+        return jsonify({'error': 'Could not parse this record'}), 500
+    record_node = records[0]
+
+    error = apply_field_edits(parser, record_node, data.get('edits', []))
+    if error:
+        return jsonify({'error': error}), 400
+
+    xml_bytes = etree.tostring(parser.xml_root, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+    try:
+        record_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(record_path, 'wb') as f:
+            f.write(xml_bytes)
+    except OSError as e:
+        return jsonify({'error': f"Couldn't save -- {record_path.parent} isn't reachable right now ({e})."}), 503
+
+    return jsonify({'xml': xml_bytes.decode('utf-8')})
+
+
 @record_bp.post('/<key>/<path:rel_path>/submit')
 @login_required
 def submit_record(key, rel_path):

@@ -147,6 +147,36 @@ def test_authenticate_short_circuits_on_empty_credentials_without_configured_bac
 
 
 # ----------------------------------------------------------------------
+# _authenticate_ldap's own bind_pattern handling -- regression coverage
+# for a real production crash: a typo like "{usename}" instead of
+# "{username}" used to raise an uncaught KeyError straight out to a
+# 500 on every single login attempt, instead of just failing this one
+# backend (the same way an unreachable LDAP server already does).
+# ----------------------------------------------------------------------
+
+def test_authenticate_ldap_returns_false_on_malformed_bind_pattern(app):
+    with app.app_context():
+        result = webapp.auth._authenticate_ldap(
+            'jsmith', 'whatever',
+            {'server': 'ldap://x', 'use_ssl': False, 'bind_pattern': 'cn={usename}'},
+        )
+    assert result is False
+
+
+def test_authenticate_falls_through_to_local_when_bind_pattern_malformed(app, monkeypatch):
+    """The whole point of not raising: a broken bind_pattern must not
+    prevent local auth from getting its turn."""
+    monkeypatch.setattr(
+        webapp.auth, 'load_ldap_config',
+        lambda cp: {'server': 'x', 'use_ssl': False, 'bind_pattern': 'cn={usename}'},
+    )
+    monkeypatch.setattr(webapp.auth, 'local_auth_enabled', lambda cp: True)
+    monkeypatch.setattr(webapp.auth, '_authenticate_local', lambda u, p: True)
+    with app.app_context():
+        assert webapp.auth.authenticate('jsmith', 'whatever') == {'username': 'jsmith'}
+
+
+# ----------------------------------------------------------------------
 # _authenticate_local's platform dispatch
 # ----------------------------------------------------------------------
 

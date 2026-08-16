@@ -19,6 +19,7 @@ import base64
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
 import zipfile
 
@@ -29,6 +30,7 @@ from vra_editor.core.web_installer import (
     InstallOptions,
     NssmMissingError,
     WindowsInstallOptions,
+    _CONFIG_SANITY_CHECK_SCRIPT,
     generate_install_script,
     generate_windows_install_script,
 )
@@ -128,6 +130,84 @@ def test_ldap_omitted_from_config_merge_when_ldap_server_blank(fixture_bundle):
     ).decode('utf-8')
     assert "LDAP_SERVER=''" in script
     assert "parser.remove_section('ldap')" in script
+
+
+def test_locations_reach_the_config_merge_step(fixture_bundle):
+    script = generate_install_script(
+        _default_options(
+            location_edit='/mnt/archive/edit', location_ingest='/mnt/archive/ingest',
+            location_app_data='/mnt/archive/clutter',
+        ),
+        source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert 'LOC_EDIT=/mnt/archive/edit' in script
+    assert 'LOC_INGEST=/mnt/archive/ingest' in script
+    assert 'LOC_APP_DATA=/mnt/archive/clutter' in script
+    assert "location_values = {" in script
+    assert "'edit': loc_edit" in script
+    assert "'app_data': loc_app_data" in script
+
+
+def test_locations_blank_by_default(fixture_bundle):
+    script = generate_install_script(_default_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert "LOC_EDIT=''" in script
+    assert "LOC_APP_DATA=''" in script
+
+
+@requires_bash
+def test_locations_real_merge_preserves_existing_and_overwrites_filled(tmp_path, fixture_bundle):
+    """Runs the ACTUAL embedded config-merge Python script against a
+    real subprocess (not a static text check) to prove the "blank
+    field leaves the existing value alone, a filled one overwrites it"
+    semantics genuinely hold -- the whole point of not just always
+    writing every key, since an operator pointing this at an existing,
+    already-configured config.ini and leaving most fields blank must
+    not have that config's locations wiped out."""
+    config_path = tmp_path / 'config.ini'
+    config_path.write_text(
+        "[locations]\n"
+        "edit = /old/edit\n"
+        "ingest = /old/ingest\n"
+        "pending = /old/pending\n"
+    )
+
+    script = generate_install_script(
+        _default_options(
+            config_path=str(config_path),
+            location_edit='/new/edit',  # overwrite this one
+            # ingest/pending left blank -- must survive untouched
+            location_reviewed='/new/reviewed',  # a brand new key
+        ),
+        source_dir=fixture_bundle,
+    )
+    script_path = tmp_path / 'install.sh'
+    script_path.write_bytes(script)
+
+    # Extract just the config-merge step (between the "Configuring"
+    # echo and the matching PYEOF) and run it directly, skipping
+    # everything before it (root check, dependency check, extraction)
+    # that isn't relevant to this and would need a real root/target dir.
+    text = script.decode('utf-8')
+    start = text.index('echo "=== Configuring')
+    end = text.index('PYEOF\n', start) + len('PYEOF\n')
+    snippet = text[start:end]
+    merge_script_path = tmp_path / 'merge_check.sh'
+    merge_script_path.write_text(
+        f'#!/bin/bash\nCONFIG_PATH={config_path}\n'
+        f'SECRET_KEY=x\nLDAP_SERVER=\'\'\nLDAP_BIND_PATTERN=\'\'\nLDAP_USE_SSL=false\n'
+        f'LOCAL_AUTH_ENABLED=false\n'
+        f"LOC_EDIT='/new/edit'\nLOC_INGEST=''\nLOC_PENDING=''\nLOC_REJECTED=''\n"
+        f"LOC_REVIEWED='/new/reviewed'\nLOC_RELEASED=''\nLOC_APP_DATA=''\n"
+        + snippet
+    )
+    result = subprocess.run(['bash', str(merge_script_path)], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+
+    written = config_path.read_text()
+    assert 'edit = /new/edit' in written        # overwritten
+    assert 'ingest = /old/ingest' in written     # preserved (left blank)
+    assert 'pending = /old/pending' in written   # preserved (left blank)
+    assert 'reviewed = /new/reviewed' in written  # newly added
 
 
 def test_linux_warns_when_local_auth_enabled_and_service_user_not_root(fixture_bundle):
@@ -325,6 +405,21 @@ def test_windows_elevation_check_present(fixture_bundle, fake_nssm):
     assert 'WindowsBuiltinRole]::Administrator' in script
 
 
+def test_windows_stops_existing_service_before_extracting(fixture_bundle, fake_nssm):
+    """Regression test: re-running the installer against an existing
+    deployment used to fail with 'Access to the path ... nssm.exe is
+    denied' because Expand-Archive can't overwrite a file NSSM still
+    has open while the service is running. The script must stop/remove
+    any prior VraEditorWeb service before extraction, using sc.exe
+    (not the newly-extracted nssm.exe) since an earlier install may
+    have lived at a different directory than this run's."""
+    script = generate_windows_install_script(_default_windows_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert "Get-Service -Name 'VraEditorWeb'" in script
+    assert 'Stop-Service' in script
+    assert 'sc.exe delete VraEditorWeb' in script
+    assert script.index('VraEditorWeb service') < script.index('Extracting web app to')
+
+
 @pytest.mark.parametrize('proxy,expect_present,expect_absent', [
     ('iis', ['New-Website', 'HostHeader', 'ApplicationRequestRouting', 'RewriteModule', 'web.config',
              'action type="Rewrite" url="http://127.0.0.1:8000/{R:1}"'],
@@ -370,6 +465,26 @@ def test_windows_ldap_omitted_from_config_merge_when_ldap_server_blank(fixture_b
     ).decode('utf-8')
     assert "$LdapServer = ''" in script
     assert "parser.remove_section('ldap')" in script
+
+
+def test_windows_locations_reach_the_config_merge_step(fixture_bundle, fake_nssm):
+    script = generate_windows_install_script(
+        _default_windows_options(
+            location_edit=r'\\fileserver\archive\edit',
+            location_app_data=r'\\fileserver\archive\clutter',
+        ),
+        source_dir=fixture_bundle,
+    ).decode('utf-8')
+    assert '$LocEdit' in script
+    assert 'fileserver' in script
+    assert "location_values = {" in script
+    assert "'app_data': loc_app_data" in script
+
+
+def test_windows_locations_blank_by_default(fixture_bundle, fake_nssm):
+    script = generate_windows_install_script(_default_windows_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert "$LocEdit = ''" in script
+    assert "$LocAppData = ''" in script
 
 
 def test_windows_no_service_user_warning_anywhere(fixture_bundle, fake_nssm):
@@ -483,3 +598,97 @@ def test_generated_windows_script_is_valid_powershell(tmp_path, fixture_bundle, 
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
+
+
+# ----------------------------------------------------------------------
+# Configuration sanity check -- runs on the target machine, against the
+# config.ini the config-merge step actually wrote (not just the
+# dialog's own field values), catching exactly the two real production
+# bugs this was built for: a bind_pattern typo (e.g. "{usename}"
+# instead of "{username}") and a [locations] entry the service account
+# can't actually write to -- both previously surfaced as a 500 only
+# once someone tried to log in, rather than at install time.
+# ----------------------------------------------------------------------
+
+def test_sanity_check_embedded_in_linux_script_before_service_install(fixture_bundle):
+    script = generate_install_script(_default_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert 'Checking configuration' in script
+    assert 'bind_pattern.format(username=' in script
+    assert script.index('Checking configuration') < script.index('Installing systemd service')
+
+
+def test_sanity_check_embedded_in_windows_script_before_service_install(fixture_bundle, fake_nssm):
+    script = generate_windows_install_script(_default_windows_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert 'sanityScript' in script
+    assert 'bind_pattern.format(username=' in script
+    assert script.index('Checking configuration') < script.index('Installing Windows service')
+
+
+def _run_sanity_check(tmp_path, config_text: str) -> str:
+    """Runs the ACTUAL embedded sanity-check script (not a copy or a
+    re-implementation) as a real subprocess against a real config.ini,
+    via whatever Python is running this test suite -- the script is
+    pure stdlib, so it behaves identically regardless of platform."""
+    config_path = tmp_path / 'config.ini'
+    config_path.write_text(config_text)
+    script_path = tmp_path / 'sanity_check.py'
+    script_path.write_text(_CONFIG_SANITY_CHECK_SCRIPT)
+    result = subprocess.run(
+        [sys.executable, str(script_path), str(config_path)],
+        capture_output=True, text=True, timeout=15,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout
+
+
+def test_sanity_check_flags_malformed_bind_pattern(tmp_path):
+    out = _run_sanity_check(tmp_path, "[ldap]\nbind_pattern = cn={usename}\n")
+    assert 'bind_pattern' in out
+    assert 'usename' in out
+    assert 'KeyError' in out
+
+
+def test_sanity_check_flags_unreachable_ldap_server(tmp_path):
+    out = _run_sanity_check(
+        tmp_path,
+        "[ldap]\nserver = ldap://nonexistent.invalid.example:389\n"
+        "bind_pattern = cn={username}\n",
+    )
+    assert 'not reachable' in out
+
+
+def test_sanity_check_flags_unwritable_location(tmp_path):
+    blocked = tmp_path / 'blocked'
+    blocked.write_text('occupies the name with a file, not a directory')
+    out = _run_sanity_check(tmp_path, f"[locations]\nedit = {blocked / 'sub'}\n")
+    assert 'not writable' in out
+    assert 'edit' in out
+
+
+def test_sanity_check_creates_a_missing_but_writable_location_with_no_warning(tmp_path):
+    target = tmp_path / 'archive' / 'edit'
+    out = _run_sanity_check(tmp_path, f"[locations]\nedit = {target}\n")
+    assert 'all checked out OK' in out
+    assert target.is_dir()
+    # The write-probe file must not be left behind.
+    assert list(target.iterdir()) == []
+
+
+def test_sanity_check_clean_config_reports_no_warnings(tmp_path):
+    out = _run_sanity_check(
+        tmp_path,
+        "[ldap]\nbind_pattern = cn={username},ou=people,dc=example,dc=org\n",
+    )
+    assert 'all checked out OK' in out
+    assert 'warning' not in out.lower()
+
+
+def test_sanity_check_skips_ldap_entirely_when_not_configured(tmp_path):
+    """No [ldap] section at all (local-auth-only deployment) shouldn't
+    produce spurious warnings about it -- just the generic "all
+    checked out OK" label, which harmlessly names [ldap] alongside
+    [locations] since it always checks whichever of the two exist."""
+    target = tmp_path / 'archive' / 'edit'
+    out = _run_sanity_check(tmp_path, f"[locations]\nedit = {target}\n")
+    assert 'all checked out OK' in out
+    assert 'Configuration warnings' not in out

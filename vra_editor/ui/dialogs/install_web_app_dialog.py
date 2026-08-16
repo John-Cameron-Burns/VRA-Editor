@@ -5,7 +5,7 @@ import platform
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QFormLayout, QLineEdit, QCheckBox, QPushButton,
     QRadioButton, QButtonGroup, QLabel, QFileDialog, QMessageBox, QGroupBox,
-    QStackedWidget, QWidget,
+    QStackedWidget, QWidget, QTabWidget,
 )
 
 from ...config import DEFAULT_CONFIG_PATH
@@ -42,10 +42,14 @@ class InstallWebAppDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Install Web Companion")
         self.setModal(True)
-        self.resize(560, 560)
+        # Tabbed (Deployment/Locations/Reverse Proxy/Authentication) --
+        # only one tab's content contributes to the visible height at a
+        # time, so this stays reasonable even with Locations' 7 fields.
+        self.resize(560, 480)
 
         self.os_group: QButtonGroup | None = None
         self.deployment_stack: QStackedWidget | None = None
+        self.locations_stack: QStackedWidget | None = None
         self.proxy_stack: QStackedWidget | None = None
 
         # Linux fields
@@ -55,6 +59,13 @@ class InstallWebAppDialog(QDialog):
         self.config_path_edit: QLineEdit | None = None
         self.proxy_group: QButtonGroup | None = None
         self.server_name_edit: QLineEdit | None = None
+        self.loc_edit: QLineEdit | None = None
+        self.loc_ingest: QLineEdit | None = None
+        self.loc_pending: QLineEdit | None = None
+        self.loc_rejected: QLineEdit | None = None
+        self.loc_reviewed: QLineEdit | None = None
+        self.loc_released: QLineEdit | None = None
+        self.loc_app_data: QLineEdit | None = None
 
         # Windows fields
         self.win_install_dir_edit: QLineEdit | None = None
@@ -63,6 +74,13 @@ class InstallWebAppDialog(QDialog):
         self.win_site_name_edit: QLineEdit | None = None
         self.win_proxy_group: QButtonGroup | None = None
         self.win_server_name_edit: QLineEdit | None = None
+        self.win_loc_edit: QLineEdit | None = None
+        self.win_loc_ingest: QLineEdit | None = None
+        self.win_loc_pending: QLineEdit | None = None
+        self.win_loc_rejected: QLineEdit | None = None
+        self.win_loc_reviewed: QLineEdit | None = None
+        self.win_loc_released: QLineEdit | None = None
+        self.win_loc_app_data: QLineEdit | None = None
 
         # Shared
         self.ldap_enable_check: QCheckBox | None = None
@@ -94,17 +112,32 @@ class InstallWebAppDialog(QDialog):
 
         outer.addWidget(self._build_os_group())
 
+        # Tabbed rather than one long stack -- Locations alone adds 7
+        # more fields per OS on top of what was already here, and
+        # Settings just went through the exact same "content ran off
+        # the bottom of the screen, unreachable" problem one long
+        # column caused. Only one tab's content contributes to the
+        # visible height at a time now.
+        tabs = QTabWidget()
+
         self.deployment_stack = QStackedWidget()
         self.deployment_stack.addWidget(self._build_linux_deployment_group())
         self.deployment_stack.addWidget(self._build_windows_deployment_group())
-        outer.addWidget(self.deployment_stack)
+        tabs.addTab(self._wrap_in_tab(self.deployment_stack), "Deployment")
+
+        self.locations_stack = QStackedWidget()
+        self.locations_stack.addWidget(self._build_linux_locations_group())
+        self.locations_stack.addWidget(self._build_windows_locations_group())
+        tabs.addTab(self._wrap_in_tab(self.locations_stack), "Locations")
 
         self.proxy_stack = QStackedWidget()
         self.proxy_stack.addWidget(self._build_linux_proxy_group())
         self.proxy_stack.addWidget(self._build_windows_proxy_group())
-        outer.addWidget(self.proxy_stack)
+        tabs.addTab(self._wrap_in_tab(self.proxy_stack), "Reverse Proxy")
 
-        outer.addWidget(self._build_auth_group())
+        tabs.addTab(self._wrap_in_tab(self._build_auth_group()), "Authentication")
+
+        outer.addWidget(tabs)
 
         # Wired here, not where the individual widgets are built --
         # service_user_edit (Linux deployment group) and local_auth_check
@@ -144,8 +177,16 @@ class InstallWebAppDialog(QDialog):
 
         return group
 
+    def _wrap_in_tab(self, widget: QWidget) -> QWidget:
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.addWidget(widget)
+        layout.addStretch()
+        return tab
+
     def _on_os_changed(self, index: int):
         self.deployment_stack.setCurrentIndex(index)
+        self.locations_stack.setCurrentIndex(index)
         self.proxy_stack.setCurrentIndex(index)
         self.local_auth_check.setText(
             "Enable local Windows accounts" if index == _WINDOWS_TAB
@@ -204,6 +245,108 @@ class InstallWebAppDialog(QDialog):
             "if you want to share archive locations with a desktop install on the same machine."
         )
         form.addRow("Config file:", self.win_config_path_edit)
+
+        return group
+
+    def _build_linux_locations_group(self) -> QGroupBox:
+        group = QGroupBox("Archive Folders (optional)")
+        form = QFormLayout(group)
+
+        note = QLabel(
+            "The [locations] this deployment reads and writes -- can be the exact same "
+            "folders a desktop install already uses (point \"Config file\" above at that "
+            "install's own config.ini instead, and leave these blank), or set directly here. "
+            "A field left blank here leaves whatever's already in the config file alone; "
+            "only a field you fill in overwrites it."
+        )
+        note.setWordWrap(True)
+        note.setStyleSheet("color: #666;")
+        form.addRow(note)
+
+        self.loc_edit = QLineEdit()
+        self.loc_edit.setPlaceholderText("/mnt/archive/edit")
+        form.addRow("Edit:", self.loc_edit)
+
+        self.loc_ingest = QLineEdit()
+        self.loc_ingest.setPlaceholderText("/mnt/archive/ingest")
+        form.addRow("Ingest:", self.loc_ingest)
+
+        self.loc_pending = QLineEdit()
+        self.loc_pending.setPlaceholderText("/mnt/archive/pending")
+        form.addRow("Pending:", self.loc_pending)
+
+        self.loc_rejected = QLineEdit()
+        self.loc_rejected.setPlaceholderText("/mnt/archive/rejected")
+        form.addRow("Rejected:", self.loc_rejected)
+
+        self.loc_reviewed = QLineEdit()
+        self.loc_reviewed.setPlaceholderText("/mnt/archive/reviewed")
+        form.addRow("Reviewed:", self.loc_reviewed)
+
+        self.loc_released = QLineEdit()
+        self.loc_released.setPlaceholderText("/mnt/archive/released")
+        form.addRow("Released:", self.loc_released)
+
+        self.loc_app_data = QLineEdit()
+        self.loc_app_data.setPlaceholderText("/mnt/archive/clutter")
+        self.loc_app_data.setToolTip(
+            "The \"clutter\" folder -- the shared version history behind Audits and the "
+            "vocabulary-search cache. Point this at the same folder a desktop install uses "
+            "to unify that history across both, rather than splitting it into two."
+        )
+        form.addRow("Clutter folder:", self.loc_app_data)
+
+        return group
+
+    def _build_windows_locations_group(self) -> QGroupBox:
+        group = QGroupBox("Archive Folders (optional)")
+        form = QFormLayout(group)
+
+        note = QLabel(
+            "The [locations] this deployment reads and writes -- can be the exact same "
+            "folders a desktop install already uses (point \"Config file\" above at that "
+            "install's own config.ini instead, and leave these blank), or set directly here. "
+            "A field left blank here leaves whatever's already in the config file alone; "
+            "only a field you fill in overwrites it. The service runs as LocalSystem, which "
+            "has no mapped network drives of its own -- use a UNC path "
+            "(\\\\server\\share\\edit), never a drive letter."
+        )
+        note.setWordWrap(True)
+        note.setStyleSheet("color: #666;")
+        form.addRow(note)
+
+        self.win_loc_edit = QLineEdit()
+        self.win_loc_edit.setPlaceholderText(r"\\fileserver\archive\edit")
+        form.addRow("Edit:", self.win_loc_edit)
+
+        self.win_loc_ingest = QLineEdit()
+        self.win_loc_ingest.setPlaceholderText(r"\\fileserver\archive\ingest")
+        form.addRow("Ingest:", self.win_loc_ingest)
+
+        self.win_loc_pending = QLineEdit()
+        self.win_loc_pending.setPlaceholderText(r"\\fileserver\archive\pending")
+        form.addRow("Pending:", self.win_loc_pending)
+
+        self.win_loc_rejected = QLineEdit()
+        self.win_loc_rejected.setPlaceholderText(r"\\fileserver\archive\rejected")
+        form.addRow("Rejected:", self.win_loc_rejected)
+
+        self.win_loc_reviewed = QLineEdit()
+        self.win_loc_reviewed.setPlaceholderText(r"\\fileserver\archive\reviewed")
+        form.addRow("Reviewed:", self.win_loc_reviewed)
+
+        self.win_loc_released = QLineEdit()
+        self.win_loc_released.setPlaceholderText(r"\\fileserver\archive\released")
+        form.addRow("Released:", self.win_loc_released)
+
+        self.win_loc_app_data = QLineEdit()
+        self.win_loc_app_data.setPlaceholderText(r"\\fileserver\archive\clutter")
+        self.win_loc_app_data.setToolTip(
+            "The \"clutter\" folder -- the shared version history behind Audits and the "
+            "vocabulary-search cache. Point this at the same folder a desktop install uses "
+            "to unify that history across both, rather than splitting it into two."
+        )
+        form.addRow("Clutter folder:", self.win_loc_app_data)
 
         return group
 
@@ -423,6 +566,13 @@ class InstallWebAppDialog(QDialog):
             ldap_bind_pattern=ldap_bind_pattern,
             ldap_use_ssl=self.ldap_use_ssl_check.isChecked(),
             local_auth_enabled=local_auth_enabled,
+            location_edit=self.loc_edit.text().strip(),
+            location_ingest=self.loc_ingest.text().strip(),
+            location_pending=self.loc_pending.text().strip(),
+            location_rejected=self.loc_rejected.text().strip(),
+            location_reviewed=self.loc_reviewed.text().strip(),
+            location_released=self.loc_released.text().strip(),
+            location_app_data=self.loc_app_data.text().strip(),
         )
 
         try:
@@ -484,6 +634,13 @@ class InstallWebAppDialog(QDialog):
             ldap_bind_pattern=ldap_bind_pattern,
             ldap_use_ssl=self.ldap_use_ssl_check.isChecked(),
             local_auth_enabled=local_auth_enabled,
+            location_edit=self.win_loc_edit.text().strip(),
+            location_ingest=self.win_loc_ingest.text().strip(),
+            location_pending=self.win_loc_pending.text().strip(),
+            location_rejected=self.win_loc_rejected.text().strip(),
+            location_reviewed=self.win_loc_reviewed.text().strip(),
+            location_released=self.win_loc_released.text().strip(),
+            location_app_data=self.win_loc_app_data.text().strip(),
         )
 
         try:

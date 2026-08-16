@@ -317,8 +317,16 @@ class MainWindow(QMainWindow):
 
     VARIANTS = dict(
         initial=BASE_BUTTONS + ['Settings', 'Audits', 'Help', 'About'],
-        edit=BASE_BUTTONS + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
-                              'Submit', 'Cancel', 'Audits', 'Help', 'About'],
+        # Open/Create/Review/Import dropped here (unlike the other
+        # variants) -- edit mode's own row is already the busiest
+        # (Save/Undo/Show XML/Review Notes/Advanced View/Sync Media/
+        # Export/Submit/Cancel plus admin), and these four are exactly
+        # the "leave the current record" actions Cancel already covers
+        # -- keeping them too was pushing buttons on the right (Submit
+        # among them) off-screen on smaller windows. Home stays as the
+        # one way out.
+        edit=['Home'] + ['Save', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media', 'Export',
+                          'Submit', 'Cancel', 'Audits', 'Help', 'About'],
         review=BASE_BUTTONS + ['Approve', 'Undo', 'Show XML', 'Review Notes', 'Advanced View', 'Sync Media',
                                 'Export', 'Reject', 'Cancel', 'Audits', 'Help', 'About'],
         settings=BASE_BUTTONS + ['Autofill', 'Save', 'Cancel', 'Audits', 'Help', 'About'],
@@ -751,7 +759,14 @@ class MainWindow(QMainWindow):
     def _on_open(self):
         if not self._confirm_discard_if_dirty():
             return
-        if self._open_from_folder('edit', dialog_title="Open Record"):
+        # Browses 'edit' and 'rejected' together -- a record a
+        # reviewer sent back otherwise has no UI path back into
+        # editing (see reject_record's docstring: "for the original
+        # editor to revisit").
+        if self._open_from_folder(
+            ('edit', 'rejected'), dialog_title="Open Record",
+            status_labels={'edit': 'Editable', 'rejected': 'Rejected'},
+        ):
             self.apply_mode('edit')
 
     def _on_create(self):
@@ -792,19 +807,36 @@ class MainWindow(QMainWindow):
         if self._open_from_folder('pending', dialog_title="Select Record to Review"):
             self.apply_mode('review')
 
-    def _open_from_folder(self, location_key: str, dialog_title: str) -> bool:
+    def _open_from_folder(self, location_keys: str | tuple[str, ...], dialog_title: str,
+                           status_labels: dict[str, str] | None = None) -> bool:
         """Returns True if a file was actually loaded -- callers should
-        only switch mode in that case, not on a cancelled dialog."""
+        only switch mode in that case, not on a cancelled dialog.
+
+        location_keys is a single key (e.g. 'pending') or several
+        (e.g. ('edit', 'rejected')) to browse together as one merged
+        list with a Status column -- see VraFilePickerDialog.
+        status_labels maps each key to that column's label; a key
+        without an entry falls back to the key itself.
+        """
+        if isinstance(location_keys, str):
+            location_keys = (location_keys,)
+
         locations = load_locations()  # re-read so it reflects the latest Settings
-        folder = locations.get(location_key)
-        if folder is None:
+        missing = [key for key in location_keys if locations.get(key) is None]
+        if missing:
             QMessageBox.warning(
                 self, "Missing location",
-                f"No '{location_key}' folder is configured in vra-config.ini.",
+                f"No {' or '.join(repr(key) for key in missing)} folder configured in vra-config.ini.",
             )
             return False
 
-        dlg = VraFilePickerDialog(directory=folder, title=dialog_title, parent=self)
+        status_labels = status_labels or {}
+        if len(location_keys) == 1:
+            directory = locations[location_keys[0]]
+        else:
+            directory = {status_labels.get(key, key): locations[key] for key in location_keys}
+
+        dlg = VraFilePickerDialog(directory=directory, title=dialog_title, parent=self)
         if dlg.exec() and dlg.selected_path is not None:
             self.doc_controller.load_file(str(dlg.selected_path))
             return True
