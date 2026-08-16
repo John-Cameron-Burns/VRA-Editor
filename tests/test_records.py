@@ -326,3 +326,121 @@ def test_submit_releases_lock(app, test_archive):
     client.post('/api/records/edit/rec1.xml/submit')
 
     assert record_locks.status(record_path, config_path) is None
+
+
+# 'edit' key merges the 'rejected' location (see
+# records_common.FOLDER_SOURCES) -- a record a reviewer sent back
+# otherwise has nowhere it can be reopened from, in either app.
+
+@requires_ldap
+def test_folder_list_edit_merges_rejected_with_status(app, test_archive):
+    _config_path, locations = test_archive
+    write_sample_record(locations['edit'], 'rec1', 'Editable Record')
+    write_sample_record(locations['rejected'], 'rec2', 'Rejected Record')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    r = client.get('/api/folders/edit')
+    assert r.status_code == 200
+    records = {rec['rel_path']: rec for rec in r.get_json()['records']}
+    assert records['rec1.xml']['status'] == 'edit'
+    assert records['rec2.xml']['status'] == 'rejected'
+
+
+@requires_ldap
+def test_folder_list_pending_status_is_pending(app, test_archive):
+    _config_path, locations = test_archive
+    write_sample_record(locations['pending'], 'rec1', 'Awaiting Review')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    r = client.get('/api/folders/pending')
+    assert r.get_json()['records'][0]['status'] == 'pending'
+
+
+@requires_ldap
+def test_open_record_finds_rejected_record_via_edit_key(app, test_archive):
+    _config_path, locations = test_archive
+    write_sample_record(locations['rejected'], 'rec1', 'Back For Revision')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    r = client.get('/api/records/edit/rec1.xml')
+    assert r.status_code == 200
+    title_node = r.get_json()['record']['children'][0]['children'][0]
+    assert title_node['data']['text'] == 'Back For Revision'
+
+
+@requires_ldap
+def test_resolve_prefers_edit_over_rejected_on_name_collision(app, test_archive):
+    """Shouldn't normally happen (rel_path is unique per its own
+    location), but if it does, 'edit' wins -- it's checked first."""
+    _config_path, locations = test_archive
+    write_sample_record(locations['edit'], 'rec1', 'In Edit')
+    write_sample_record(locations['rejected'], 'rec1', 'In Rejected')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    r = client.get('/api/records/edit/rec1.xml')
+    title_node = r.get_json()['record']['children'][0]['children'][0]
+    assert title_node['data']['text'] == 'In Edit'
+
+
+@requires_ldap
+def test_resubmitting_a_rejected_record_moves_it_to_pending(app, test_archive):
+    _config_path, locations = test_archive
+    record_path = write_sample_record(locations['rejected'], 'rec1', 'Fixed Now')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    client.get('/api/records/edit/rec1.xml')
+    r = client.post('/api/records/edit/rec1.xml/submit')
+    assert r.status_code == 200
+
+    dest = Path(r.get_json()['dest_path'])
+    assert dest == (locations['pending'] / 'rec1.xml').resolve()
+    assert dest.exists()
+    assert not record_path.exists()
+
+
+# The 'Show XML' panel's backing endpoint.
+
+@requires_ldap
+def test_record_xml_returns_current_content(app, test_archive):
+    _config_path, locations = test_archive
+    write_sample_record(locations['edit'], 'rec1', 'XML Preview')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    client.get('/api/records/edit/rec1.xml')
+    r = client.post('/api/records/edit/rec1.xml/xml', json={'edits': []})
+    assert r.status_code == 200
+    assert 'XML Preview' in r.get_json()['xml']
+
+
+@requires_ldap
+def test_record_xml_reflects_pending_edits(app, test_archive):
+    _config_path, locations = test_archive
+    write_sample_record(locations['edit'], 'rec1', 'Before Edit')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    tree = client.get('/api/records/edit/rec1.xml').get_json()['record']
+    title_path = tree['children'][0]['children'][0]['path']
+
+    r = client.post('/api/records/edit/rec1.xml/xml', json={
+        'edits': [{'path': title_path, 'text': 'After Edit', 'type': 'descriptive'}],
+    })
+    assert r.status_code == 200
+    assert 'After Edit' in r.get_json()['xml']
+
+
+@requires_ldap
+def test_record_xml_requires_holding_the_lock(app, test_archive):
+    _config_path, locations = test_archive
+    write_sample_record(locations['edit'], 'rec1', 'Unopened XML')
+
+    client = app.test_client()
+    client.post('/api/auth/login', json=JSMITH)
+    r = client.post('/api/records/edit/rec1.xml/xml', json={'edits': []})
+    assert r.status_code == 409

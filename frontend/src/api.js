@@ -27,24 +27,11 @@ async function request(method, path, body) {
   return data
 }
 
-// Separate from request() above: media-sync's compare/apply endpoints
-// take a multipart file upload, not JSON -- FormData sets its own
-// Content-Type (with the multipart boundary), so it must NOT be
-// overridden with 'application/json' the way every other call is.
-async function requestMultipart(path, formData) {
-  const res = await fetch(path, { method: 'POST', credentials: 'include', body: formData })
-  const contentType = res.headers.get('content-type') || ''
-  const data = contentType.includes('application/json') ? await res.json() : null
-  if (!res.ok) {
-    throw new ApiError((data && data.error) || `Request failed (${res.status})`, res.status)
-  }
-  return data
-}
-
 export const api = {
   login: (username, password) => request('POST', '/api/auth/login', { username, password }),
   logout: () => request('POST', '/api/auth/logout'),
   whoami: () => request('GET', '/api/auth/whoami'),
+  getVersion: () => request('GET', '/api/version'),
 
   listFolder: (key) => request('GET', `/api/folders/${key}`),
 
@@ -58,6 +45,8 @@ export const api = {
     request('PUT', `/api/records/${key}/${relPath}`, { edits, commit_message: commitMessage || undefined }),
   flushEdits: (key, relPath, edits) =>
     request('POST', `/api/records/${key}/${relPath}/flush-edits`, { edits }),
+  fetchXml: (key, relPath, edits) =>
+    request('POST', `/api/records/${key}/${relPath}/xml`, { edits }),
   submit: (key, relPath, commitMessage) =>
     request('POST', `/api/records/${key}/${relPath}/submit`, { commit_message: commitMessage || undefined }),
   approve: (key, relPath, commitMessage) =>
@@ -90,18 +79,6 @@ export const api = {
   runImport: () => request('POST', '/api/import/run'),
   stashOrphan: (relPath) => request('POST', '/api/import/orphans/stash', { rel_path: relPath }),
   ignoreOrphan: (relPath) => request('POST', '/api/import/orphans/ignore', { rel_path: relPath }),
-
-  compareMedia: (key, relPath, file) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    return requestMultipart(`/api/records/${key}/${relPath}/media-sync/compare`, formData)
-  },
-  applyMedia: (key, relPath, file, selections) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('selections', JSON.stringify(selections))
-    return requestMultipart(`/api/records/${key}/${relPath}/media-sync/apply`, formData)
-  },
 }
 
 export { ApiError }

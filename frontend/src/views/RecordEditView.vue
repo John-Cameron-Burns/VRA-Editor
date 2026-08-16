@@ -1,10 +1,10 @@
 <script setup>
-import { onBeforeUnmount, onMounted, provide, reactive, ref } from 'vue'
+import { onBeforeUnmount, onMounted, provide, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { api, ApiError } from '../api'
 import TreeNode from '../components/TreeNode.vue'
 import ReviewNotesPanel from '../components/ReviewNotesPanel.vue'
-import MediaSyncModal from '../components/MediaSyncModal.vue'
+import { recordActions, clearRecordActions } from '../recordActions'
 
 const props = defineProps({
   folderKey: { type: String, required: true },
@@ -20,13 +20,18 @@ const loadError = ref('')
 const saveError = ref('')
 const structureError = ref('')
 const statusMessage = ref('')
-const saving = ref(false)
-const submitting = ref(false)
 const commitMessage = ref('')
 const lockLost = ref(false)
-const showRejectPrompt = ref(false)
 const rejectReason = ref('')
-const showMediaSync = ref(false)
+const xmlContent = ref('')
+const xmlLoading = ref(false)
+const xmlError = ref('')
+
+// Save/Submit/Approve/Reject themselves live in the persistent top bar
+// (see App.vue + recordActions.js), not inline on the page -- read/
+// write recordActions.saving/submitting/showRejectPrompt directly
+// (it's a reactive object, so this works exactly like a local ref)
+// rather than keeping a separate copy in sync.
 
 // Bumped every time a structural mutation replaces tree.value, and
 // used as part of <TreeNode>'s :key -- forces Vue to fully discard and
@@ -129,20 +134,20 @@ async function flushEdits() {
 async function onSave() {
   saveError.value = ''
   statusMessage.value = ''
-  saving.value = true
+  recordActions.saving = true
   try {
     await api.save(props.folderKey, props.relPath, Array.from(edits.values()), commitMessage.value)
     statusMessage.value = 'Saved.'
   } catch (e) {
     saveError.value = e.message || 'Save failed'
   } finally {
-    saving.value = false
+    recordActions.saving = false
   }
 }
 
 async function onSubmit() {
   saveError.value = ''
-  submitting.value = true
+  recordActions.submitting = true
   try {
     await flushEdits()
     await api.submit(props.folderKey, props.relPath, commitMessage.value)
@@ -151,13 +156,13 @@ async function onSubmit() {
   } catch (e) {
     saveError.value = e.message || 'Submit failed'
   } finally {
-    submitting.value = false
+    recordActions.submitting = false
   }
 }
 
 async function onApprove() {
   saveError.value = ''
-  submitting.value = true
+  recordActions.submitting = true
   try {
     await flushEdits()
     await api.approve(props.folderKey, props.relPath, commitMessage.value)
@@ -166,38 +171,63 @@ async function onApprove() {
   } catch (e) {
     saveError.value = e.message || 'Approve failed'
   } finally {
-    submitting.value = false
+    recordActions.submitting = false
   }
 }
 
 async function onReject() {
   saveError.value = ''
-  submitting.value = true
+  recordActions.submitting = true
   try {
     await flushEdits()
     await api.reject(props.folderKey, props.relPath, rejectReason.value, commitMessage.value)
     released = true
-    showRejectPrompt.value = false
+    recordActions.showRejectPrompt = false
     router.push({ name: 'review' })
   } catch (e) {
     saveError.value = e.message || 'Reject failed'
   } finally {
-    submitting.value = false
+    recordActions.submitting = false
   }
 }
 
-function onMediaSyncApplied(record) {
-  // Same after-the-fact resync runStructureAction does: the endpoint
-  // already wrote and committed, so just adopt its response and clear
-  // any now-stale pending edits rather than re-fetching.
-  tree.value = record
-  edits.clear()
-  treeVersion.value += 1
-  showMediaSync.value = false
+async function loadXml() {
+  xmlLoading.value = true
+  xmlError.value = ''
+  try {
+    const data = await api.fetchXml(props.folderKey, props.relPath, Array.from(edits.values()))
+    xmlContent.value = data.xml
+  } catch (e) {
+    xmlError.value = e.message || 'Could not load the XML for this record'
+  } finally {
+    xmlLoading.value = false
+  }
 }
 
+// The XML panel reflects in-progress edits (see api.fetchXml, which
+// flushes them server-side same as flushEdits does), so re-fetch each
+// time the top bar's Show XML toggle is switched on rather than
+// caching it stale from the first toggle.
+watch(
+  () => recordActions.showXml,
+  (shown) => {
+    if (shown) loadXml()
+  },
+)
+
+recordActions.folderKey = props.folderKey
+recordActions.relPath = props.relPath
+recordActions.onSave = onSave
+recordActions.onSubmit = onSubmit
+recordActions.onApprove = onApprove
+recordActions.onReject = onReject
+recordActions.active = true
+
 onMounted(load)
-onBeforeUnmount(releaseLock)
+onBeforeUnmount(() => {
+  releaseLock()
+  clearRecordActions()
+})
 onBeforeRouteLeave(async () => {
   await releaseLock()
   return true
@@ -218,63 +248,46 @@ onBeforeRouteLeave(async () => {
         This record's lock was lost -- someone else may now hold it. Saving may fail.
       </p>
 
-      <div class="export-links">
-        Export as:
-        <a :href="`/api/records/${folderKey}/${relPath}/export/dublin-core`">Dublin Core</a>
-        <a :href="`/api/records/${folderKey}/${relPath}/export/lido`">LIDO</a>
-        <button class="link-button" @click="showMediaSync = true">Sync with image file…</button>
+      <div class="record-body" :class="{ 'with-xml': recordActions.showXml }">
+        <div class="tree-pane">
+          <p v-if="structureError" class="error">{{ structureError }}</p>
+          <TreeNode :key="treeVersion" :node="tree" />
+        </div>
+
+        <div v-if="recordActions.showXml" class="xml-pane">
+          <p v-if="xmlLoading">Loading XML…</p>
+          <p v-else-if="xmlError" class="error">{{ xmlError }}</p>
+          <pre v-else class="xml-content">{{ xmlContent }}</pre>
+        </div>
       </div>
-
-      <MediaSyncModal
-        v-if="showMediaSync"
-        :folder-key="folderKey"
-        :rel-path="relPath"
-        @close="showMediaSync = false"
-        @applied="onMediaSyncApplied"
-      />
-
-      <p v-if="structureError" class="error">{{ structureError }}</p>
-      <TreeNode :key="treeVersion" :node="tree" />
 
       <ReviewNotesPanel :folder-key="folderKey" :rel-path="relPath" :notes="notes" @update:notes="notes = $event" />
 
+      <!-- Save/Submit/Approve/Reject themselves are in the persistent
+           top bar (see App.vue) -- this stays for the details that
+           belong with the page content: the commit message, status/
+           error feedback, and (once Reject is clicked up there) the
+           reason prompt. -->
       <div class="save-bar">
         <label class="commit-label">
           Commit message (optional)
           <input v-model="commitMessage" type="text" placeholder="Describe this change" />
         </label>
 
-        <div v-if="showRejectPrompt" class="reject-prompt">
+        <div v-if="recordActions.showRejectPrompt" class="reject-prompt">
           <label>
             Reason for rejecting (optional, becomes a review note)
             <input v-model="rejectReason" type="text" placeholder="What needs to change?" />
           </label>
           <div class="reject-prompt-actions">
-            <button class="secondary" @click="showRejectPrompt = false">Cancel</button>
-            <button class="reject" :disabled="submitting" @click="onReject">
-              {{ submitting ? 'Rejecting…' : 'Confirm reject' }}
+            <button class="secondary" @click="recordActions.showRejectPrompt = false">Cancel</button>
+            <button class="reject" :disabled="recordActions.submitting" @click="onReject">
+              {{ recordActions.submitting ? 'Rejecting…' : 'Confirm reject' }}
             </button>
           </div>
         </div>
 
-        <div v-else class="save-actions">
-          <span v-if="statusMessage" class="status">{{ statusMessage }}</span>
-          <button class="secondary" :disabled="saving || submitting" @click="onSave">
-            {{ saving ? 'Saving…' : 'Save' }}
-          </button>
-
-          <template v-if="folderKey === 'pending'">
-            <button class="reject" :disabled="saving || submitting" @click="showRejectPrompt = true">Reject</button>
-            <button class="primary" :disabled="saving || submitting" @click="onApprove">
-              {{ submitting ? 'Approving…' : 'Approve' }}
-            </button>
-          </template>
-          <template v-else>
-            <button class="primary" :disabled="saving || submitting" @click="onSubmit">
-              {{ submitting ? 'Submitting…' : 'Submit for review' }}
-            </button>
-          </template>
-        </div>
+        <span v-if="statusMessage" class="status">{{ statusMessage }}</span>
         <p v-if="saveError" class="error">{{ saveError }}</p>
       </div>
     </template>
@@ -287,26 +300,6 @@ onBeforeRouteLeave(async () => {
   margin-bottom: 16px;
   color: #555;
   font-size: 0.85em;
-}
-.export-links {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85em;
-  color: #555;
-  margin-bottom: 16px;
-}
-.export-links a {
-  color: #2e7d5b;
-}
-.export-links .link-button {
-  background: none;
-  border: none;
-  padding: 0;
-  color: #2e7d5b;
-  font-size: 1em;
-  cursor: pointer;
-  text-decoration: underline;
 }
 .save-bar {
   position: sticky;
@@ -329,11 +322,6 @@ onBeforeRouteLeave(async () => {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-.save-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 .status {
   color: #2e7d5b;
   font-size: 0.85em;
@@ -351,13 +339,6 @@ button.secondary {
 }
 button.secondary:hover:not(:disabled) {
   background: #ddd;
-}
-button.primary {
-  background: #2e7d5b;
-  color: white;
-}
-button.primary:hover:not(:disabled) {
-  background: #266449;
 }
 button.reject {
   background: white;
@@ -379,6 +360,35 @@ button:disabled {
   background: #fdecc8;
   padding: 8px 12px;
   border-radius: 4px;
+}
+.record-body {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+.tree-pane {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.record-body.with-xml .tree-pane,
+.record-body.with-xml .xml-pane {
+  flex: 1 1 50%;
+}
+.xml-pane {
+  min-width: 0;
+  position: sticky;
+  top: 76px;
+}
+.xml-content {
+  background: #2e2e2e;
+  color: #e0e0e0;
+  padding: 12px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.8em;
+  line-height: 1.4;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
 }
 .reject-prompt {
   display: flex;

@@ -173,7 +173,10 @@ step; adding or removing something always gets its own step. It does
 - **Reject** (while reviewing) sends it into *rejected*, for the
   original editor to revisit. Approve and Reject don't re-validate —
   a reviewer needs to be able to reject something broken without
-  having to fix it themselves first.
+  having to fix it themselves first. A rejected record shows up right
+  alongside your other editable records when you click **Open** (or,
+  in the web app, on the Edit folder page) — no separate step is
+  needed to bring it back into editing.
 - **Cancel** discards any unsaved changes (after confirming, if
   there are any) and returns to the start screen — the same as Home.
 

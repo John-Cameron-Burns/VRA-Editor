@@ -99,6 +99,19 @@ WEBAPP_BUNDLE_DATAS = (
     + [(str(vra_editor_dir / name), 'vra_editor/resources/webapp_bundle/vra_editor')
        for name in ('__init__.py', 'config.py', 'app_data.py', 'utils.py')]
     + _bundled(vra_editor_dir / 'core', 'vra_editor/resources/webapp_bundle/vra_editor/core')
+    # The XSDs vra_structure.py/schema_validator.py parse at runtime
+    # (XSD_PATH/STRICT_XSD_PATH/RESOURCES_DIR all resolve relative to
+    # vra_editor/core/*.py's own location, i.e. ../resources from
+    # there) -- without these, every schema-driven call (building the
+    # record tree, validating on Submit) 500s the instant it's used,
+    # which is everything: opening a record, editing a field, saving.
+    + [(str(vra_editor_dir / 'resources' / name), 'vra_editor/resources/webapp_bundle/vra_editor/resources')
+       for name in ('vra_core4.xsd', 'vra_core4_strict.xsd', 'xml.xsd')]
+    # core/update_check.get_app_version() (the web app's own /api/version,
+    # for its About panel) reads this the same way the desktop .app/.exe
+    # does -- without it, a real deployed web companion would report
+    # itself as "development build" even when built from a tagged release.
+    + [(str(_version_file), 'vra_editor/resources/webapp_bundle/vra_editor/resources')]
     + _bundled(frontend_dist_dir, 'vra_editor/resources/webapp_bundle/frontend/dist', pattern='*')
     + [(str(repo_root / 'requirements-web.txt'), 'vra_editor/resources/webapp_bundle')]
 )

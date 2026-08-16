@@ -19,6 +19,7 @@ import base64
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
 import zipfile
 
@@ -29,6 +30,7 @@ from vra_editor.core.web_installer import (
     InstallOptions,
     NssmMissingError,
     WindowsInstallOptions,
+    _CONFIG_SANITY_CHECK_SCRIPT,
     generate_install_script,
     generate_windows_install_script,
 )
@@ -596,3 +598,97 @@ def test_generated_windows_script_is_valid_powershell(tmp_path, fixture_bundle, 
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
+
+
+# ----------------------------------------------------------------------
+# Configuration sanity check -- runs on the target machine, against the
+# config.ini the config-merge step actually wrote (not just the
+# dialog's own field values), catching exactly the two real production
+# bugs this was built for: a bind_pattern typo (e.g. "{usename}"
+# instead of "{username}") and a [locations] entry the service account
+# can't actually write to -- both previously surfaced as a 500 only
+# once someone tried to log in, rather than at install time.
+# ----------------------------------------------------------------------
+
+def test_sanity_check_embedded_in_linux_script_before_service_install(fixture_bundle):
+    script = generate_install_script(_default_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert 'Checking configuration' in script
+    assert 'bind_pattern.format(username=' in script
+    assert script.index('Checking configuration') < script.index('Installing systemd service')
+
+
+def test_sanity_check_embedded_in_windows_script_before_service_install(fixture_bundle, fake_nssm):
+    script = generate_windows_install_script(_default_windows_options(), source_dir=fixture_bundle).decode('utf-8')
+    assert 'sanityScript' in script
+    assert 'bind_pattern.format(username=' in script
+    assert script.index('Checking configuration') < script.index('Installing Windows service')
+
+
+def _run_sanity_check(tmp_path, config_text: str) -> str:
+    """Runs the ACTUAL embedded sanity-check script (not a copy or a
+    re-implementation) as a real subprocess against a real config.ini,
+    via whatever Python is running this test suite -- the script is
+    pure stdlib, so it behaves identically regardless of platform."""
+    config_path = tmp_path / 'config.ini'
+    config_path.write_text(config_text)
+    script_path = tmp_path / 'sanity_check.py'
+    script_path.write_text(_CONFIG_SANITY_CHECK_SCRIPT)
+    result = subprocess.run(
+        [sys.executable, str(script_path), str(config_path)],
+        capture_output=True, text=True, timeout=15,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout
+
+
+def test_sanity_check_flags_malformed_bind_pattern(tmp_path):
+    out = _run_sanity_check(tmp_path, "[ldap]\nbind_pattern = cn={usename}\n")
+    assert 'bind_pattern' in out
+    assert 'usename' in out
+    assert 'KeyError' in out
+
+
+def test_sanity_check_flags_unreachable_ldap_server(tmp_path):
+    out = _run_sanity_check(
+        tmp_path,
+        "[ldap]\nserver = ldap://nonexistent.invalid.example:389\n"
+        "bind_pattern = cn={username}\n",
+    )
+    assert 'not reachable' in out
+
+
+def test_sanity_check_flags_unwritable_location(tmp_path):
+    blocked = tmp_path / 'blocked'
+    blocked.write_text('occupies the name with a file, not a directory')
+    out = _run_sanity_check(tmp_path, f"[locations]\nedit = {blocked / 'sub'}\n")
+    assert 'not writable' in out
+    assert 'edit' in out
+
+
+def test_sanity_check_creates_a_missing_but_writable_location_with_no_warning(tmp_path):
+    target = tmp_path / 'archive' / 'edit'
+    out = _run_sanity_check(tmp_path, f"[locations]\nedit = {target}\n")
+    assert 'all checked out OK' in out
+    assert target.is_dir()
+    # The write-probe file must not be left behind.
+    assert list(target.iterdir()) == []
+
+
+def test_sanity_check_clean_config_reports_no_warnings(tmp_path):
+    out = _run_sanity_check(
+        tmp_path,
+        "[ldap]\nbind_pattern = cn={username},ou=people,dc=example,dc=org\n",
+    )
+    assert 'all checked out OK' in out
+    assert 'warning' not in out.lower()
+
+
+def test_sanity_check_skips_ldap_entirely_when_not_configured(tmp_path):
+    """No [ldap] section at all (local-auth-only deployment) shouldn't
+    produce spurious warnings about it -- just the generic "all
+    checked out OK" label, which harmlessly names [ldap] alongside
+    [locations] since it always checks whichever of the two exist."""
+    target = tmp_path / 'archive' / 'edit'
+    out = _run_sanity_check(tmp_path, f"[locations]\nedit = {target}\n")
+    assert 'all checked out OK' in out
+    assert 'Configuration warnings' not in out

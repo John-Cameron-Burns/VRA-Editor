@@ -36,6 +36,97 @@ from typing import Optional, Sequence
 
 _ARCHIVE_MARKER = '__WEBAPP_BUNDLE_BELOW__'
 
+# Shared verbatim by both generate_install_script and
+# generate_windows_install_script -- pure stdlib (configparser/socket/
+# pathlib/urllib), so it runs identically under either platform's
+# python with no changes. Deliberately reads the CONFIG FILE ON DISK
+# after the config-merge step, not the dialog's own field values --
+# that's the only way to also catch problems in whatever this install
+# preserved from an existing config.ini (see the config-merge step's
+# own "blank field leaves the existing value alone" behavior), not
+# just what this particular run's operator typed in.
+#
+# Everything here is a warning, never a hard failure: the service
+# still gets installed and started either way, since e.g. an
+# unreachable LDAP server might be a temporary/firewall-not-open-yet
+# state, and local auth (if enabled) might be the operator's real,
+# intended path regardless of whatever LDAP's own state is.
+#
+# Known limitation, not solved here: the [locations] writability probe
+# is a plain blocking filesystem call with no timeout of its own --
+# for a UNC path on a genuinely offline server, SMB's own client-side
+# timeout (often 20-30+ seconds) applies per entry, so a handful of
+# locations all pointing at the same down server can make this step
+# feel stalled for a while rather than failing fast.
+_CONFIG_SANITY_CHECK_SCRIPT = """import configparser
+import socket
+import sys
+from pathlib import Path
+from urllib.parse import urlparse
+
+config_path = Path(sys.argv[1])
+parser = configparser.ConfigParser()
+if config_path.exists():
+    parser.read(config_path)
+
+warnings = []
+
+if parser.has_section('ldap'):
+    bind_pattern = parser['ldap'].get('bind_pattern', '')
+    try:
+        bind_pattern.format(username='test')
+    except (KeyError, IndexError) as e:
+        warnings.append(
+            "[ldap] bind_pattern %r does not substitute correctly (%s: %s) -- every LDAP "
+            "login will fail. Expected a {username} placeholder, e.g. "
+            "'cn={username},ou=people,dc=example,dc=org'."
+            % (bind_pattern, type(e).__name__, e)
+        )
+
+    server = parser['ldap'].get('server', '').strip()
+    if server:
+        parsed = urlparse(server)
+        host = parsed.hostname
+        port = parsed.port or (636 if parsed.scheme == 'ldaps' else 389)
+        if host:
+            try:
+                with socket.create_connection((host, port), timeout=5):
+                    pass
+            except OSError as e:
+                warnings.append(
+                    "[ldap] server %r is not reachable right now (%s) -- LDAP logins will "
+                    "fail until this is fixed." % (server, e)
+                )
+        else:
+            warnings.append("[ldap] server %r doesn't look like a valid LDAP URL." % server)
+
+if parser.has_section('locations'):
+    for key, value in parser['locations'].items():
+        value = value.strip()
+        if not value:
+            continue
+        path = Path(value)
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+            probe = path / '.vra-editor-write-test'
+            probe.write_text('x')
+            probe.unlink()
+        except OSError as e:
+            warnings.append(
+                "[locations] %s = %r is not writable by this service account (%s)."
+                % (key, value, e)
+            )
+
+if warnings:
+    print("")
+    print("=== Configuration warnings (service installed and started anyway) ===")
+    for w in warnings:
+        print("  - " + w)
+    print("Fix these, then restart the service once resolved.")
+else:
+    print("Configuration check: [ldap]/[locations] entries all checked out OK.")
+"""
+
 
 def bundle_dir() -> Path:
     """Where the packaged webapp bundle lives -- same resolution
@@ -396,6 +487,11 @@ with open(config_path, 'w') as f:
 print(f"Wrote {{config_path}}")
 PYEOF
 
+echo "=== Checking configuration ==="
+python3 - "$CONFIG_PATH" <<'SANITYEOF'
+{_CONFIG_SANITY_CHECK_SCRIPT}
+SANITYEOF
+
 echo "=== Installing systemd service ==="
 cat > /etc/systemd/system/vra-editor-web.service <<UNITEOF
 [Unit]
@@ -599,6 +695,15 @@ function Install-VraEditorWeb {
         $LocEdit $LocIngest $LocPending $LocRejected $LocReviewed $LocReleased $LocAppData
     Remove-Item $mergeScriptPath
 
+    Write-Host "=== Checking configuration ==="
+    $sanityScript = @'
+%%SANITY_CHECK_SCRIPT%%
+'@
+    $sanityScriptPath = [System.IO.Path]::GetTempFileName() + '.py'
+    [System.IO.File]::WriteAllText($sanityScriptPath, $sanityScript, (New-Object System.Text.UTF8Encoding $false))
+    & "$InstallDir\venv\Scripts\python.exe" $sanityScriptPath $ConfigPath
+    Remove-Item $sanityScriptPath
+
     # Local-account login (if enabled) uses win32security.LogonUser, which
     # LocalSystem can call for any local account without extra privilege
     # grants -- unlike PAM on Linux, no service-account warning is needed here.
@@ -764,6 +869,7 @@ def generate_windows_install_script(options: WindowsInstallOptions, source_dir: 
         # test_no_unescaped_nested_double_quotes_in_write_host_lines).
         '%%PROXY_SUMMARY%%': _ps_quote(proxy_summary),
         '%%MERGE_SCRIPT%%': _WINDOWS_CONFIG_MERGE_SCRIPT,
+        '%%SANITY_CHECK_SCRIPT%%': _CONFIG_SANITY_CHECK_SCRIPT,
         '%%BUNDLE_BASE64%%': encoded_bundle,
     }
 

@@ -15,6 +15,15 @@ const emptyMessage = computed(() =>
   props.folderKey === 'pending' ? 'No records awaiting review.' : 'No records in the edit folder.',
 )
 
+// Edit folder merges 'edit' and 'rejected' records into one list (see
+// webapp/records_common.py's FOLDER_SOURCES) -- each record's status
+// says which one it's actually sitting in, since a rejected record is
+// opened/saved/resubmitted exactly the same way as an editable one.
+const STATUS_LABELS = { edit: 'Editable', rejected: 'Rejected', pending: 'Pending' }
+function statusLabel(status) {
+  return STATUS_LABELS[status] || status
+}
+
 async function load() {
   loading.value = true
   error.value = ''
@@ -62,6 +71,7 @@ watch(() => props.folderKey, load)
           </td>
           <td class="rel-path">{{ rec.rel_path }}</td>
           <td>
+            <span class="status-badge" :class="rec.status">{{ statusLabel(rec.status) }}</span>
             <span v-if="rec.locked_by" class="lock-badge">Locked by {{ rec.locked_by }}</span>
           </td>
         </tr>
@@ -119,6 +129,24 @@ h1 {
   font-size: 0.8em;
   padding: 2px 8px;
   border-radius: 10px;
+  margin-left: 6px;
+}
+.status-badge {
+  font-size: 0.8em;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.status-badge.edit {
+  background: #e3f2e9;
+  color: #2e7d5b;
+}
+.status-badge.rejected {
+  background: #fbeae9;
+  color: #b3261e;
+}
+.status-badge.pending {
+  background: #eee;
+  color: #555;
 }
 .error {
   color: #b3261e;

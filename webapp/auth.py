@@ -48,7 +48,20 @@ def _authenticate_ldap(username: str, password: str, cfg: dict) -> bool:
     """A plain LDAP simple bind -- covers both a generic test-server DN
     pattern and Active Directory's UPN/NetBIOS forms purely through
     cfg['bind_pattern'], with no dev/prod code branch."""
-    bind_dn = cfg['bind_pattern'].format(username=username)
+    try:
+        bind_dn = cfg['bind_pattern'].format(username=username)
+    except (KeyError, IndexError) as e:
+        # A malformed bind_pattern (e.g. "{usename}" instead of
+        # "{username}") is a configuration bug, not a wrong password --
+        # every login attempt would hit this identically, so it's
+        # worth a clear server-side log line, but it still shouldn't
+        # 500 the request: fail this backend the same way an
+        # unreachable LDAP server already does, so local auth (if
+        # enabled) still gets a chance.
+        current_app.logger.error(
+            "Invalid [ldap] bind_pattern %r in config -- %s: %s", cfg['bind_pattern'], type(e).__name__, e,
+        )
+        return False
     server = ldap3.Server(cfg['server'], use_ssl=cfg['use_ssl'], get_info=ldap3.NONE)
     conn = ldap3.Connection(server, user=bind_dn, password=password)
     try:

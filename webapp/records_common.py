@@ -12,29 +12,54 @@ from vra_editor.config import load_locations
 from vra_editor.core import commit_to_git, record_locks
 from .tree_json import resolve_path
 
-# 'edit' (cataloguing) and 'pending' (review queue) are the only
-# locations exposed through the web app -- reviewed/rejected/released
-# are reachable only via the transitions *into* them (Approve/Reject/
-# Submit), never browsed/opened directly, matching how the desktop's
-# own Review button only ever opens from 'pending'.
-ALLOWED_FOLDERS = ('edit', 'pending')
+# 'edit' (cataloguing) and 'pending' (review queue) are the two
+# routing keys the web app exposes. FOLDER_SOURCES maps each to the
+# physical location(s) actually searched -- 'edit' also searches
+# 'rejected', so a record a reviewer sent back has somewhere to be
+# reopened from (it otherwise sits there with no UI path back into
+# editing, in either app -- see FolderView.vue's merged listing,
+# which surfaces 'rejected' records through this same 'edit' key).
+# reviewed/released stay unreachable, matching how they're never
+# opened directly in the desktop app either.
+FOLDER_SOURCES = {
+    'edit': ('edit', 'rejected'),
+    'pending': ('pending',),
+}
+ALLOWED_FOLDERS = tuple(FOLDER_SOURCES)
 
 
 def resolve_record_path(key: str, rel_path: str, config_path) -> Optional[tuple]:
     """(folder, record_path) for key/rel_path, or None if key isn't an
     allowed/configured location, or rel_path would resolve outside of
-    it (e.g. via '../..' path traversal)."""
-    if key not in ALLOWED_FOLDERS:
+    it (e.g. via '../..' path traversal).
+
+    For key='edit', checks each of FOLDER_SOURCES['edit'] in turn and
+    returns whichever one rel_path actually exists under -- a rejected
+    record lives physically in 'rejected' until it's resubmitted, but
+    is still opened/saved/submitted through the same 'edit' key path
+    resolution everywhere else in this app already uses. Falls back to
+    the first candidate (edit itself) when rel_path doesn't exist in
+    any of them yet -- e.g. creating a brand new record, or restoring
+    a revision -- matching this function's previous existence-agnostic
+    behavior for those callers.
+    """
+    if key not in FOLDER_SOURCES:
         return None
     locations = load_locations(config_path)
-    folder = locations.get(key)
-    if folder is None:
-        return None
-    folder = folder.resolve()
-    record_path = (folder / rel_path).resolve()
-    if not record_path.is_relative_to(folder):
-        return None
-    return folder, record_path
+    fallback = None
+    for source_key in FOLDER_SOURCES[key]:
+        folder = locations.get(source_key)
+        if folder is None:
+            continue
+        folder = folder.resolve()
+        record_path = (folder / rel_path).resolve()
+        if not record_path.is_relative_to(folder):
+            return None
+        if fallback is None:
+            fallback = (folder, record_path)
+        if record_path.exists():
+            return folder, record_path
+    return fallback
 
 
 def owns_lock(record_path: Path, username: str, config_path) -> bool:

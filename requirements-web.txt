@@ -34,15 +34,3 @@ dulwich --config-settings "--build-option=--pure"
 # dependency chain on that machine; confirmed as a real gap by a
 # ModuleNotFoundError on a clean venv on a real deployment target.
 certifi
-
-# Media Sync's compare endpoint needs core/media_metadata.read_image_info
-# (dimensions/DPI/EXIF date/GPS), which is Pillow-only -- required here,
-# unlike pyexiv2 below.
-Pillow>=10.0.0
-
-# Optional: only the 5 IPTC-backed compare fields (title/description/
-# rights/agent/subject) need pyexiv2 -- measurements/date/location work
-# without it. webapp/routes/media_routes.py feature-detects its absence
-# and reports those 5 fields as 'unavailable' rather than failing the
-# whole endpoint. Uncomment to enable them on this deployment:
-# pyexiv2>=2.15.0
