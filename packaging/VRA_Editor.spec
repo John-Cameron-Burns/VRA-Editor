@@ -103,6 +103,22 @@ WEBAPP_BUNDLE_DATAS = (
     + [(str(repo_root / 'requirements-web.txt'), 'vra_editor/resources/webapp_bundle')]
 )
 
+# NSSM (nssm.cc) -- Windows-only, vendored so "Install web companion"
+# (core/web_installer.py's generate_windows_install_script) can wrap
+# the web app as a real Windows service with zero extra downloads at
+# install time. Deliberately NOT part of WEBAPP_BUNDLE_DATAS above --
+# that tree mirrors the actual web app source 1:1 for both platforms,
+# and Linux's own bundle has no use for a Windows binary;
+# core/web_installer.py's nssm_path() looks for this file at this same
+# destination, its own resource dir, mirroring how the pyexiv2/
+# libexiv2 handling below is present only when actually needed for the
+# platform being built, absent (not a hard error) otherwise.
+nssm_source = repo_root / 'packaging' / 'windows' / 'nssm.exe'
+NSSM_DATAS = [(str(nssm_source), 'vra_editor/resources')] if sys.platform == 'win32' and nssm_source.is_file() else []
+if sys.platform == 'win32' and not nssm_source.is_file():
+    print("WARNING: packaging/windows/nssm.exe not found -- \"Install web companion\" won't be "
+          "able to generate a Windows install script from this build.", file=sys.stderr)
+
 # pyexiv2's compiled extension (exiv2api.so/.pyd) links against its
 # sibling libexiv2 library with no rpath/DT_NEEDED search path pointing
 # at it -- it only resolves at import time because that library happens
@@ -146,6 +162,7 @@ a = Analysis(
         + [(str(images_dir / name), 'vra_editor/images') for name in IMAGE_FILES]
         + [(str(_version_file), 'vra_editor/resources')]
         + WEBAPP_BUNDLE_DATAS
+        + NSSM_DATAS
     ),
     hiddenimports=[],
     hookspath=[],
