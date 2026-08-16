@@ -106,17 +106,20 @@ and Audits — works the same folder-based way in both.
 
 ## What's new
 
+- **v1.2.1** — The web app can now sign in with a local OS account as
+  well as (or instead of) LDAP. A record a reviewer rejects can be
+  reopened for editing again, in both apps — previously nothing in
+  either app could browse back into the Rejected folder. The web app's
+  Save/Submit/Approve/Reject/Export controls moved into a persistent
+  top bar, gained a **Show XML** view and an About panel, and dropped
+  Media Sync entirely (desktop-only now — see **Web app vs. desktop
+  app** above for what else is deliberately different between the two).
 - **v1.2.0** — A new **web companion app**: review, edit, import, and
-  export records from a browser with the same folder-based workflow, so
-  work can continue without the desktop app installed. Set it up with one
-  click from Settings — **Install as Web Server** generates a ready-to-run
-  script that installs it as a real background service (Nginx/Apache on
-  Linux, IIS on Windows), signed in with an LDAP directory account, a
-  local OS account, or both. Since launch: a record a reviewer rejects can
-  now be reopened for editing again, in both apps; the web app moved its
-  Save/Submit/Approve/Reject/Export controls into a persistent top bar and
-  gained a **Show XML** view. See **Web app vs. desktop app** above for
-  what's deliberately different between the two.
+  export records from a browser with the same folder-based workflow and
+  LDAP sign-in, so work can continue without the desktop app installed.
+  Set it up with one click from Settings — **Install as Web Server**
+  generates a ready-to-run script that installs it as a real background
+  service (Nginx/Apache on Linux, IIS on Windows).
 - **v1.1.0** — A dedicated app icon, replacing the placeholder company
   logo. Sync Media now asks whether to use the file with a matching
   name or browse for a different one, instead of silently guessing;
